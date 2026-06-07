@@ -136,7 +136,12 @@ A uniform preprocessing pipeline was applied to every abstract:
 4. Removal of tokens with length ≤ 2 characters.
 5. **No** stemming or lemmatization — to preserve biomedical term integrity (e.g., *Alzheimer's* vs. *Alzheimer*).
 
-After preprocessing, the corpus contained a mean of approximately 147 tokens per abstract (σ ≈ 49), with a minimum of 12 and a maximum of 412 tokens. The processed corpus was serialized as `step2_cleaned_corpus.csv` for full reproducibility. The word-count distributions of the raw and cleaned corpora are shown in `BioBERT Results/step1_raw_length_distribution.png` and `step2_preprocessing_stats.png` (Appendix A, available as supplementary material).
+After preprocessing, the corpus contained a mean of approximately 147 tokens per abstract (σ ≈ 49), with a minimum of 12 and a maximum of 412 tokens. The processed corpus was serialized as `step2_cleaned_corpus.csv` for full reproducibility. The word-count distributions of the raw and cleaned corpora are shown below:
+
+![Raw length distribution](BioBERT Results/step1_raw_length_distribution.png)
+![Preprocessing stats](BioBERT Results/step2_preprocessing_stats.png)
+
+(Appendix A, available as supplementary material for higher resolution.)
 
 The full dataset, retrieval script, and preprocessing code are released with the manuscript and are available at [GitHub repository URL]. PubMed metadata were retrieved under the NCBI data-access policy; only publicly indexed abstracts were used, with no patient-identifiable information.
 
@@ -146,7 +151,51 @@ The full dataset, retrieval script, and preprocessing code are released with the
 
 The proposed pipeline comprises five stages: (1) text representation, (2) dimensionality reduction, (3) clustering, (4) topic-keyword extraction, and (5) automated disease mapping. The complete pipeline is illustrated in Fig. 1.
 
-> **Fig. 1.** *Complete pipeline architecture: from the PubMed corpus through dual representation (TF-IDF / BioBERT), UMAP reduction, three clustering algorithms, automated keyword extraction, and a three-metric evaluation framework. All six pipeline configurations (2 representations × 3 algorithms) are evaluated under identical conditions to enable controlled comparison. Place at the beginning of Section IV.*
+**Fig. 1.** *Complete pipeline architecture: from the PubMed corpus through dual representation (TF-IDF / BioBERT), UMAP reduction, three clustering algorithms (K-Means, HDBSCAN, HAC), automated keyword extraction, and a three-metric evaluation framework. All six pipeline configurations (2 representations × 3 algorithms) are evaluated under identical conditions to enable controlled comparison.*
+
+```
+┌──────────────┐    ┌────────────────────┐
+│  PubMed      │───▶│ Preprocessing      │
+│  14,064      │    │ • lowercase         │
+│  abstracts   │    │ • stopword removal  │
+└──────────────┘    │ • punctuation strip │
+                    └─────────┬──────────┘
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+    ┌──────────────────┐             ┌──────────────────┐
+    │  TF-IDF          │             │  BioBERT         │
+    │  (sparse, |𝒱|=   │             │  (dense, 768-d)  │
+    │   ~16k terms)    │             │  mean-pooling    │
+    └────────┬─────────┘             └────────┬─────────┘
+             │                                │
+             ▼                                ▼
+    ┌──────────────────────────────────────────────────┐
+    │  UMAP 2-D Projection  (cosine, n=15, min=0.1)   │
+    └────────────────────────┬─────────────────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        ▼                    ▼                    ▼
+   ┌─────────┐         ┌───────────┐         ┌─────────┐
+   │ K-Means │         │  HDBSCAN  │         │   HAC   │
+   │  (K=5)  │         │ (mc=30)   │         │ (Ward,  │
+   │         │         │           │         │   K=5)  │
+   └────┬────┘         └─────┬─────┘         └────┬────┘
+        │                    │                    │
+        └────────────────────┼────────────────────┘
+                             ▼
+                  ┌──────────────────────┐
+                  │  Per-cluster TF-IDF  │
+                  │  Top-10 keywords     │
+                  └──────────┬───────────┘
+                             ▼
+                  ┌──────────────────────┐
+                  │  Evaluation:         │
+                  │  • Silhouette        │
+                  │  • Davies–Bouldin    │
+                  │  • NPMI Coherence    │
+                  └──────────────────────┘
+```
 
 ### A. Text Representation
 
@@ -176,7 +225,13 @@ $$\mathbf{e}_d = \frac{1}{|\mathcal{T}_d|} \sum_{i \in \mathcal{T}_d} \mathbf{h}
 
 where 𝒯_d is the set of non-padding token indices for document *d*, **h**_i^(L) ∈ ℝ^768 is the hidden state of token *i* at the final transformer layer *L*, and **e**_d ∈ ℝ^768 is the document embedding. Mean pooling was preferred over `[CLS]`-token extraction because it captures the aggregate contextual semantics of the full abstract rather than relying on a single summary token, an advantage for variable-length biomedical text. The resulting matrix has shape (14,064, 768) and is L2-normalized prior to dimensionality reduction.
 
-> **Fig. 2.** *Unsupervised 2D UMAP projections of (a) BioBERT embeddings and (b) TF-IDF embeddings, prior to clustering. BioBERT's projection exhibits visibly denser, more sharply defined clusters, consistent with its semantic encoding of biomedical terminology. Source: `BioBERT Results/step5_umap2d_unlabeled.png` and `TF-IDF Results/step5_umap2d_unlabeled.png`. Place at the end of Section IV-A.*
+> **Fig. 2.** *Unsupervised 2D UMAP projections of (a) BioBERT embeddings and (b) TF-IDF embeddings, prior to clustering. BioBERT's projection exhibits visibly denser, more sharply defined clusters, consistent with its semantic encoding of biomedical terminology.*
+>
+> (a) BioBERT UMAP 2D Projection
+> ![BioBERT UMAP](BioBERT Results/step5_umap2d_unlabeled.png)
+>
+> (b) TF-IDF UMAP 2D Projection
+> ![TF-IDF UMAP](TF-IDF Results/step5_umap2d_unlabeled.png)
 
 ### B. Dimensionality Reduction via UMAP
 
@@ -208,7 +263,7 @@ K-Means minimizes the within-cluster sum of squared distances:
 
 $$\underset{S}{\arg\min} \sum_{k=1}^{K} \sum_{\mathbf{x} \in S_k} \|\mathbf{x} - \boldsymbol{\mu}_k\|^2$$
 
-where *S* = {*S*₁, *S*₂, …, *S_K*} is the partition, **μ**_k is the centroid of cluster *S_k*, and *K* is the number of clusters. The optimal *K* = 5 is determined automatically by the elbow method over *K* ∈ {2, 3, …, 15}, identified as the point of maximum curvature in the inertia curve (`BioBERT Results/step6a_automated_elbow_method.png`).
+where *S* = {*S*₁, *S*₂, …, *S_K*} is the partition, **μ**_k is the centroid of cluster *S_k*, and *K* is the number of clusters. The optimal *K* = 5 is determined automatically by the elbow method over *K* ∈ {2, 3, …, 15}, identified as the point of maximum curvature in the inertia curve (Fig. A8, Appendix A).
 
 #### 2) Hierarchical Agglomerative Clustering (HAC, Ward Linkage)
 
@@ -241,7 +296,13 @@ HDBSCAN extracts a flat clustering from the condensed cluster tree by selecting 
 
 HDBSCAN identified **80 micro-clusters** in the BioBERT pipeline and **116 micro-clusters** in the TF-IDF pipeline, automatically adapting its resolution to the local density structure of each embedding space. The substantial difference in cluster count (80 vs. 116) reflects the different geometry of the two embedding spaces: TF-IDF's sparse, high-dimensional representation preserves term co-occurrence directly, producing more numerous but smaller, sharper clusters, while BioBERT's dense semantic space tends to merge related but terminologically distinct documents into broader clusters.
 
-> **Fig. 3.** *Labeled UMAP projections for (a) BioBERT and (b) TF-IDF pipelines, with K-Means, HDBSCAN, and HAC cluster assignments color-coded. This composite figure provides the most visually comprehensive comparison of the three clustering strategies on each representation. HDBSCAN's output (center panel) reveals fine-grained, irregularly shaped micro-clusters that the other two algorithms are structurally incapable of resolving. Source: `BioBERT Results/step6b_cluster_umap_all.png` and `TF-IDF Results/step6b_cluster_umap_all.png`. Place at the beginning of Section VI.*
+> **Fig. 3.** *Labeled UMAP projections for (a) BioBERT and (b) TF-IDF pipelines, with K-Means, HDBSCAN, and HAC cluster assignments color-coded. This composite figure provides the most visually comprehensive comparison of the three clustering strategies on each representation. HDBSCAN's output (center panel) reveals fine-grained, irregularly shaped micro-clusters that the other two algorithms are structurally incapable of resolving.*
+>
+> (a) BioBERT
+> ![BioBERT cluster UMAP](BioBERT Results/step6b_cluster_umap_all.png)
+>
+> (b) TF-IDF
+> ![TF-IDF cluster UMAP](TF-IDF Results/step6b_cluster_umap_all.png)
 
 ### D. Topic Keyword Extraction
 
@@ -251,7 +312,13 @@ For each cluster (K-Means, HAC, and HDBSCAN), the top *N_k* keywords are extract
 
 For each K-Means cluster, a human-readable clinical label is generated by selecting the top two highest-weighted keywords and concatenating them (e.g., Cluster 4 → "Cognitive, Dementia"). This automated label serves two purposes: (i) it provides a low-effort summary of the cluster's clinical content, and (ii) it offers a transparent, reproducible alternative to manual labeling. The complete mapping is saved as `step10_disease_knowledge_mapping.csv` for both pipelines.
 
-> **Fig. 4.** *UMAP projections with automatically generated clinical labels overlaid on each K-Means cluster centroid for (a) BioBERT and (b) TF-IDF pipelines. Labels are derived from the top two keywords of each cluster. Source: `BioBERT Results/step11_final_mapped_umap_all_algorithms.png` and `TF-IDF Results/step11_final_mapped_umap_all_algorithms.png`. Place at the end of Section IV-E.*
+> **Fig. 4.** *UMAP projections with automatically generated clinical labels overlaid on each K-Means cluster centroid for (a) BioBERT and (b) TF-IDF pipelines. Labels are derived from the top two keywords of each cluster.*
+>
+> (a) BioBERT
+> ![BioBERT final mapped UMAP](BioBERT Results/step11_final_mapped_umap_all_algorithms.png)
+>
+> (b) TF-IDF
+> ![TF-IDF final mapped UMAP](TF-IDF Results/step11_final_mapped_umap_all_algorithms.png)
 
 ### F. Evaluation Metrics
 
@@ -318,7 +385,7 @@ The `dmis-lab/biobert-v1.1` model was loaded from the Hugging Face model hub, tr
 
 ### C. K-Means, HAC, and HDBSCAN Configurations
 
-For K-Means and HAC, the number of clusters *K* = 5 was selected automatically by the elbow method, which examines the within-cluster sum of squares (inertia) for *K* ∈ {2, …, 15} and identifies the point of maximum curvature as the optimal *K*. The elbow curve is shown in `step6a_automated_elbow_method.png` (Appendix A). K-Means was run with `n_init = 20` random restarts to mitigate sensitivity to centroid initialization.
+For K-Means and HAC, the number of clusters *K* = 5 was selected automatically by the elbow method, which examines the within-cluster sum of squares (inertia) for *K* ∈ {2, …, 15} and identifies the point of maximum curvature as the optimal *K*. The elbow curves are shown in Appendix A (Figs. A8–A9). K-Means was run with `n_init = 20` random restarts to mitigate sensitivity to centroid initialization.
 
 For HDBSCAN, the choice of `min_cluster_size = 30` reflects a deliberate trade-off: a smaller value would produce many small clusters with few documents each, which limits the statistical reliability of the per-cluster coherence estimate; a larger value would force unrelated documents into the same cluster. `min_samples = 5` was selected to control the noise-labeling threshold.
 
@@ -351,7 +418,19 @@ All code, hyperparameters, and random seeds are released with the manuscript at 
 
 *↑ = higher is better; ↓ = lower is better. Bold indicates best value per metric across all pipelines.*
 
-> **Fig. 5.** *Three-panel evaluation metrics comparison: (a) Silhouette Score and (b) Davies–Bouldin Index bar charts across all six pipelines, and (c) NPMI coherence boxplot showing the per-topic distribution for each pipeline–algorithm combination. The boxplot confirms that HDBSCAN's higher mean NPMI is not driven by a single outlier cluster: the inter-quartile range of per-cluster NPMI for HDBSCAN lies entirely above the median NPMI of K-Means in both pipelines. Source: `BioBERT Results/step8_evaluation_metrics.png`, `TF-IDF Results/step8_evaluation_metrics.png`, `Coherence Results/coherence_per_topic_boxplot.png`, and `Coherence Results/coherence_grouped_bar.png`. Place directly below Table V.*
+> **Fig. 5.** *Three-panel evaluation metrics comparison: (a) Silhouette Score and (b) Davies–Bouldin Index bar charts across all six pipelines, and (c) NPMI coherence boxplot showing the per-topic distribution for each pipeline–algorithm combination. The boxplot confirms that HDBSCAN's higher mean NPMI is not driven by a single outlier cluster: the inter-quartile range of per-cluster NPMI for HDBSCAN lies entirely above the median NPMI of K-Means in both pipelines.*
+>
+> (a) BioBERT Evaluation Metrics
+> ![BioBERT evaluation metrics](BioBERT Results/step8_evaluation_metrics.png)
+>
+> (b) TF-IDF Evaluation Metrics
+> ![TF-IDF evaluation metrics](TF-IDF Results/step8_evaluation_metrics.png)
+>
+> (c) NPMI Coherence Boxplot
+> ![Coherence boxplot](Coherence Results/coherence_per_topic_boxplot.png)
+>
+> (d) Grouped Bar Chart
+> ![Grouped bar](Coherence Results/coherence_grouped_bar.png)
 
 Three observations follow from Table V:
 
@@ -361,7 +440,12 @@ Three observations follow from Table V:
 
 ### B. Inter-Concept Similarity (Anchor Diagnostics)
 
-A complementary diagnostic was performed before clustering. For each pipeline, the cleaned corpus was reduced to *K* = 10 pseudo-anchors by K-Means, and pairwise cosine similarity between anchor centroids was computed in the original embedding space. For BioBERT, anchor similarities range from 0.70 to 0.99 (mean ≈ 0.97) — every anchor is highly similar to every other anchor. This near-saturation is expected for a 768-dimensional dense embedding space in which documents from different disease domains share substantial semantic content. For TF-IDF, anchor similarities range from 0.25 to 0.67 (mean ≈ 0.44), reflecting the much higher *orthogonality* of sparse, term-specific vectors. The corresponding heatmaps are shown in `BioBERT Results/step4_inter_concept_similarity.png` and `TF-IDF Results/step4_inter_concept_similarity.png` (Appendix A). The diagnostic supports a key methodological choice: the same downstream clustering algorithm behaves very differently on the two representations, and the *differences* in geometric separability are themselves a source of insight.
+A complementary diagnostic was performed before clustering. For each pipeline, the cleaned corpus was reduced to *K* = 10 pseudo-anchors by K-Means, and pairwise cosine similarity between anchor centroids was computed in the original embedding space. For BioBERT, anchor similarities range from 0.70 to 0.99 (mean ≈ 0.97) — every anchor is highly similar to every other anchor. This near-saturation is expected for a 768-dimensional dense embedding space in which documents from different disease domains share substantial semantic content. For TF-IDF, anchor similarities range from 0.25 to 0.67 (mean ≈ 0.44), reflecting the much higher *orthogonality* of sparse, term-specific vectors. The corresponding heatmaps are shown below (Appendix A):
+
+![BioBERT inter-concept similarity](BioBERT Results/step4_inter_concept_similarity.png)
+![TF-IDF inter-concept similarity](TF-IDF Results/step4_inter_concept_similarity.png)
+
+The diagnostic supports a key methodological choice: the same downstream clustering algorithm behaves very differently on the two representations, and the *differences* in geometric separability are themselves a source of insight.
 
 ### C. Macro-Level Analysis: K-Means Clusters (*K* = 5)
 
@@ -389,7 +473,13 @@ K-Means produced five broad thematic partitions for each pipeline. The clinical 
 
 The five-cluster partitions from both pipelines converge on the same five broad clinical themes: cardiovascular/metabolic disease, neuroscience/dementia, oncology, molecular mechanisms, and clinical outcomes. This thematic convergence validates the clinical relevance of both representations at the macro level, despite their representational differences. However, the heterogeneity within each macro-cluster (evidenced by the mixed top keywords — e.g., *patients* appears across all five clusters) illustrates the fundamental limitation of global partition-based clustering: clinically distinct sub-populations are merged into a single partition, and the per-cluster NPMI scores are consequently moderate (0.0311 to 0.1248).
 
-> **Fig. 6.** *K-Means macro-level clusters visualized on the UMAP projection for (a) BioBERT and (b) TF-IDF pipelines. The five thematic partitions recover the broad disease domains of the corpus, but the cluster boundaries are coarse and multiple micro-domains are merged. Source: `BioBERT Results/step6b_cluster_umap_all.png` and `TF-IDF Results/step6b_cluster_umap_all.png` (K-Means panels). Place below Tables VI and VII.*
+> **Fig. 6.** *K-Means macro-level clusters visualized on the UMAP projection for (a) BioBERT and (b) TF-IDF pipelines. The five thematic partitions recover the broad disease domains of the corpus, but the cluster boundaries are coarse and multiple micro-domains are merged.*
+>
+> (a) BioBERT K-Means
+> ![BioBERT K-Means UMAP](BioBERT Results/step6b_cluster_umap_all.png)
+>
+> (b) TF-IDF K-Means
+> ![TF-IDF K-Means UMAP](TF-IDF Results/step6b_cluster_umap_all.png)
 
 ### D. Micro-Level Analysis: HDBSCAN Micro-Topic Discovery
 
@@ -425,7 +515,13 @@ HDBSCAN identified **80 biologically distinct micro-clusters** from the BioBERT 
 | 9    | 25      | Plasma Biomarkers (Neurodegeneration)  | ptau, plasma, gfap, biomarkers, cognitive, nfl, disease, levels, clinical, amyloid         | 0.2313 |
 | 10   | 106     | Dementia Caregiving Research           | adrd, caregivers, research, care, caregiver, health, burden, dementia, recruitment          | 0.2226 |
 
-> **Fig. 7.** *Heatmap of top-keyword TF-IDF weights for the top 10 HDBSCAN micro-clusters in the (a) BioBERT and (b) TF-IDF pipelines. Each row is a micro-topic; cell intensity indicates the within-cluster TF-IDF weight. The heatmap makes the high specificity of the micro-topics visually unambiguous. Source: `BioBERT Results/step9_cluster_keywords.png` and `TF-IDF Results/step9_cluster_keywords.png`. Place at the beginning of Section VI-D.*
+> **Fig. 7.** *Heatmap of top-keyword TF-IDF weights for the top 10 HDBSCAN micro-clusters in the (a) BioBERT and (b) TF-IDF pipelines. Each row is a micro-topic; cell intensity indicates the within-cluster TF-IDF weight. The heatmap makes the high specificity of the micro-topics visually unambiguous.*
+>
+> (a) BioBERT HDBSCAN Keywords
+> ![BioBERT cluster keywords](BioBERT Results/step9_cluster_keywords.png)
+>
+> (b) TF-IDF HDBSCAN Keywords
+> ![TF-IDF cluster keywords](TF-IDF Results/step9_cluster_keywords.png)
 
 The relative gain of each HDBSCAN top micro-topic over the corresponding K-Means baseline is striking:
 
@@ -434,7 +530,9 @@ The relative gain of each HDBSCAN top micro-topic over the corresponding K-Means
 
 Critically, none of these high-coherence micro-topics are resolvable from the K-Means five-cluster partition: "plasma biomarkers for Alzheimer's disease" and "alpha-synuclein aggregation" are both subsumed within K-Means Cluster 4 (Neurocognitive Disorders), obscuring their distinct mechanistic identities.
 
-> **Fig. 8.** *Per-cluster NPMI coherence of the top 10 HDBSCAN micro-topics, plotted against the global K-Means mean (dashed line) for (a) BioBERT and (b) TF-IDF. Every HDBSCAN top-10 micro-topic outperforms the K-Means macro-average, making the case for density-based micro-topic discovery unambiguous. Source: `Manuscript Results/Figure1_HDBSCAN_vs_KMeans_Coherence.png`. Place at the end of Section VI-D.*
+> **Fig. 8.** *Per-cluster NPMI coherence of the top 10 HDBSCAN micro-topics, plotted against the global K-Means mean (dashed line) for (a) BioBERT and (b) TF-IDF. Every HDBSCAN top-10 micro-topic outperforms the K-Means macro-average, making the case for density-based micro-topic discovery unambiguous.*
+>
+> ![HDBSCAN vs K-Means coherence](Manuscript Results/Figure1_HDBSCAN_vs_KMeans_Coherence.png)
 
 ### E. Cross-Representation Comparison: BioBERT vs. TF-IDF
 
@@ -450,7 +548,9 @@ A practical implication: an **ensemble system** integrating both representation 
 
 ### F. Aggregate Statistical Robustness
 
-To confirm that the HDBSCAN NPMI advantage is not driven by outlier clusters, the per-cluster NPMI distribution was examined in detail. The boxplot in `Coherence Results/coherence_per_topic_boxplot.png` (Fig. 5c) shows that, in both pipelines, the *inter-quartile range* of HDBSCAN's per-cluster NPMI lies entirely above the *median* of K-Means and HAC. The per-topic NPMI scores are available for all 6 configurations in `Coherence Results/topic_coherence_per_topic.csv` (90 BioBERT topics and 231 TF-IDF topics in total). The heatmap in `Coherence Results/coherence_heatmap.png` provides a side-by-side view of all six pipeline–algorithm combinations.
+To confirm that the HDBSCAN NPMI advantage is not driven by outlier clusters, the per-cluster NPMI distribution was examined in detail. The boxplot in Fig. 5c shows that, in both pipelines, the *inter-quartile range* of HDBSCAN's per-cluster NPMI lies entirely above the *median* of K-Means and HAC. The per-topic NPMI scores are available for all 6 configurations in `Coherence Results/topic_coherence_per_topic.csv` (90 BioBERT topics and 231 TF-IDF topics in total). The heatmap below provides a side-by-side view of all six pipeline–algorithm combinations:
+
+![Coherence heatmap](Coherence Results/coherence_heatmap.png)
 
 ---
 
@@ -583,37 +683,108 @@ The complete experimental code, preprocessing pipeline, and evaluation scripts a
 
 ---
 
-## Appendix A: Supplementary Figures (File Inventory)
+## Appendix A: Supplementary Figures
 
-For reproducibility and reviewer convenience, the complete set of figures generated by the pipeline is summarized below. All files are released with the manuscript.
+For reproducibility and reviewer convenience, the complete set of figures generated by the pipeline is shown below. All files are released with the manuscript.
 
-| # | File Path                                            | Section | Caption Summary                                           |
-|---|------------------------------------------------------|---------|-----------------------------------------------------------|
-| A1 | `BioBERT Results/step1_raw_length_distribution.png`  | III.C   | Raw abstract word-count distribution                     |
-| A2 | `BioBERT Results/step2_preprocessing_stats.png`      | III.C   | Cleaned abstract token-count distribution                |
-| A3 | `BioBERT Results/step3_biobert_correlation.png`      | IV.A    | First-50-dimension correlation heatmap of BioBERT space  |
-| A4 | `BioBERT Results/step4_inter_concept_similarity.png` | VI.B   | Inter-anchor cosine similarity heatmap (BioBERT)          |
-| A5 | `TF-IDF Results/step4_inter_concept_similarity.png`  | VI.B   | Inter-anchor cosine similarity heatmap (TF-IDF)           |
-| A6 | `BioBERT Results/step5_umap2d_unlabeled.png`         | IV.A    | Unsupervised 2D UMAP projection of BioBERT embeddings    |
-| A7 | `TF-IDF Results/step5_umap2d_unlabeled.png`          | IV.A    | Unsupervised 2D UMAP projection of TF-IDF embeddings     |
-| A8 | `BioBERT Results/step6a_automated_elbow_method.png`  | IV.C    | Elbow curve for K-Means K selection (BioBERT)            |
-| A9 | `TF-IDF Results/step6a_automated_elbow_method.png`   | IV.C    | Elbow curve for K-Means K selection (TF-IDF)             |
-| A10 | `BioBERT Results/step6b_cluster_umap_all.png`       | IV.C    | K-Means, HDBSCAN, HAC overlay (BioBERT)                  |
-| A11 | `TF-IDF Results/step6b_cluster_umap_all.png`        | IV.C    | K-Means, HDBSCAN, HAC overlay (TF-IDF)                   |
-| A12 | `BioBERT Results/step7_topic_keywords_grid.png`      | IV.D    | Top keywords per K-Means cluster (BioBERT)               |
-| A13 | `TF-IDF Results/step7_topic_keywords_grid.png`       | IV.D    | Top keywords per K-Means cluster (TF-IDF)                |
-| A14 | `BioBERT Results/step8_evaluation_metrics.png`      | VI.A    | Silhouette and DBI bar charts (BioBERT)                  |
-| A15 | `TF-IDF Results/step8_evaluation_metrics.png`       | VI.A    | Silhouette and DBI bar charts (TF-IDF)                   |
-| A16 | `Coherence Results/coherence_per_topic_boxplot.png` | VI.A    | Per-topic NPMI coherence boxplot across all 6 pipelines   |
-| A17 | `Coherence Results/coherence_grouped_bar.png`       | VI.A    | Grouped bar chart of mean NPMI across all 6 pipelines    |
-| A18 | `Coherence Results/coherence_heatmap.png`           | VI.A    | Heatmap of NPMI coherence across all 6 pipelines         |
-| A19 | `Coherence Results/combined_metrics_table.png`      | VI.A    | Combined metrics table (Silhouette, DBI, NPMI)            |
-| A20 | `BioBERT Results/step9_cluster_keywords.png`        | VI.D    | Top keywords per HDBSCAN micro-cluster (BioBERT)         |
-| A21 | `TF-IDF Results/step9_cluster_keywords.png`         | VI.D    | Top keywords per HDBSCAN micro-cluster (TF-IDF)          |
-| A22 | `BioBERT Results/step10_disease_knowledge_mapping.png` | IV.E | K-Means disease label table (BioBERT)                    |
-| A23 | `TF-IDF Results/step10_disease_knowledge_mapping.png` | IV.E  | K-Means disease label table (TF-IDF)                     |
-| A24 | `BioBERT Results/step11_final_mapped_umap_all_algorithms.png` | IV.E | UMAP with K-Means disease labels (BioBERT)        |
-| A25 | `TF-IDF Results/step11_final_mapped_umap_all_algorithms.png` | IV.E | UMAP with K-Means disease labels (TF-IDF)            |
-| A26 | `Manuscript Results/Table1_Macro_KMeans.png`         | VI.C    | Publication-ready macro-level K-Means table              |
-| A27 | `Manuscript Results/Table2_Micro_HDBSCAN.png`        | VI.D    | Publication-ready top-10 HDBSCAN micro-topics table      |
-| A28 | `Manuscript Results/Figure1_HDBSCAN_vs_KMeans_Coherence.png` | VI.D | HDBSCAN top-10 vs. K-Means mean NPMI comparison         |
+### Section III.C — Corpus Statistics
+
+**A1:** Raw abstract word-count distribution (BioBERT)
+![Raw length distribution](BioBERT Results/step1_raw_length_distribution.png)
+
+**A2:** Cleaned abstract token-count distribution (BioBERT)
+![Preprocessing stats](BioBERT Results/step2_preprocessing_stats.png)
+
+### Section IV.A — Text Representation
+
+**A3:** First-50-dimension correlation heatmap of BioBERT space
+![BioBERT correlation](BioBERT Results/step3_biobert_correlation.png)
+
+**A6:** Unsupervised 2D UMAP projection of BioBERT embeddings
+![BioBERT UMAP unlabeled](BioBERT Results/step5_umap2d_unlabeled.png)
+
+**A7:** Unsupervised 2D UMAP projection of TF-IDF embeddings
+![TF-IDF UMAP unlabeled](TF-IDF Results/step5_umap2d_unlabeled.png)
+
+### Section IV.C — Clustering Algorithms
+
+**A8:** Elbow curve for K-Means K selection (BioBERT)
+![BioBERT elbow](BioBERT Results/step6a_automated_elbow_method.png)
+
+**A9:** Elbow curve for K-Means K selection (TF-IDF)
+![TF-IDF elbow](TF-IDF Results/step6a_automated_elbow_method.png)
+
+**A10:** K-Means, HDBSCAN, HAC overlay (BioBERT)
+![BioBERT cluster UMAP all](BioBERT Results/step6b_cluster_umap_all.png)
+
+**A11:** K-Means, HDBSCAN, HAC overlay (TF-IDF)
+![TF-IDF cluster UMAP all](TF-IDF Results/step6b_cluster_umap_all.png)
+
+### Section IV.D — Topic Keyword Extraction
+
+**A12:** Top keywords per K-Means cluster (BioBERT)
+![BioBERT topic keywords](BioBERT Results/step7_topic_keywords_grid.png)
+
+**A13:** Top keywords per K-Means cluster (TF-IDF)
+![TF-IDF topic keywords](TF-IDF Results/step7_topic_keywords_grid.png)
+
+### Section IV.E — Automated Disease Knowledge Mapping
+
+**A22:** K-Means disease label table (BioBERT)
+![BioBERT disease mapping](BioBERT Results/step10_disease_knowledge_mapping.png)
+
+**A23:** K-Means disease label table (TF-IDF)
+![TF-IDF disease mapping](TF-IDF Results/step10_disease_knowledge_mapping.png)
+
+**A24:** UMAP with K-Means disease labels (BioBERT)
+![BioBERT final mapped](BioBERT Results/step11_final_mapped_umap_all_algorithms.png)
+
+**A25:** UMAP with K-Means disease labels (TF-IDF)
+![TF-IDF final mapped](TF-IDF Results/step11_final_mapped_umap_all_algorithms.png)
+
+### Section VI.A — Quantitative Clustering Evaluation
+
+**A14:** Silhouette and DBI bar charts (BioBERT)
+![BioBERT evaluation](BioBERT Results/step8_evaluation_metrics.png)
+
+**A15:** Silhouette and DBI bar charts (TF-IDF)
+![TF-IDF evaluation](TF-IDF Results/step8_evaluation_metrics.png)
+
+**A16:** Per-topic NPMI coherence boxplot across all 6 pipelines
+![Coherence boxplot](Coherence Results/coherence_per_topic_boxplot.png)
+
+**A17:** Grouped bar chart of mean NPMI across all 6 pipelines
+![Coherence grouped bar](Coherence Results/coherence_grouped_bar.png)
+
+**A18:** Heatmap of NPMI coherence across all 6 pipelines
+![Coherence heatmap](Coherence Results/coherence_heatmap.png)
+
+**A19:** Combined metrics table (Silhouette, DBI, NPMI)
+![Combined metrics](Coherence Results/combined_metrics_table.png)
+
+### Section VI.B — Inter-Concept Similarity
+
+**A4:** Inter-anchor cosine similarity heatmap (BioBERT)
+![BioBERT concept similarity](BioBERT Results/step4_inter_concept_similarity.png)
+
+**A5:** Inter-anchor cosine similarity heatmap (TF-IDF)
+![TF-IDF concept similarity](TF-IDF Results/step4_inter_concept_similarity.png)
+
+### Section VI.C — Macro-Level K-Means Results
+
+**A26:** Publication-ready macro-level K-Means table
+![Macro K-Means table](Manuscript Results/Table1_Macro_KMeans.png)
+
+### Section VI.D — Micro-Level HDBSCAN Results
+
+**A20:** Top keywords per HDBSCAN micro-cluster (BioBERT)
+![BioBERT cluster keywords](BioBERT Results/step9_cluster_keywords.png)
+
+**A21:** Top keywords per HDBSCAN micro-cluster (TF-IDF)
+![TF-IDF cluster keywords](TF-IDF Results/step9_cluster_keywords.png)
+
+**A27:** Publication-ready top-10 HDBSCAN micro-topics table
+![Micro HDBSCAN table](Manuscript Results/Table2_Micro_HDBSCAN.png)
+
+**A28:** HDBSCAN top-10 vs. K-Means mean NPMI comparison
+![HDBSCAN vs K-Means coherence](Manuscript Results/Figure1_HDBSCAN_vs_KMeans_Coherence.png)
