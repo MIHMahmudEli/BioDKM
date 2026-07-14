@@ -11,6 +11,26 @@
 \interdisplaylinepenalty=2500
 \usepackage{flushend}
 \usepackage{stfloats}
+% ---- Balance the vertical text block on A4 paper ----
+% IEEEtran fixes \textheight for US Letter; on a4paper the surplus height
+% otherwise collects as an oversized bottom margin. Extend the text block
+% downward so the top and bottom margins are roughly equal (~18-20mm each).
+\addtolength{\textheight}{24mm}
+
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
+
+% ---- Colour palette for the TikZ pipeline figure ----
+\definecolor{pipeData}{HTML}{1F6FEB}
+\definecolor{pipePrep}{HTML}{0E7C86}
+\definecolor{pipeFeat}{HTML}{6E40AA}
+\definecolor{pipeDiag}{HTML}{B45309}
+\definecolor{pipeUmap}{HTML}{9A3412}
+\definecolor{pipeClus}{HTML}{15803D}
+\definecolor{pipeTopic}{HTML}{2563EB}
+\definecolor{pipeMap}{HTML}{BE123C}
+\definecolor{pipeBg}{HTML}{F1F5F9}
 
 \hypersetup{
   colorlinks=true,
@@ -23,9 +43,9 @@
 
 \begin{document}
 
-\raggedbottom
+\flushbottom
 
-\title{Unsupervised Disease Knowledge Mapping from PubMed Abstracts: A Comparative Study of TF-IDF and BioBERT Embeddings with KMeans, HDBSCAN, and Hierarchical Clustering}
+\title{Density-Based Clustering Enables Unsupervised Disease Knowledge Mapping from PubMed Abstracts: A Comparison of Sparse and Contextual Embeddings}
 
 \author{\IEEEauthorblockN{Anonymous Author(s)}
 \IEEEauthorblockA{Manuscript submitted for double-blind review}}
@@ -33,7 +53,7 @@
 \maketitle
 
 \begin{abstract}
-The exponential growth of biomedical literature renders manual synthesis of disease-specific knowledge from abstracts impractical. We present an unsupervised disease knowledge mapping pipeline combining domain-adapted embeddings, UMAP dimensionality reduction, density-based clustering, and cluster-level term weighting. We systematically evaluated two feature extraction strategies---TF-IDF and BioBERT---with three clustering algorithms (KMeans, HDBSCAN, Hierarchical) across 14,064 PubMed abstracts spanning eight disease categories. TF-IDF with HDBSCAN achieved the highest clustering quality (Silhouette 0.4786, Davies--Bouldin 0.6034, NPMI coherence 0.1158), discovering 116 fine-grained topics; BioBERT with HDBSCAN yielded comparable coherence (NPMI 0.1154, 80 topics), confirming that density-based clustering substantially outperforms parametric alternatives regardless of embedding method. Clinical validation demonstrated two-level interpretability: macro-level KMeans produced five broad categories (e.g., Cardiovascular \& Metabolic Risk, Neurocognitive Disorders), while micro-level HDBSCAN identified highly specific subtopics with NPMI coherence reaching 0.322 (Ptau Plasma biomarkers). To our knowledge, this is the first pipeline to unify BioBERT embeddings, UMAP projection, HDBSCAN clustering, and TF-IDF interpretation for unsupervised biomedical disease knowledge discovery.
+The exponential growth of biomedical literature renders manual synthesis of disease-specific knowledge from abstracts impractical. We present an unsupervised disease knowledge mapping pipeline combining domain-adapted embeddings, UMAP dimensionality reduction, density-based clustering, and cluster-level term weighting. We systematically evaluated two feature extraction strategies (TF-IDF and BioBERT) with three clustering algorithms (KMeans, HDBSCAN, Hierarchical) across 14,064 PubMed abstracts spanning eight disease categories. TF-IDF with HDBSCAN achieved the highest clustering quality (Silhouette 0.4786, Davies--Bouldin 0.6034, NPMI coherence 0.1158), discovering 116 fine-grained topics; BioBERT with HDBSCAN yielded comparable coherence (NPMI 0.1154, 80 topics), confirming that density-based clustering substantially outperforms parametric alternatives regardless of embedding method. Clinical validation demonstrated two-level interpretability: macro-level KMeans produced five broad categories (e.g., Cardiovascular \& Metabolic Risk, Neurocognitive Disorders), while micro-level HDBSCAN identified highly specific subtopics with NPMI coherence reaching 0.322 (Ptau Plasma biomarkers). To our knowledge, this is the first pipeline to unify BioBERT embeddings, UMAP projection, HDBSCAN clustering, and TF-IDF interpretation for unsupervised biomedical disease knowledge discovery.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -44,13 +64,21 @@ Biomedical text mining, unsupervised clustering, BioBERT, TF-IDF, HDBSCAN, UMAP,
 
 \IEEEPARstart{T}{he} volume of published biomedical research has grown at an accelerating rate over the past two decades. PubMed surpassed 29 million indexed articles by 2019~\cite{ref1}, and disease-specific corpora continue to expand rapidly: neoplasm-related publications alone increased at 42.41\% annually through 2021~\cite{ref13}. This growth creates a fundamental problem for researchers. The knowledge needed to understand a disease, identify research trends, or discover connections across disciplines is distributed across hundreds of thousands of abstracts, each written in specialized terminology that varies by subfield. Manual review at this scale is not feasible, and keyword-based search returns documents matching surface terms rather than organizing them around underlying themes.
 
-Computational approaches to biomedical knowledge extraction have made substantial progress. Domain-adapted language models such as BioBERT~\cite{ref1} have demonstrated that continued pre-training on PubMed abstracts and PMC full-text articles yields significant improvements over general-domain models on named entity recognition, relation extraction, and question answering. Supervised methods have been extended to disease-gene association mining~\cite{ref8}~\cite{ref10}, knowledge graph construction~\cite{ref9}, and document classification~\cite{ref13}, all with strong results where labeled data or predefined ontologies are available. At the same time, unsupervised topic modeling and clustering methods have evolved from bag-of-words models such as Latent Dirichlet Allocation (LDA) toward approaches that incorporate contextual embeddings from transformer architectures~\cite{ref15}~\cite{ref17}.
+Computational approaches to biomedical knowledge extraction have made substantial progress. Domain-adapted language models such as BioBERT~\cite{ref1} have demonstrated that continued pre-training on PubMed abstracts and PMC full-text articles yields significant improvements over general-domain models on named entity recognition, relation extraction, and question answering. Supervised methods have been extended to disease-gene association mining~\cite{ref8,ref10}, knowledge graph construction~\cite{ref9}, and document classification~\cite{ref13}, all with strong results where labeled data or predefined ontologies are available. At the same time, unsupervised topic modeling and clustering methods have evolved from bag-of-words models such as Latent Dirichlet Allocation (LDA) toward approaches that incorporate contextual embeddings from transformer architectures~\cite{ref15,ref17}.
 
-Despite these advances, three limitations persist in the existing literature. First, most biomedical NLP evaluations focus on supervised tasks: entity recognition, relation extraction, and document classification~\cite{ref2}~\cite{ref3}~\cite{ref4}~\cite{ref5}~\cite{ref6}. Unsupervised discovery of thematic structure at the corpus level, where no labels exist to guide the analysis, has received comparatively less attention. Second, among the clustering and topic modeling studies that do exist~\cite{ref15}~\cite{ref16}~\cite{ref17}, the embedding stage typically relies on either sparse frequency-based features (TF-IDF, bag-of-words) or general-purpose sentence transformers, neither of which fully exploits the domain-specific representational capacity of biomedical language models. Third, existing clustering frameworks either impose parametric assumptions about cluster distributions, as Gaussian Mixture Models (GMM) and KMeans do, or produce topic representations that require manual inspection without automated labeling~\cite{ref17}. No prior study has, to our knowledge, integrated domain-adapted embeddings, nonlinear dimensionality reduction, density-based clustering, and cluster-level term weighting into a single unsupervised pipeline for disease-specific knowledge discovery from PubMed abstracts.
+Despite these advances, three limitations persist in the existing literature. First, most biomedical NLP evaluations focus on supervised tasks: entity recognition, relation extraction, and document classification~\cite{ref2,ref3,ref4,ref5,ref6}. Unsupervised discovery of thematic structure at the corpus level, where no labels exist to guide the analysis, has received comparatively less attention. Second, among the clustering and topic modeling studies that do exist~\cite{ref15,ref16,ref17}, the embedding stage typically relies on either sparse frequency-based features (TF-IDF, bag-of-words) or general-purpose sentence transformers, neither of which fully exploits the domain-specific representational capacity of biomedical language models. Third, existing clustering frameworks either impose parametric assumptions about cluster distributions, as Gaussian Mixture Models (GMM) and KMeans do, or produce topic representations that require manual inspection without automated labeling~\cite{ref17}. No prior study has, to our knowledge, integrated domain-adapted embeddings, nonlinear dimensionality reduction, density-based clustering, and cluster-level term weighting into a single unsupervised pipeline for disease-specific knowledge discovery from PubMed abstracts.
 
 We address this gap by designing and systematically evaluating a modular unsupervised pipeline for disease knowledge mapping. The pipeline comprises four stages: (1) feature extraction via either TF-IDF vectorization (5,000 features) or BioBERT 768-dimensional contextual embeddings; (2) nonlinear dimensionality reduction using Uniform Manifold Approximation and Projection (UMAP) with cosine distance; (3) clustering via three algorithms representing different inductive biases: KMeans (partition-based), HDBSCAN (density-based), and agglomerative hierarchical clustering (connectivity-based); and (4) automated topic interpretation using cluster-level TF-IDF keyword extraction. The pipeline is evaluated across 14,065 PubMed abstracts collected from eight disease categories (diabetes, cancer, cardiovascular disease, neurological disorders, stroke, hypertension, Alzheimer's, and Parkinson's) using the NCBI E-utilities API.
 
-The experimental design compares all six configurations formed by crossing two embedding methods with three clustering algorithms. We assess clustering quality using three complementary metrics: Silhouette coefficient (cluster separation), Davies--Bouldin index (intra-cluster compactness), and Normalized Pointwise Mutual Information (NPMI) coherence (topic interpretability). Clinical interpretability is validated at two granularity levels: macro-level categorization through KMeans clusters and micro-level topic discovery through HDBSCAN clusters.
+This study is guided by four research questions (RQs) that structure the experimental design and analysis:
+\begin{itemize}
+\item \textbf{RQ1.} To what extent does the choice of clustering algorithm, whether partition-based (KMeans), density-based (HDBSCAN), or connectivity-based (hierarchical), determine clustering quality and topic coherence for biomedical abstracts, relative to the choice of feature representation?
+\item \textbf{RQ2.} Do domain-adapted contextual embeddings (BioBERT) produce more coherent and better-separated unsupervised topic structures than sparse frequency-based features (TF-IDF) when both are processed through an identical downstream pipeline?
+\item \textbf{RQ3.} Can a fully unsupervised pipeline, without any labeled training data, recover clinically meaningful disease categories at multiple granularity levels (broad clinical domains and fine-grained research themes)?
+\item \textbf{RQ4.} What is the trade-off between computational cost and topic-discovery quality across the two embedding strategies, and what does this imply for resource-constrained deployment?
+\end{itemize}
+
+The experimental design addresses these questions by comparing all six configurations formed by crossing two embedding methods with three clustering algorithms. We assess clustering quality using three complementary metrics: Silhouette coefficient (cluster separation), Davies--Bouldin index (intra-cluster compactness), and Normalized Pointwise Mutual Information (NPMI) coherence (topic interpretability). Clinical interpretability is validated at two granularity levels: macro-level categorization through KMeans clusters and micro-level topic discovery through HDBSCAN clusters.
 
 Our main findings are as follows. The TF-IDF with HDBSCAN configuration achieves the highest overall clustering quality (Silhouette~0.4786, Davies--Bouldin~0.6034, NPMI~0.1158), discovering 116 fine-grained topics. BioBERT with HDBSCAN yields comparable topic coherence (NPMI~0.1154, 80 topics), confirming that density-based clustering substantially outperforms parametric approaches regardless of the embedding method. The parametric algorithms (KMeans, Hierarchical) are constrained to exactly five topics by the Elbow method and produce consistently lower coherence scores (NPMI~0.06--0.08). The macro-level KMeans clusters map to five clinically meaningful categories: Cardiovascular \& Metabolic Risk, Preclinical Molecular Biology, Oncology \& Case Studies, Clinical Outcomes \& Mortality, and Neurocognitive Disorders. The micro-level HDBSCAN topics include highly specific subtopics with NPMI coherence reaching 0.322 for Ptau Plasma biomarkers and 0.282 for Syn Disease aggregation pathways, demonstrating that the density-based approach captures both broad clinical categories and narrow specialized research themes within a single corpus.
 
@@ -60,11 +88,11 @@ The remainder of this paper is organized as follows. Section~II reviews related 
 
 \section{Related Work}
 
-The rapid expansion of biomedical literature has rendered manual extraction of disease knowledge impractical, driving the development of automated text mining tools. Early computational approaches relied heavily on co-occurrence mining to build disease-gene associations~\cite{ref8}, or converted syntactically complex sentences into structured semantic graphs using supervised architectures and predefined schemas~\cite{ref12,ref13}. While these systems produce robust entity-level networks~\cite{ref9,ref10}, they are intrinsically limited by their training data and taxonomic boundaries. The latent thematic structure of a disease corpus---how research topics naturally cluster and evolve---remains largely invisible to supervised systems that only search for what they have been programmed to find~\cite{ref14}.
+The rapid expansion of biomedical literature has rendered manual extraction of disease knowledge impractical, driving the development of automated text mining tools. Early computational approaches relied heavily on co-occurrence mining to build disease-gene associations~\cite{ref8}, or converted syntactically complex sentences into structured semantic graphs using supervised architectures and predefined schemas~\cite{ref12,ref13}. While these systems produce robust entity-level networks~\cite{ref9,ref10}, they are intrinsically limited by their training data and taxonomic boundaries. The latent thematic structure of a disease corpus, that is, how research topics naturally cluster and evolve, remains largely invisible to supervised systems that only search for what they have been programmed to find~\cite{ref14}.
 
 Unsupervised clustering and topic modeling offer an alternative by organizing documents without labeled data. Traditional models like LDA and NMF rely on bag-of-words representations that discard sequential order and semantic context, often clustering documents based on surface vocabulary overlap rather than true conceptual similarity~\cite{ref15}. Contextual embeddings from transformer architectures successfully address this limitation. However, models trained on general-domain text (e.g., standard BERT) underperform on biomedical corpora due to massive vocabulary mismatch~\cite{ref2,ref17}. Domain-adapted models, specifically BioBERT~\cite{ref1}, overcome this by continuing pre-training on PubMed abstracts and PMC full-text articles, yielding state-of-the-art representations that capture the complex contextual meaning of biomedical terminology~\cite{ref3,ref4,ref5,ref6,ref7}. 
 
-Despite the availability of these powerful embeddings, current unsupervised methodologies remain fragmented. For example, Davagdorj et al.~\cite{ref15} clustered BioBERT embeddings but relied on Gaussian Mixture Models (GMM), which impose rigid parametric assumptions that biomedical research themes rarely satisfy. Grootendorst's BERTopic framework~\cite{ref17} elegantly combined transformer embeddings with density-based clustering (HDBSCAN) and cluster-level keyword extraction (c-TF-IDF), but utilized general-purpose models rather than domain-adapted ones. Similarly, while visualization techniques like UMAP have been used to project disease embeddings~\cite{ref11,ref19,ref20}, they are typically employed as post-hoc display tools rather than integrated analytical layers. Furthermore, few studies explore how these advanced deep-learning pipelines compare directly against optimized sparse representations like TF-IDF~\cite{ref18} in density-based topological spaces. To our knowledge, no existing study has combined BioBERT semantic embeddings, UMAP dimensionality reduction, HDBSCAN density clustering, and TF-IDF cluster interpretation into a single, unified pipeline for unsupervised disease knowledge discovery.
+Despite the availability of these powerful embeddings, current unsupervised methodologies remain fragmented. For example, Davagdorj et al.~\cite{ref15} clustered BioBERT embeddings but relied on Gaussian Mixture Models (GMM), which impose rigid parametric assumptions that biomedical research themes rarely satisfy. Grootendorst's BERTopic framework~\cite{ref17} elegantly combined transformer embeddings with density-based clustering (HDBSCAN) and cluster-level keyword extraction (c-TF-IDF), but utilized general-purpose models rather than domain-adapted ones. The BERTopic paradigm has since been adopted for large-scale biomedical corpus mapping, for example, two decades of rheumatology research across 34 journals~\cite{ref30} and BioBERT-embedded comparisons of LDA and BERTopic for opioid--cardiovascular risk analysis~\cite{ref31}; yet these studies apply a single fixed configuration rather than systematically isolating which pipeline components drive performance. The recent TopicForest framework~\cite{ref29} pushes in a complementary direction, using contrastively trained large language model embeddings with hierarchical dendrogram cutting and recursive LLM labeling, but its emphasis is multi-resolution labeling rather than a controlled comparison of embedding and clustering families. The effectiveness of the UMAP-then-HDBSCAN combination for large-scale health data has been independently corroborated at a comparable corpus scale in ECG risk-profile clustering~\cite{ref32}. Similarly, while visualization techniques like UMAP have been used to project disease embeddings~\cite{ref11,ref19,ref20}, they are typically employed as post-hoc display tools rather than integrated analytical layers. Furthermore, few studies explore how these advanced deep-learning pipelines compare directly against optimized sparse representations like TF-IDF~\cite{ref18} in density-based topological spaces. To our knowledge, no existing study has combined BioBERT semantic embeddings, UMAP dimensionality reduction, HDBSCAN density clustering, and TF-IDF cluster interpretation into a single, unified pipeline for unsupervised disease knowledge discovery.
 
 \section{Methodology}
 
@@ -72,8 +100,55 @@ Fig.~\ref{fig:pipeline} presents the complete pipeline architecture, comprising 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{Manuscript_Results/Complete_pipeline_architecture.png}
-\caption{Pipeline architecture for unsupervised disease knowledge mapping from PubMed abstracts. The modular design supports interchangeability of the feature extraction and clustering components, yielding six experimental configurations.}
+\resizebox{0.99\columnwidth}{!}{%
+\begin{tikzpicture}[
+  font=\sffamily,
+  stage/.style={rectangle, rounded corners=2pt, draw=#1, line width=0.7pt,
+                top color=white, bottom color=#1!12, text=black,
+                align=center, inner sep=3.2pt, minimum height=8mm, text width=58mm},
+  sub/.style={rectangle, rounded corners=2pt, draw=#1, line width=0.6pt,
+              top color=white, bottom color=#1!16, text=black,
+              align=center, inner sep=2.4pt, minimum height=8mm, text width=22mm},
+  arr/.style={-{Stealth[length=2.4mm]}, line width=0.9pt, draw=gray!70},
+  splitarr/.style={-{Stealth[length=2.0mm]}, line width=0.7pt, draw=gray!55},
+]
+
+\node[stage=pipeData] (data) {\textbf{1. Data Acquisition}\\[1pt]\scriptsize NCBI E-utilities $\cdot$ 8 disease queries\\[-1pt]\scriptsize 14{,}065 PubMed abstracts};
+\node[stage=pipePrep, below=6mm of data] (prep) {\textbf{2. Text Preprocessing}\\[1pt]\scriptsize lowercase $\cdot$ tokenize $\cdot$ stop-words\\[-1pt]\scriptsize $\rightarrow$ 14{,}064 documents};
+
+% Feature extraction branch (stage 3)
+\node[sub=pipeFeat, below=5.5mm of prep, xshift=-15mm] (tfidf) {\textbf{3a. TF-IDF}\\[-1pt]\scriptsize $14064\!\times\!5000$};
+\node[sub=pipeFeat, below=5.5mm of prep, xshift=15mm] (biobert) {\textbf{3b. BioBERT}\\[-1pt]\scriptsize 768-d embed.};
+
+\node[stage=pipeDiag, below=5.5mm of tfidf.south -| prep] (centroid) {\textbf{4. Pseudo-Class Centroid Analysis}\\[-1pt]\scriptsize $K{=}10$ diagnostic $\cdot$ inter-concept similarity};
+\node[stage=pipeUmap, below=6mm of centroid] (umap) {\textbf{5. UMAP Dimensionality Reduction}\\[-1pt]\scriptsize 2D $\cdot$ cosine $\cdot$ \textit{n\_neighbors}$=15$};
+
+% Clustering branch (stage 6)
+\node[sub=pipeClus, below=5.5mm of umap, xshift=-28mm] (kmeans) {\textbf{6a. KMeans}\\[-1pt]\scriptsize $K{=}5$};
+\node[sub=pipeClus, below=5.5mm of umap] (hdbscan) {\textbf{6b. HDBSCAN}\\[-1pt]\scriptsize density};
+\node[sub=pipeClus, below=5.5mm of umap, xshift=28mm] (hier) {\textbf{6c. Hierarchical}\\[-1pt]\scriptsize Ward};
+
+\node[stage=pipeTopic, below=5.5mm of hdbscan] (topic) {\textbf{7. Topic \& Keyword Extraction}\\[-1pt]\scriptsize cluster-level TF-IDF $\cdot$ top-15 terms};
+\node[stage=pipeMap, below=6mm of topic] (map) {\textbf{8. Disease Knowledge Mapping}\\[-1pt]\scriptsize auto labels $\cdot$ NPMI / Silhouette / DB};
+
+% arrows
+\draw[arr] (data) -- (prep);
+\draw[splitarr] (prep.south) -- (tfidf.north);
+\draw[splitarr] (prep.south) -- (biobert.north);
+\draw[splitarr] (tfidf.south) -- (centroid.north);
+\draw[splitarr] (biobert.south) -- (centroid.north);
+\draw[arr] (centroid) -- (umap);
+\draw[splitarr] (umap.south) -- (kmeans.north);
+\draw[splitarr] (umap.south) -- (hdbscan.north);
+\draw[splitarr] (umap.south) -- (hier.north);
+\draw[splitarr] (kmeans.south) -- (topic.north);
+\draw[splitarr] (hdbscan.south) -- (topic.north);
+\draw[splitarr] (hier.south) -- (topic.north);
+\draw[arr] (topic) -- (map);
+
+\end{tikzpicture}%
+}
+\caption{Pipeline architecture for unsupervised disease knowledge mapping from PubMed abstracts. The modular design supports interchangeability of the feature extraction stage (TF-IDF or BioBERT) and the clustering stage (KMeans, HDBSCAN, or hierarchical), yielding the six experimental configurations evaluated in this study.}
 \label{fig:pipeline}
 \end{figure}
 
@@ -193,7 +268,7 @@ For each clustering solution, topics were derived using two complementary approa
 
 \subsection{Disease Knowledge Mapping}
 
-Clusters were automatically mapped to interpretable disease topics by extracting the two highest-scoring terms from a cluster-specific TF-IDF vectorizer (max\_features=100}, stop\_words='english'}), joining them with ``\&'', and converting to title case. For example, a cluster whose top two terms were ``ptau'' and ``plasma'' received the label ``Ptau \& Plasma''. Noise points identified by HDBSCAN (label --1) were excluded from mapping and labeled ``Noise.'' This procedure provides a zero-shot, data-driven semantic label for every cluster without requiring manual annotation.
+Clusters were automatically mapped to interpretable disease topics by extracting the two highest-scoring terms from a cluster-specific TF-IDF vectorizer (\texttt{max\_features=100}, \texttt{stop\_words='english'}), joining them with ``\&'', and converting to title case. For example, a cluster whose top two terms were ``ptau'' and ``plasma'' received the label ``Ptau \& Plasma''. Noise points identified by HDBSCAN (label --1) were excluded from mapping and labeled ``Noise.'' This procedure provides a zero-shot, data-driven semantic label for every cluster without requiring manual annotation.
 
 \subsection{Evaluation Metrics}
 
@@ -320,6 +395,15 @@ Fig.~\ref{fig:eval_metrics} visualizes the NPMI coherence scores across all six 
 \label{fig:eval_metrics}
 \end{figure}
 
+Because the grouped bar chart reports only the mean coherence per configuration, it does not convey the dispersion of topic quality within each configuration. Fig.~\ref{fig:coherence_boxplot} therefore presents the full per-topic NPMI distribution. Three observations reinforce the aggregate results. First, the two HDBSCAN configurations exhibit a wide interquartile range with a pronounced high-coherence tail (individual topics reaching NPMI~$>0.30$), whereas the KMeans and hierarchical configurations collapse to only five points each, visually confirming that the parametric algorithms cannot express fine-grained thematic structure. Second, the TF-IDF+HDBSCAN and BioBERT+HDBSCAN distributions are nearly indistinguishable in both median and spread, providing distributional evidence for the near-identical mean coherence reported in Table~\ref{tab:combined_metrics}. Third, HDBSCAN produces a small number of low- and negative-coherence topics, an expected consequence of density-based clustering retaining genuinely sparse regions rather than forcing every document into a compact cluster.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{Coherence_Results/coherence_per_topic_boxplot.png}
+\caption{Per-topic NPMI coherence distribution for all six configurations. Boxes show the interquartile range and median; overlaid points are individual topics. The density-based (HDBSCAN) configurations span a broad range with a high-coherence tail, while the Elbow-constrained parametric configurations are limited to five topics each. The two HDBSCAN distributions (TF-IDF and BioBERT) are closely matched, corroborating their near-identical mean coherence.}
+\label{fig:coherence_boxplot}
+\end{figure}
+
 \subsection{Macro-Level Clinical Validation}
 
 To assess the clinical interpretability of the clustering results, we examined the five KMeans clusters produced by the BioBERT pipeline. Each cluster was manually assigned a clinical category label by the authors based on its top TF-IDF keywords. Table~\ref{tab:macro} presents the resulting macro-level disease categories with their corresponding NPMI coherence scores.
@@ -410,6 +494,8 @@ The final UMAP projections with automated disease labels (Fig.~\ref{fig:knowledg
 
 The experimental results presented in Section~IV yield three principal findings with implications for unsupervised disease knowledge mapping from biomedical text. First, the choice of clustering algorithm has a substantially larger impact on clustering quality and topic coherence than the choice of embedding method. Second, density-based clustering with HDBSCAN discovers an order of magnitude more topics than parametric alternatives, and these topics are both more coherent and more interpretable. Third, TF-IDF frequency features and BioBERT contextual embeddings produce comparable topic coherence when paired with HDBSCAN, challenging the assumption that deeper representations are always necessary for unsupervised biomedical text organization.
 
+Framed against the four research questions, our results provide clear answers. For \textbf{RQ1}, the clustering algorithm dominates: HDBSCAN improves Silhouette by up to 29.1\% and NPMI coherence by up to 48\% over the best parametric configuration, a margin that exceeds the difference between embeddings for any fixed algorithm. For \textbf{RQ2}, BioBERT embeddings yield measurably better separation only under restrictive parametric clustering (KMeans, hierarchical), but are statistically indistinguishable from TF-IDF in coherence under HDBSCAN (0.1154 vs.\ 0.1158). For \textbf{RQ3}, the pipeline recovers both five broad clinically valid categories and 80--116 fine-grained research themes, including established biomarker topics, entirely without labels. For \textbf{RQ4}, TF-IDF attains equivalent coherence at a fraction of the cost (seconds vs.\ $\sim$35 CPU-minutes), making it the pragmatic default when macro-level clinical alignment is not required. The following subsections elaborate on each of these findings.
+
 \subsection{The Primacy of Clustering Algorithm over Embedding Method}
 
 Across all three evaluation metrics, the variance attributable to the clustering algorithm exceeds the variance attributable to the embedding strategy. HDBSCAN achieves the highest scores in both pipelines on every metric, and the performance gap between HDBSCAN and the next-best algorithm is consistently larger than the gap between TF-IDF and BioBERT for any fixed algorithm. This finding has practical significance: researchers building unsupervised biomedical document organization systems should prioritize the flexibility of the clustering component over the sophistication of the embedding step.
@@ -434,9 +520,9 @@ The two-level structure also addresses a known limitation of HDBSCAN: it can pro
 
 \subsection{Comparison with Existing Frameworks}
 
-Our pipeline shares architectural similarities with BERTopic~\cite{ref17}, which also uses HDBSCAN clustering with cluster-level TF-IDF (c-TF-IDF) for topic labeling. Two differences are consequential. First, BERTopic uses general-domain sentence-transformer models, whereas our BioBERT configuration uses a model specifically pretrained on biomedical text, which has been shown to capture relational knowledge between biomedical concepts more accurately~\cite{ref20}. Second, our systematic six-configuration comparison provides evidence about which pipeline components drive performance, rather than evaluating a single configuration.
+Our pipeline shares architectural similarities with BERTopic~\cite{ref17}, which also uses HDBSCAN clustering with cluster-level TF-IDF (c-TF-IDF) for topic labeling. Two differences are consequential. First, BERTopic uses general-domain sentence-transformer models, whereas our BioBERT configuration uses a model specifically pretrained on biomedical text, which has been shown to capture relational knowledge between biomedical concepts more accurately~\cite{ref20}. Second, our systematic six-configuration comparison provides evidence about which pipeline components drive performance, rather than evaluating a single configuration, as recent large-scale BERTopic applications to biomedical corpora typically do~\cite{ref30,ref31}. This distinction is also what separates our study from TopicForest~\cite{ref29}: whereas TopicForest optimizes a single hierarchical LLM-labeling pipeline for multi-resolution presentation, our objective is to quantify the relative contribution of the embedding and clustering families through a controlled factorial design, yielding actionable guidance for pipeline construction.
 
-The LORE framework~\cite{ref11} demonstrated that UMAP projections of disease-gene embeddings exhibit geometric structure with biological meaning, a finding that our results corroborate and extend to the document level. While LORE targets gene-disease association prediction with 90\% mean average precision, our pipeline targets corpus-level thematic discovery, a complementary task that existing literature mining systems have not addressed. Knowledge graph approaches~\cite{ref8}~\cite{ref9}~\cite{ref10} organize information around predefined entity types and relations, making them suitable for structured querying but not for discovering the emergent thematic structure of a document corpus.
+The LORE framework~\cite{ref11} demonstrated that UMAP projections of disease-gene embeddings exhibit geometric structure with biological meaning, a finding that our results corroborate and extend to the document level. While LORE targets gene-disease association prediction with 90\% mean average precision, our pipeline targets corpus-level thematic discovery, a complementary task that existing literature mining systems have not addressed. Knowledge graph approaches~\cite{ref8,ref9,ref10} organize information around predefined entity types and relations, making them suitable for structured querying but not for discovering the emergent thematic structure of a document corpus.
 
 \subsection{Limitations and Future Work}
 
@@ -526,6 +612,14 @@ Future work should extend the pipeline to full-text articles, incorporate tempor
 \bibitem{ref27} D. L. Davies and D. W. Bouldin, ``A cluster separation measure,'' \textit{IEEE Trans. Pattern Anal. Mach. Intell.}, vol.~PAMI-1, no.~2, pp.~224--227, Apr.~1979, doi: 10.1109/TPAMI.1979.4766909.
 
 \bibitem{ref28} G. Bouma, ``Normalized (pointwise) mutual information in collocation extraction,'' in \textit{Proc. GSCL 2009}, Potsdam, Germany, Sep.~2009, pp.~31--40.
+
+\bibitem{ref29} C. Chang, B. Ondov, B. Choi, X. Peng, H. He, and H. Xu, ``TopicForest: embedding-driven hierarchical clustering and labeling for biomedical literature,'' \textit{J. Biomed. Inform.}, vol.~172, Art. no.~104958, 2025, doi: 10.1016/j.jbi.2025.104958.
+
+\bibitem{ref30} A. Madrid-Garc\'ia, D. Freites-N\'u\~nez, B. Merino-Barbancho, I. P\'erez Sancristobal, and L. Rodr\'iguez-Rodr\'iguez, ``Mapping two decades of research in rheumatology-specific journals: a topic modeling analysis with BERTopic,'' \textit{Ther. Adv. Musculoskelet. Dis.}, vol.~16, Art. no.~1759720X241308037, Dec.~2024, doi: 10.1177/1759720X241308037.
+
+\bibitem{ref31} L. Ma, R. Chen, W. Ge, P. Rogers, B. Lyn-Cook, H. Hong, W. Tong, N. Wu, and W. Zou, ``AI-powered topic modeling: comparing LDA and BERTopic in analyzing opioid-related cardiovascular risks in women,'' \textit{Exp. Biol. Med.}, vol.~250, Art. no.~10389, 2025, doi: 10.3389/ebm.2025.10389.
+
+\bibitem{ref32} V. Kaverinskiy, I. Chaikovsky, A. Mnevets, T. Ryzhenko, M. Bocharov, and K. Malakhov, ``Scalable clustering of complex ECG health data: big data clustering analysis with UMAP and HDBSCAN,'' \textit{Computation}, vol.~13, no.~6, Art. no.~144, 2025, doi: 10.3390/computation13060144.
 
 \end{thebibliography}
 

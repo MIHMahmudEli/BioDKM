@@ -16,3 +16,8 @@ env/
 #ignore my code
 run_biobert_pipeline.py
 run_pipeline_step5_9.py
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
