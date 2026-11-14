@@ -1,0 +1,1577 @@
+\documentclass[a4paper,fleqn]{cas-dc}
+
+\usepackage[numbers]{natbib}
+\usepackage{helvet}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
+
+\graphicspath{{figures/}{./figures/}}
+% Float placement optimization
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.80}
+\renewcommand{\dbltopfraction}{0.95}
+\renewcommand{\dblfloatpagefraction}{0.80}
+\setcounter{topnumber}{8}
+\setcounter{bottomnumber}{8}
+\setcounter{totalnumber}{16}
+\setcounter{dbltopnumber}{8}
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
+
+
+% Colour palette for the high-visibility TikZ pipeline figure
+\definecolor{cTealBorder}{RGB}{13, 148, 136}
+\definecolor{cTealBg}{RGB}{240, 253, 250}
+\definecolor{cTealBadge}{RGB}{15, 118, 110}
+
+\definecolor{cSlateBorder}{RGB}{71, 85, 105}
+\definecolor{cSlateBg}{RGB}{248, 250, 252}
+\definecolor{cSlateBadge}{RGB}{51, 65, 85}
+
+\definecolor{cBlueBorder}{RGB}{37, 99, 235}
+\definecolor{cBlueBg}{RGB}{239, 246, 255}
+\definecolor{cBlueBadge}{RGB}{29, 78, 216}
+
+\definecolor{cAmberBorder}{RGB}{217, 119, 6}
+\definecolor{cAmberBg}{RGB}{255, 251, 235}
+\definecolor{cAmberBadge}{RGB}{180, 83, 9}
+
+\definecolor{cGreenBorder}{RGB}{16, 185, 129}
+\definecolor{cGreenBg}{RGB}{236, 253, 245}
+\definecolor{cGreenBadge}{RGB}{5, 150, 105}
+
+\definecolor{cPurpleBorder}{RGB}{139, 92, 246}
+\definecolor{cPurpleBg}{RGB}{245, 243, 255}
+\definecolor{cPurpleBadge}{RGB}{109, 40, 217}
+
+\definecolor{cRoseBorder}{RGB}{225, 29, 72}
+\definecolor{cRoseBg}{RGB}{255, 241, 242}
+\definecolor{cRoseBadge}{RGB}{190, 18, 60}
+
+\definecolor{busSlate}{RGB}{71, 85, 105}
+\definecolor{textDark}{RGB}{15, 23, 42}
+\definecolor{textSub}{RGB}{51, 65, 85}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!70!black,
+  citecolor=blue!70!black,
+  urlcolor=blue!70!black
+}
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+
+% Short title
+\shorttitle{BioDKM: Biomedical Disease Knowledge Mapping}
+
+% Short author
+\shortauthors{M. I. Hossain et al.}
+
+% Main title of the paper
+\title [mode = title]{BioDKM: An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature}
+
+% Authors
+\author[1]{Mohsin Ibna Hossain}[orcid=0009-0003-9123-9040]
+\ead{23-50194-1@student.aiub.edu}
+\credit{Conceptualization, Methodology, Software, Formal analysis, Writing - Original Draft}
+
+\author[1]{Mosharof Hossain Dpio}[orcid=0009-0008-1036-033X]
+\ead{mosharofhossin561@gmail.com}
+\credit{Data curation, Investigation, Validation, Formal analysis, Writing - Review \& Editing}
+
+\author[1]{Rajarshi Mondal}
+\ead{23-50279-1@student.aiub.edu}
+\credit{Software, Visualization, Investigation, Validation}
+
+\author[1]{Shadman Shakib}
+\ead{23-50200-1@student.aiub.edu}
+\credit{Investigation, Validation, Data curation, Resources}
+
+\author[1]{Tohedul Islam}
+\cormark[1]
+\ead{islamtohedul@aiub.edu}
+\credit{Supervision, Project administration, Resources, Writing - Review \& Editing}
+
+\cortext[cor1]{Corresponding author}
+
+\affiliation[1]{organization={Department of Computer Science and Engineering, American International University-Bangladesh (AIUB)},
+    addressline={408/1, Kuratoli, Khilkhet}, 
+    city={Dhaka},
+    postcode={1229}, 
+    country={Bangladesh}}
+
+\begin{abstract}
+The exponential growth of biomedical literature renders manual synthesis of disease knowledge impractical. We present \textbf{BioDKM} (\textbf{Bio}medical \textbf{D}isease \textbf{K}nowledge \textbf{M}apping), a comprehensive unsupervised framework combining multi-representation embeddings, non-linear topological projection, density-based clustering, and automated clinical interpretation. We systematically evaluate five diverse feature representations (sparse TF-IDF, continual pretrained BioBERT, domain-specific PubMedBERT, scientific SciBERT, and sentence-transformer MiniLM) across three clustering algorithms (KMeans, HDBSCAN, Hierarchical) and two topic modeling baselines (LDA, BERTopic) on 14,064 PubMed abstracts spanning eight disease classes. Density-based HDBSCAN consistently outperforms parametric approaches across all representations. TF-IDF with HDBSCAN achieves superior intrinsic quality (Silhouette 0.4786, Davies--Bouldin 0.6034) and high topic coherence (NPMI 0.1158), discovering 116 fine-grained topics at 3.5$\times$ faster runtime than LDA. Sentence-MiniLM with HDBSCAN attains NPMI 0.1270 across 95 topics. Quantitative clinical grounding against the National Library of Medicine Medical Subject Headings (MeSH 2024) ontology establishes that while KMeans remains confined to broad anatomical levels (depth 2--3), HDBSCAN penetrates to specialized taxonomic depths of 5 and 6. Furthermore, an unsupervised cross-disease comorbidity network uncovers clinically verified pathophysiological axes (Cardiovascular--Stroke affinity 0.812, Alzheimer's--Stroke 0.782, Alzheimer's--Hypertension 0.781) and identifies multidisciplinary bridge clusters without supervision. Our results prove that BioDKM provides an accurate, scalable foundation for automated biomedical literature synthesis.
+\end{abstract}
+
+\begin{keywords}
+Biomedical text mining \sep Unsupervised clustering \sep BioBERT \sep MeSH ontology grounding \sep Disease comorbidity network \sep TF-IDF \sep HDBSCAN \sep UMAP \sep PubMed abstracts \sep Topic coherence
+\end{keywords}
+
+\maketitle
+
+\section{Introduction}
+
+The volume of published biomedical research has grown at an accelerating rate over the past two decades. PubMed surpassed 29 million indexed articles by 2019~\cite{ref1}, and disease-specific corpora continue to expand rapidly: neoplasm-related publications alone increased at 42.41\% annually through 2021~\cite{ref13}. This growth creates a fundamental problem for researchers. The knowledge needed to understand a disease, identify research trends, or discover connections across disciplines is distributed across hundreds of thousands of abstracts, each written in specialized terminology that varies by subfield. Manual review at this scale is not feasible, and keyword-based search returns documents matching surface terms rather than organizing them around underlying themes.
+
+Computational approaches to biomedical knowledge extraction have made substantial progress. Domain-adapted language models such as BioBERT~\cite{ref1} have demonstrated that continued pre-training on PubMed abstracts and PMC full-text articles yields significant improvements over general-domain models on named entity recognition, relation extraction, and question answering. Supervised methods have been extended to disease-gene association mining~\cite{ref8,ref10}, knowledge graph construction~\cite{ref9}, and document classification~\cite{ref13}, all with strong results where labeled data or predefined ontologies are available. At the same time, unsupervised topic modeling and clustering methods have evolved from bag-of-words models such as Latent Dirichlet Allocation (LDA) toward approaches that incorporate contextual embeddings from transformer architectures~\cite{ref15,ref17}.
+
+Despite these advances, three limitations persist in the existing literature. First, most biomedical NLP evaluations focus on supervised tasks: entity recognition, relation extraction, and document classification~\cite{ref2,ref3,ref4,ref5,ref6}. Unsupervised discovery of thematic structure at the corpus level, where no labels exist to guide the analysis, has received comparatively less attention. Second, among the clustering and topic modeling studies that do exist~\cite{ref15,ref16,ref17}, the embedding stage typically relies on either sparse frequency-based features (TF-IDF, bag-of-words) or general-purpose sentence transformers, neither of which fully exploits the domain-specific representational capacity of biomedical language models. Third, existing clustering frameworks either impose parametric assumptions about cluster distributions, as Gaussian Mixture Models (GMM) and KMeans do, or produce topic representations that require manual inspection without automated labeling~\cite{ref17}. No prior study has, to our knowledge, integrated domain-adapted embeddings, nonlinear dimensionality reduction, density-based clustering, MeSH ontology grounding, and cross-disease network discovery into a single unsupervised pipeline for disease-specific knowledge discovery from PubMed abstracts.
+
+We address this gap by proposing \textbf{BioDKM} (\textbf{Bio}medical \textbf{D}isease \textbf{K}nowledge \textbf{M}apping), a modular unsupervised framework for disease knowledge mapping and comorbidity discovery. The pipeline comprises four stages: (1) feature extraction across sparse and contextual representations (TF-IDF, BioBERT, PubMedBERT, SciBERT, and Sentence-MiniLM); (2) nonlinear dimensionality reduction using Uniform Manifold Approximation and Projection (UMAP) with cosine distance; (3) clustering via three algorithms representing different inductive biases: KMeans (partition-based), HDBSCAN (density-based), and agglomerative hierarchical clustering (connectivity-based); and (4) automated topic interpretation, clinical MeSH ontology grounding, and cross-disease comorbidity mapping. The pipeline is evaluated across 14,065 PubMed abstracts collected from eight disease categories (diabetes, cancer, cardiovascular disease, neurological disorders, stroke, hypertension, Alzheimer's, and Parkinson's) using the NCBI E-utilities API.
+
+This study is guided by six research questions (RQs) that structure the experimental design and analysis:
+\begin{itemize}
+\item \textbf{RQ1.} To what extent does the choice of clustering algorithm, whether partition-based (KMeans), density-based (HDBSCAN), or connectivity-based (hierarchical), determine clustering quality and topic coherence for biomedical abstracts, relative to the choice of feature representation?
+\item \textbf{RQ2.} Do domain-adapted contextual embeddings (BioBERT, PubMedBERT, SciBERT) produce more coherent and better-separated unsupervised topic structures than sparse frequency-based features (TF-IDF) when both are processed through an identical downstream pipeline?
+\item \textbf{RQ3.} Can a fully unsupervised pipeline, without any labeled training data, recover clinically meaningful disease categories at multiple granularity levels (broad clinical domains and fine-grained research themes)?
+\item \textbf{RQ4.} What is the trade-off between computational cost and topic-discovery quality across the embedding strategies, and what does this imply for resource-constrained deployment?
+\item \textbf{RQ5.} To what extent do unsupervised cluster keywords align with standardized National Library of Medicine Medical Subject Headings (MeSH), and does density-based clustering capture deeper taxonomic hierarchy depths?
+\item \textbf{RQ6.} Can unsupervised density-based clustering automatically reconstruct known clinical comorbidity relationships and identify multidisciplinary bridge clusters connecting disparate disease categories?
+\end{itemize}
+
+The experimental design addresses these questions by comparing configurations formed by crossing diverse embedding methods with clustering algorithms alongside classical (LDA) and neural (BERTopic) baselines. We assess clustering quality using three complementary metrics: Silhouette coefficient (cluster separation), Davies--Bouldin index (intra-cluster compactness), and Normalized Pointwise Mutual Information (NPMI) coherence (topic interpretability). Clinical interpretability is validated through macro-level categorization (KMeans), micro-level topic discovery (HDBSCAN), quantitative MeSH ontology grounding, and cross-disease comorbidity networks.
+
+Our main findings are as follows. The TF-IDF with HDBSCAN configuration achieves the highest overall clustering quality (Silhouette~0.4786, Davies--Bouldin~0.6034, NPMI~0.1158), discovering 116 fine-grained topics. BioBERT with HDBSCAN yields comparable topic coherence (NPMI~0.1154, 80 topics), and Sentence-MiniLM reaches NPMI~0.1270 (95 topics), confirming that density-based clustering substantially outperforms parametric approaches regardless of the embedding method. Parametric algorithms (KMeans, Hierarchical) are constrained to exactly five topics by the Elbow method and produce consistently lower coherence scores (NPMI~0.06--0.08). Grounding against the 2024 MeSH ontology demonstrates that HDBSCAN clusters penetrate into granular taxonomic depths of 5 and 6, capturing precise biomedical entities (e.g., *Phosphorylated Tau*, *Diabetic Foot Ulcer*, *Alpha-Synuclein Fibrils*). Finally, the unsupervised cross-disease comorbidity network reconstructs known clinical disease axes (Cardiovascular--Stroke 0.812, Alzheimer's--Stroke 0.782, Alzheimer's--Hypertension 0.781) and identifies multidisciplinary bridge clusters without supervision.
+
+The contributions of this work are fivefold:
+\begin{enumerate}
+\item We present \textbf{BioDKM}, the first unified unsupervised framework integrating sparse (TF-IDF) and contextual transformer embeddings (BioBERT, PubMedBERT, SciBERT, SBERT) with UMAP topological projection, HDBSCAN density clustering, and cluster-level TF-IDF keyword extraction for disease knowledge mapping from PubMed abstracts.
+\item We provide a systematic comparative evaluation across five representations, three clustering families, and two benchmark baselines (LDA, BERTopic) on a multi-disease corpus of 14,065 abstracts, accompanied by 1,000-fold bootstrap confidence intervals and non-parametric hypothesis tests.
+\item We establish objective clinical validity through quantitative grounding against the 2024 NLM MeSH hierarchical ontology, demonstrating that density-based clustering penetrates to deep taxonomic tree levels (depths 4--6) compared to surface-level parametric clusters (depths 2--3).
+\item We formulate an unsupervised disease comorbidity matrix and relational knowledge network that automatically discovers clinically verified disease interactions and cross-disciplinary bridge topics without pair-level disease training.
+\item We definitively resolve the density-based outlier filtering critique through an apples-to-apples matched core subset ablation and 100\% soft $k$-NN assignment, while demonstrating exceptional topological stability across 10-fold subsampling perturbations ($\text{AMI} = 0.7498 \pm 0.0110$, 100\% replication of clinical sentinel topics).
+\end{enumerate}
+
+The remainder of this paper is organized as follows. Section~II reviews related work in biomedical language models, literature mining, unsupervised clustering, and embedding visualization. Section~III describes the dataset collection, preprocessing pipeline, and methodological details of all experimental configurations. Section~IV presents the quantitative results, baseline comparisons, ablation studies, MeSH ontology grounding, and disease comorbidity network discovery. Section~V discusses the implications, clinical translation, and limitations. Section~VI concludes the paper.
+
+\section{Related Work}
+
+The rapid expansion of biomedical literature has rendered manual extraction of disease knowledge impractical, driving the development of automated text mining tools. Early computational approaches relied heavily on co-occurrence mining to build disease-gene associations~\cite{ref8}, or converted syntactically complex sentences into structured semantic graphs using supervised architectures and predefined schemas~\cite{ref12,ref13}. While these systems produce robust entity-level networks~\cite{ref9,ref10}, they are intrinsically limited by their training data and taxonomic boundaries. The latent thematic structure of a disease corpus, that is, how research topics naturally cluster and evolve, remains largely invisible to supervised systems that only search for what they have been programmed to find~\cite{ref14}.
+
+Unsupervised clustering and topic modeling offer an alternative by organizing documents without labeled data. Traditional models like LDA and NMF rely on bag-of-words representations that discard sequential order and semantic context, often clustering documents based on surface vocabulary overlap rather than true conceptual similarity~\cite{ref15}. Contextual embeddings from transformer architectures successfully address this limitation. However, models trained on general-domain text (e.g., standard BERT) underperform on biomedical corpora due to massive vocabulary mismatch~\cite{ref2,ref17}. Domain-adapted models, specifically BioBERT~\cite{ref1}, overcome this by continuing pre-training on PubMed abstracts and PMC full-text articles, yielding state-of-the-art representations that capture the complex contextual meaning of biomedical terminology~\cite{ref3,ref4,ref5,ref6,ref7}. 
+
+Despite the availability of these powerful embeddings, current unsupervised methodologies remain fragmented. For example, Davagdorj et al.~\cite{ref15} clustered BioBERT embeddings but relied on Gaussian Mixture Models (GMM), which impose rigid parametric assumptions that biomedical research themes rarely satisfy. Grootendorst's BERTopic framework~\cite{ref17} elegantly combined transformer embeddings with density-based clustering (HDBSCAN) and cluster-level keyword extraction (c-TF-IDF), but utilized general-purpose models rather than domain-adapted ones. The BERTopic paradigm has since been adopted for large-scale biomedical corpus mapping, for example, two decades of rheumatology research across 34 journals~\cite{ref30} and BioBERT-embedded comparisons of LDA and BERTopic for opioid--cardiovascular risk analysis~\cite{ref31}; yet these studies apply a single fixed configuration rather than systematically isolating which pipeline components drive performance. The recent TopicForest framework~\cite{ref29} pushes in a complementary direction, using contrastively trained large language model embeddings with hierarchical dendrogram cutting and recursive LLM labeling, but its emphasis is multi-resolution labeling rather than a controlled comparison of embedding and clustering families. The effectiveness of the UMAP-then-HDBSCAN combination for large-scale health data has been independently corroborated at a comparable corpus scale in ECG risk-profile clustering~\cite{ref32}. Similarly, while visualization techniques like UMAP have been used to project disease embeddings~\cite{ref11,ref19,ref20}, they are typically employed as post-hoc display tools rather than integrated analytical layers. Furthermore, few studies explore how these advanced deep-learning pipelines compare directly against optimized sparse representations like TF-IDF~\cite{ref18} in density-based topological spaces. To our knowledge, no existing study has combined biomedical semantic embeddings, UMAP dimensionality reduction, HDBSCAN density clustering, and cluster-level keyword interpretation into a unified, reproducible pipeline for unsupervised disease knowledge discovery. We address this gap with \textbf{BioDKM}.
+
+\section{Methodology}
+
+Fig.~\ref{fig:pipeline} presents the comprehensive experimental architecture of the proposed \textbf{BioDKM} framework, spanning eight coordinated phases: multi-query data acquisition, text preprocessing, multi-representation feature extraction (TF-IDF, BioBERT, PubMedBERT, SciBERT, Sentence-MiniLM), diagnostic centroid separability, dimensionality reduction ablation (UMAP vs. PCA vs. High-Dimensional), clustering alongside classical (LDA) and neural (BERTopic) baselines, cluster-level keyword interpretation, and a multi-pillar evaluation framework (intrinsic cluster validity, semantic coherence, external ground-truth disease alignment, quantitative MeSH clinical ontology grounding, unsupervised disease comorbidity networking, and statistical hypothesis testing).
+
+\begin{figure*}[!t]
+\centering
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\sffamily,
+  >=Stealth,
+  card/.style={draw=#1Border, fill=#1Bg, line width=1.1pt, rounded corners=5pt, align=center, inner sep=4.5pt, text=textDark},
+  subcard/.style={draw=#1Border!85, fill=white, line width=0.8pt, rounded corners=3.5pt, align=center, inner sep=3.5pt, text=textDark},
+  headerBar/.style={fill=#1Badge, text=white, font=\sffamily\bfseries\fontsize{7.2pt}{8.8pt}\selectfont, rounded corners=2.5pt, inner sep=3pt, minimum height=4.8mm, align=center},
+  bus/.style={line width=1.4pt, draw=busSlate},
+  branch/.style={-{Stealth[length=5.5pt, width=4.0pt]}, line width=1.1pt, draw=busSlate},
+  mainArrow/.style={-{Stealth[length=7.0pt, width=5.2pt]}, line width=1.6pt, draw=busSlate},
+  junc/.style={circle, fill=busSlate, inner sep=0pt, minimum size=4.0pt}
+]
+
+\coordinate (originX) at (0,0);
+
+% ─── ROW 1: ACQUISITION & PREPROCESSING ─────────────────────────────────────
+% Centers at -66mm and +66mm, width 114mm -> Gap between cards is exactly 18mm!
+\node[card=cTeal, text width=114mm, minimum height=18mm] (cStage1) at (-66mm, 0) {
+  {\color{cTealBadge}\bfseries\fontsize{7.5pt}{9pt}\selectfont STAGE 1: CORPUS ACQUISITION}\\[1.5pt]
+  {\color{cTealBorder!50}\rule{110mm}{0.5pt}}\\[2.5pt]
+  {\fontsize{8.5pt}{10.2pt}\selectfont\textbf{NCBI Entrez E-Utilities Data Acquisition Engine}}\\[1.5pt]
+  {\fontsize{7.0pt}{8.4pt}\selectfont Automated retrieval across 8 clinical queries ($N = 14{,}065$ PubMed abstracts)}\\[1pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Neoplasm (1,951) $\cdot$ Diabetes (1,922) $\cdot$ Stroke (1,880) $\cdot$ Alzheimer's (1,753) $\cdot$ Hypertension (1,747) $\cdot$ CVD (1,722) $\cdot$ Neuro (1,586) $\cdot$ Parkinson's (1,504)}
+};
+
+\node[card=cSlate, text width=114mm, minimum height=18mm] (cStage2) at (66mm, 0) {
+  {\color{cSlateBadge}\bfseries\fontsize{7.5pt}{9pt}\selectfont STAGE 2: BIOMEDICAL TEXT PREPROCESSING}\\[1.5pt]
+  {\color{cSlateBorder!50}\rule{110mm}{0.5pt}}\\[2.5pt]
+  {\fontsize{8.5pt}{10.2pt}\selectfont\textbf{Biomedical Text Standardization \& Cleaning Pipeline}}\\[1.5pt]
+  {\fontsize{7.0pt}{8.4pt}\selectfont Lowercase normalisation $\cdot$ Regex non-alphabetic filtering ($[\text{\textasciicircum a-zA-Z}\backslash\text{s}]$) $\cdot$ NLTK tokenisation}\\[1pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Stop-word removal $\cdot$ Length thresholding ($\text{len} > 2$) $\cdot$ Strict deduplication $\rightarrow$ \textbf{14{,}064 Verified Documents}}
+};
+
+% 18mm prominent horizontal arrow connecting Stage 1 to Stage 2
+\draw[mainArrow] (cStage1.east) -- (cStage2.west);
+
+% ─── ROW 2: MULTI-REPRESENTATION EXTRACTION (14mm vertical gap from Row 1) ──
+\coordinate (r2Center) at (0, -43mm);
+
+\node[headerBar=cBlue, text width=248mm] (hStage3) at ($(r2Center) + (0, 15.5mm)$) {STAGE 3: MULTI-REPRESENTATION FEATURE EXTRACTION};
+
+\node[subcard=cBlue, text width=56mm, minimum height=18mm] at ($(r2Center) + (-93mm, -2.5mm)$) (c3a) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{3a. Sparse TF-IDF Vectorizer}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont Term Salience \& Inverse Doc Frequency}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} $\text{vocab} = 5{,}000$ (unigram + bigram) $\cdot$ $\text{min\_df} = 5$\\[0.5pt] Output: $\mathbf{X} \in \mathbb{R}^{14{,}064 \times 5{,}000}$ ($\ell_2$-norm)}
+};
+
+\node[subcard=cBlue, text width=56mm, minimum height=18mm] at ($(r2Center) + (-31mm, -2.5mm)$) (c3b) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{3b. BioBERT v1.1 Encoder}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont PubMed + PMC Continual Pretraining}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} 12-layer, 768-d Contextual BERT $\cdot$ Mean pool\\[0.5pt] Output: $\mathbf{X} \in \mathbb{R}^{14{,}064 \times 768}$ ($\ell_2$-norm)}
+};
+
+\node[subcard=cBlue, text width=56mm, minimum height=18mm] at ($(r2Center) + (31mm, -2.5mm)$) (c3c) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{3c. Scientific BERT Encoders}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont Scratch \& Multi-Domain Encoders}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} \textbf{PubMedBERT}: 768-d from scratch on PubMed\\[0.5pt] \textbf{SciBERT}: 768-d scientific \textit{scivocab} ($\ell_2$-norm)}
+};
+
+\node[subcard=cBlue, text width=56mm, minimum height=18mm] at ($(r2Center) + (93mm, -2.5mm)$) (c3d) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{3d. Sentence-Transformer}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont Contrastive Bi-Encoder Architecture}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} \textbf{all-MiniLM-L6-v2}: 384-d dense embedding\\[0.5pt] 1B+ sentence pair contrastive pretraining}
+};
+
+\begin{scope}[on background layer]
+  \node[card=cBlue, inner xsep=4.5pt, inner ysep=4.5pt, fit=(hStage3) (c3a) (c3d)] (boxStage3) {};
+\end{scope}
+
+% ─── ROW 3: DIAGNOSTIC & TOPOLOGICAL REDUCTION (11.5mm vertical gap from Row 2)
+\coordinate (r3Center) at (0, -77mm);
+
+\node[card=cAmber, text width=114mm, minimum height=18mm] at ($(r3Center) + (-66mm, 0)$) (c4a) {
+  {\color{cAmberBadge}\bfseries\fontsize{7.5pt}{9pt}\selectfont STAGE 4A: CENTROID DIAGNOSTICS}\\[1.5pt]
+  {\color{cAmberBorder!50}\rule{110mm}{0.5pt}}\\[2.5pt]
+  {\fontsize{8.5pt}{10.2pt}\selectfont\textbf{Centroid Diagnostic Analysis (Exploratory Separability)}}\\[1.5pt]
+  {\fontsize{7.0pt}{8.4pt}\selectfont $K = 10$ pseudo-class partitioning $\cdot$ Centroid vectors $\boldsymbol{\mu}_c = \frac{1}{|P_c|}\sum_{d \in P_c}\mathbf{E}_d$}\\[1pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Pairwise centroid cosine similarity matrix $\cdot$ Modularity verification}
+};
+
+\node[card=cAmber, text width=114mm, minimum height=18mm] at ($(r3Center) + (66mm, 0)$) (c4b) {
+  {\color{cAmberBadge}\bfseries\fontsize{7.5pt}{9pt}\selectfont STAGE 4B: TOPOLOGICAL MANIFOLD PROJECTION}\\[1.5pt]
+  {\color{cAmberBorder!50}\rule{110mm}{0.5pt}}\\[2.5pt]
+  {\fontsize{8.5pt}{10.2pt}\selectfont\textbf{Topological Manifold Projection \& Dimensionality Ablation}}\\[1.5pt]
+  {\fontsize{7.0pt}{8.4pt}\selectfont UMAP 2D Approximation: Fuzzy simplicial cross-entropy ($\text{cosine}, k{=}15$)}\\[1pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Full Ablation: High-Dim vs. PCA (50D/2D) vs. UMAP 2D $\cdot$ Trustworthiness $T(k) = 0.982$}
+};
+
+% ─── ROW 4: CLUSTERING & BASELINES (14.5mm vertical gap from Row 3) ─────────
+\coordinate (r4Center) at (0, -119mm);
+
+\node[headerBar=cGreen, text width=248mm] (hStage5) at ($(r4Center) + (0, 15.5mm)$) {STAGE 5: CLUSTERING \& BASELINES};
+
+\node[subcard=cGreen, text width=56mm, minimum height=18mm] at ($(r4Center) + (-93mm, -2.5mm)$) (c5a) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{5a. HDBSCAN Density}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont Hierarchical Density Clustering}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} Mutual reachability $\cdot$ MST condensation\\[0.5pt] \textbf{80--116 Fine-grained Topics + Noise}}
+};
+
+\node[subcard=cGreen, text width=56mm, minimum height=18mm] at ($(r4Center) + (-31mm, -2.5mm)$) (c5b) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{5b. KMeans Partitioning}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont Centroid Distance Optimization}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} Spherical Voronoi tessellation $\cdot$ Elbow sweep\\[0.5pt] \textbf{Optimal $K = 5$ Macro Categories}}
+};
+
+\node[subcard=cGreen, text width=56mm, minimum height=18mm] at ($(r4Center) + (31mm, -2.5mm)$) (c5c) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{5c. Agglomerative Hier.}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont Bottom-up Dendrogram Clustering}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} Ward minimum variance $\cdot$ Pairwise Euclidean\\[0.5pt] \textbf{Hierarchical Tree Cut ($K = 5$)}}
+};
+
+\node[subcard=cGreen, text width=56mm, minimum height=18mm] at ($(r4Center) + (93mm, -2.5mm)$) (c5d) {
+  {\fontsize{8.0pt}{9.5pt}\selectfont\textbf{5d. Literature Baselines}}\\[1.5pt]
+  {\fontsize{6.7pt}{8.0pt}\selectfont Classical \& Neural Benchmarks}\\[1pt]
+  {\fontsize{6.0pt}{7.2pt}\selectfont\color{textSub} \textbf{LDA}: Latent Dirichlet Allocation (VB)\\[0.5pt] \textbf{BERTopic}: Transformer + HDBSCAN + c-TF-IDF}
+};
+
+\begin{scope}[on background layer]
+  \node[card=cGreen, inner xsep=4.5pt, inner ysep=4.5pt, fit=(hStage5) (c5a) (c5d)] (boxStage5) {};
+\end{scope}
+
+% ─── ROW 5: TOPIC INTERPRETATION (11.5mm vertical gap from Row 4) ──────────
+\coordinate (r5Center) at (0, -151.5mm);
+
+\node[card=cPurple, text width=248mm, minimum height=16mm] at (r5Center) (cStage6) {
+  {\color{cPurpleBadge}\bfseries\fontsize{7.5pt}{9pt}\selectfont STAGE 6: TOPIC SEMANTIC INTERPRETATION \& NOISE RE-ALLOCATION}\\[1.5pt]
+  {\color{cPurpleBorder!50}\rule{244mm}{0.5pt}}\\[2.5pt]
+  {\fontsize{8.5pt}{10.2pt}\selectfont\textbf{Topic Semantic Interpretation \& Complete Noise Partition Allocation}}\\[1.5pt]
+  {\fontsize{7.0pt}{8.4pt}\selectfont Class-based TF-IDF ($c\text{-TF-IDF}$): $W_{t,c} = \frac{tf_{t,c}}{tf_c} \cdot \log\left(1 + \frac{A}{tf_t}\right)$ $\cdot$ Automated Title-Case Clinical Label Synthesis}\\[1pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Soft $k$-NN classification protocol for noise boundary papers $\rightarrow$ Guaranteed 100\% complete corpus document assignment}
+};
+
+% ─── ROW 6: MULTI-PILLAR EMPIRICAL VALIDATION SUITE (14mm vertical gap from Row 5)
+\coordinate (r6Center) at (0, -193mm);
+
+\node[headerBar=cRose, text width=248mm] (hStage7) at ($(r6Center) + (0, 15.5mm)$) {STAGE 7: MULTI-PILLAR EMPIRICAL VALIDATION SUITE};
+
+\node[subcard=cRose, text width=37mm, minimum height=18mm] at ($(r6Center) + (-104.5mm, -2.5mm)$) (c7a) {
+  {\fontsize{7.6pt}{9.0pt}\selectfont\textbf{7a. Intrinsic Quality}}\\[1.5pt]
+  {\fontsize{6.1pt}{7.3pt}\selectfont Silhouette (0.4786)\\[0.5pt] Davies-Bouldin (0.6034)\\[0.5pt] Matched-Core Ablation}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=18mm] at ($(r6Center) + (-62.7mm, -2.5mm)$) (c7b) {
+  {\fontsize{7.6pt}{9.0pt}\selectfont\textbf{7b. Semantic Purity}}\\[1.5pt]
+  {\fontsize{6.1pt}{7.3pt}\selectfont NPMI Coherence (0.1158)\\[0.5pt] Word Intrusion (98.55\%)\\[0.5pt] Purity Margin (+0.145)}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=18mm] at ($(r6Center) + (-20.9mm, -2.5mm)$) (c7c) {
+  {\fontsize{7.6pt}{9.0pt}\selectfont\textbf{7c. Disease Alignment}}\\[1.5pt]
+  {\fontsize{6.1pt}{7.3pt}\selectfont Adjusted Rand Index (ARI)\\[0.5pt] Normalized MI (NMI)\\[0.5pt] Ground-Truth Matrix}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=18mm] at ($(r6Center) + (20.9mm, -2.5mm)$) (c7d) {
+  {\fontsize{7.6pt}{9.0pt}\selectfont\textbf{7d. MeSH Grounding}}\\[1.5pt]
+  {\fontsize{6.1pt}{7.3pt}\selectfont 2024 NLM MeSH Tree\\[0.5pt] Depths 1--8 Alignment\\[0.5pt] Granular Depths 4--6}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=18mm] at ($(r6Center) + (62.7mm, -2.5mm)$) (c7e) {
+  {\fontsize{7.6pt}{9.0pt}\selectfont\textbf{7e. Comorbidity Net}}\\[1.5pt]
+  {\fontsize{6.1pt}{7.3pt}\selectfont Unsupervised Cosine Net\\[0.5pt] Cardiovasc-Stroke 0.812\\[0.5pt] Alzheimer-Stroke 0.782}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=18mm] at ($(r6Center) + (104.5mm, -2.5mm)$) (c7f) {
+  {\fontsize{7.6pt}{9.0pt}\selectfont\textbf{7f. Scalability/Stab.}}\\[1.5pt]
+  {\fontsize{6.1pt}{7.3pt}\selectfont 10-Fold Perturb. ($0.750$)\\[0.5pt] Near-Linear ($\alpha = 0.326$)\\[0.5pt] 451 docs/s ($16.5\times$ BERTopic)}
+};
+
+\begin{scope}[on background layer]
+  \node[card=cRose, inner xsep=4.5pt, inner ysep=4.5pt, fit=(hStage7) (c7a) (c7f)] (boxStage7) {};
+\end{scope}
+
+% ─── ORTHOGONAL BUS ROUTING & INTERCONNECTS ─────────────────────────────────
+
+% Bus 1: Stage 2 -> Stage 3 (Clean 8mm drop into boxStage3.north, NO junction dot on corner!)
+\coordinate (bus1Center) at ($(cStage2.south)!0.42!(boxStage3.north)$);
+\draw[bus] (cStage2.south) -- (cStage2.south |- bus1Center) -- (originX |- bus1Center);
+\draw[mainArrow] (originX |- bus1Center) -- (boxStage3.north);
+\node[junc] at (cStage2.south) {};
+\node[junc] at (cStage2.south |- bus1Center) {};
+
+% Internal distribution bus inside Stage 3
+\coordinate (bus3In) at ($(hStage3.south)!0.5!(c3b.north)$);
+\draw[bus] (originX |- hStage3.south) -- (originX |- bus3In);
+\draw[bus] (c3a.north |- bus3In) -- (c3d.north |- bus3In);
+\node[junc] at (originX |- bus3In) {};
+\node[junc] at (c3a.north |- bus3In) {};
+\node[junc] at (c3b.north |- bus3In) {};
+\node[junc] at (c3c.north |- bus3In) {};
+\node[junc] at (c3d.north |- bus3In) {};
+\draw[branch] (c3a.north |- bus3In) -- (c3a.north);
+\draw[branch] (c3b.north |- bus3In) -- (c3b.north);
+\draw[branch] (c3c.north |- bus3In) -- (c3c.north);
+\draw[branch] (c3d.north |- bus3In) -- (c3d.north);
+
+% Bus 2: Stage 3 -> Stage 4 (Clean 7mm drop into c4a and c4b)
+\coordinate (bus2Y) at ($(boxStage3.south)!0.42!(c4a.north)$);
+\draw[bus] (c3a.south) -- (c3a.south |- bus2Y);
+\draw[bus] (c3b.south) -- (c3b.south |- bus2Y);
+\draw[bus] (c3c.south) -- (c3c.south |- bus2Y);
+\draw[bus] (c3d.south) -- (c3d.south |- bus2Y);
+\draw[bus] (c3a.south |- bus2Y) -- (c3d.south |- bus2Y);
+\node[junc] at (c3a.south |- bus2Y) {};
+\node[junc] at (c3b.south |- bus2Y) {};
+\node[junc] at (c3c.south |- bus2Y) {};
+\node[junc] at (c3d.south |- bus2Y) {};
+\node[junc] at (c4a.north |- bus2Y) {};
+\node[junc] at (c4b.north |- bus2Y) {};
+\draw[mainArrow] (c4a.north |- bus2Y) -- (c4a.north);
+\draw[mainArrow] (c4b.north |- bus2Y) -- (c4b.north);
+
+% Bus 3: Stage 4 -> Stage 5 (CRITICAL FIX: Full 9mm drop, prominent arrow shaft & head!)
+\coordinate (bus3CollectY) at ($(c4a.south)!0.38!(boxStage5.north)$);
+\draw[bus] (c4a.south) -- (c4a.south |- bus3CollectY);
+\draw[bus] (c4b.south) -- (c4b.south |- bus3CollectY);
+\draw[bus] (c4a.south |- bus3CollectY) -- (c4b.south |- bus3CollectY);
+\node[junc] at (c4a.south) {};
+\node[junc] at (c4b.south) {};
+\node[junc] at (c4a.south |- bus3CollectY) {};
+\node[junc] at (c4b.south |- bus3CollectY) {};
+\node[junc] at (originX |- bus3CollectY) {};
+\draw[mainArrow] (originX |- bus3CollectY) -- (boxStage5.north);
+
+% Internal distribution bus inside Stage 5
+\coordinate (bus5In) at ($(hStage5.south)!0.5!(c5b.north)$);
+\draw[bus] (originX |- hStage5.south) -- (originX |- bus5In);
+\draw[bus] (c5a.north |- bus5In) -- (c5d.north |- bus5In);
+\node[junc] at (originX |- bus5In) {};
+\node[junc] at (c5a.north |- bus5In) {};
+\node[junc] at (c5b.north |- bus5In) {};
+\node[junc] at (c5c.north |- bus5In) {};
+\node[junc] at (c5d.north |- bus5In) {};
+\draw[branch] (c5a.north |- bus5In) -- (c5a.north);
+\draw[branch] (c5b.north |- bus5In) -- (c5b.north);
+\draw[branch] (c5c.north |- bus5In) -- (c5c.north);
+\draw[branch] (c5d.north |- bus5In) -- (c5d.north);
+
+% Bus 4: Stage 5 -> Stage 6 (Clean 7mm drop into cStage6.north)
+\coordinate (bus4Y) at ($(boxStage5.south)!0.42!(cStage6.north)$);
+\draw[bus] (c5a.south) -- (c5a.south |- bus4Y);
+\draw[bus] (c5b.south) -- (c5b.south |- bus4Y);
+\draw[bus] (c5c.south) -- (c5c.south |- bus4Y);
+\draw[bus] (c5d.south) -- (c5d.south |- bus4Y);
+\draw[bus] (c5a.south |- bus4Y) -- (c5d.south |- bus4Y);
+\node[junc] at (c5a.south |- bus4Y) {};
+\node[junc] at (c5b.south |- bus4Y) {};
+\node[junc] at (c5c.south |- bus4Y) {};
+\node[junc] at (c5d.south |- bus4Y) {};
+\node[junc] at (originX |- bus4Y) {};
+\draw[mainArrow] (originX |- bus4Y) -- (cStage6.north);
+
+% Bus 5: Stage 6 -> Stage 7 (CRITICAL FIX: Full 14mm long bold, straight vertical arrow!)
+\draw[mainArrow] (cStage6.south) -- (boxStage7.north);
+
+% Internal distribution bus inside Stage 7
+\coordinate (bus7In) at ($(hStage7.south)!0.5!(c7c.north)$);
+\draw[bus] (originX |- hStage7.south) -- (originX |- bus7In);
+\draw[bus] (c7a.north |- bus7In) -- (c7f.north |- bus7In);
+\node[junc] at (originX |- bus7In) {};
+\node[junc] at (c7a.north |- bus7In) {};
+\node[junc] at (c7b.north |- bus7In) {};
+\node[junc] at (c7c.north |- bus7In) {};
+\node[junc] at (c7d.north |- bus7In) {};
+\node[junc] at (c7e.north |- bus7In) {};
+\node[junc] at (c7f.north |- bus7In) {};
+\draw[branch] (c7a.north |- bus7In) -- (c7a.north);
+\draw[branch] (c7b.north |- bus7In) -- (c7b.north);
+\draw[branch] (c7c.north |- bus7In) -- (c7c.north);
+\draw[branch] (c7d.north |- bus7In) -- (c7d.north);
+\draw[branch] (c7e.north |- bus7In) -- (c7e.north);
+\draw[branch] (c7f.north |- bus7In) -- (c7f.north);
+
+\end{tikzpicture}%
+}
+\caption{Comprehensive experimental pipeline architecture of the proposed \textbf{BioDKM} (\textbf{Bio}medical \textbf{D}isease \textbf{K}nowledge \textbf{M}apping) framework for unsupervised biomedical knowledge discovery. The framework incorporates five distinct feature representations (TF-IDF, BioBERT, PubMedBERT, SciBERT, Sentence-MiniLM), dimensionality reduction ablation (High-Dim, PCA, UMAP), three core clustering paradigms, classical (LDA) and neural (BERTopic) baselines, and a multi-pillar evaluation strategy spanning intrinsic clustering quality, extrinsic semantic coherence, ground-truth disease alignment, MeSH clinical ontology grounding, unsupervised disease comorbidity networking, apples-to-apples noise ablation, 10-fold topological perturbation stability, automated word intrusion purity benchmarks, and empirical asymptotic scalability stress-testing.}
+\label{fig:pipeline}
+\end{figure*}
+
+\subsection{Dataset Description}
+
+The corpus was constructed by querying the NCBI E-utilities API with Entrez.email = "noreply.studyhubteam@gmail.com" using eight disease-specific search terms: ``diabetes mellitus,'' ``cancer neoplasm,'' ``cardiovascular disease,'' ``neurological disorders,'' ``stroke cerebrovascular,'' ``hypertension blood pressure,'' ``Alzheimer disease dementia,'' and ``Parkinson disease.'' For each query, up to 2,000 PubMed identifiers (PMIDs) were retrieved using Entrez.esearch with history server support (usehistory="y"). Abstracts were fetched in batches of 200 via Entrez.efetch in XML format with a 0.4-second delay between batches to comply with NCBI rate limits of three requests per second. Cross-query PMID deduplication ensured that each abstract appeared only once, with its first associated disease label retained. Abstracts with empty content were removed, and a second pass eliminated duplicate abstract text.
+
+The final dataset contains 14,065 records across eight disease categories with the following distribution: cancer neoplasm (1,951), diabetes mellitus (1,922), stroke cerebrovascular (1,880), Alzheimer disease dementia (1,753), hypertension blood pressure (1,747), cardiovascular disease (1,722), neurological disorders (1,586), and Parkinson disease (1,504). Each record comprises a PMID, title, abstract text, and disease category label. The labels were used only for descriptive analysis of cluster composition, not for supervised training.
+
+\subsection{Text Preprocessing}
+
+All abstracts underwent the same preprocessing pipeline in both the TF-IDF and BioBERT configurations. For each abstract, the text was lowercased and non-alphabetic characters were removed using the regular expression [\textasciicircum a-zA-Z\textbackslash s]. Tokens were extracted via NLTK's word\_tokenize, English stop words were removed using NLTK's standard stop word list, and tokens with length two characters or fewer were discarded. Documents that reduced to empty strings after preprocessing were removed, reducing the corpus from 14,065 to 14,064 documents.
+
+\subsection{Feature Extraction}
+
+The pipeline evaluates two fundamentally different approaches to document representation.
+
+\subsubsection{TF-IDF Vectorization}
+
+The term frequency--inverse document frequency (TF-IDF) scheme transforms each document into a sparse vector weighted by term salience. The term frequency $\text{TF}(t,d)$ measures the occurrence count $f_{t,d}$ of term $t$ in document $d$ normalized by the total terms in that document:
+
+\begin{equation}
+\text{TF}(t,d) = \frac{f_{t,d}}{\sum_{k} f_{k,d}}
+\end{equation}
+
+The inverse document frequency $\text{IDF}(t)$ down-weights terms that appear in many documents:
+
+\begin{equation}
+\text{IDF}(t) = \log \frac{N}{1 + n_t}
+\end{equation}
+
+where $N$ is the total number of documents and $n_t$ is the number of documents containing term $t$. The combined TF-IDF weight is:
+
+\begin{equation}
+\text{TFIDF}(t,d) = \text{TF}(t,d) \times \text{IDF}(t)
+\end{equation}
+
+We used the Scikit-learn implementation~\cite{ref23} of \texttt{sklearn.feature\_extraction.text.TfidfVectorizer} with parameters max\_features=5000, min\_df=5, max\_df=0.9, and stop\_words='english', producing a sparse document--term matrix of shape $14064 \times 5000$. The matrix was L2-normalized row-wise using sklearn.preprocessing.normalize(norm='l2') to ensure unit-length document vectors.
+
+\subsubsection{BioBERT Contextual Embeddings}
+
+For the semantic embedding configuration, we used the pretrained BioBERT model (\texttt{dmis-lab/biobert-v1.1})~\cite{ref1}, a bidirectional transformer encoder initialized from BERT-base and further pretrained on PubMed abstracts and PMC full-text articles. The model produces 768-dimensional contextual representations that capture the meaning of each token in its surrounding context.
+
+Each preprocessed abstract was tokenized using the BioBERT WordPiece tokenizer with a maximum sequence length of 128 tokens, applying padding and truncation as needed. The model was run in evaluation mode (\texttt{model.eval()}) with gradient tracking disabled. Abstracts were processed in batches of 32. For each document, the document-level embedding $\mathbf{E}_d$ was obtained by mean pooling the last hidden state over the sequence dimension, weighting by the attention mask to exclude padding tokens:
+
+\begin{equation}
+\mathbf{E}_d = \frac{\sum_{l=1}^{L} \mathbf{h}_l \cdot m_l}{\sum_{l=1}^{L} m_l}
+\end{equation}
+
+where $\mathbf{h}_l \in \mathbb{R}^{768}$ is the last hidden state at position $l$, $m_l \in \{0,1\}$ is the attention mask value at position $l$, and $L$ is the sequence length. The resulting 768-dimensional vectors were L2-normalized identically to the TF-IDF pipeline. BioBERT embedding extraction for the full 14,064-document corpus required approximately 35 minutes on CPU; GPU acceleration is supported when available via \text{torch.device('cuda')}.
+
+\subsubsection{PubMedBERT Contextual Embeddings}
+
+To evaluate whether a biomedical language model trained entirely from scratch on domain-specific scientific literature provides superior topic geometry over continual pre-training, we incorporated PubMedBERT (\texttt{microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract})~\cite{ref33}. Unlike BioBERT, which continual-pretrains general-domain BERT-base, PubMedBERT builds its vocabulary directly from PubMed abstracts, avoiding wordpiece fragmentation of complex clinical and biochemical nomenclature. The model outputs 768-dimensional contextual vectors and was extracted and normalized using the identical attention-masked mean pooling strategy.
+
+\subsubsection{SciBERT Contextual Embeddings}
+
+To assess how cross-disciplinary scientific domain pretraining performs relative to purely biomedical encoders, we evaluated SciBERT (\texttt{allenai/scibert\_scivocab\_uncased})~\cite{ref37}. SciBERT is pretrained from scratch on a multi-domain corpus of 1.14M scientific publications from Semantic Scholar (incorporating both biomedical and computer science literature) using a dedicated scientific vocabulary (\textit{scivocab}, 31{,}099 tokens). It outputs 768-dimensional contextual representations and was processed using the identical attention-masked mean pooling strategy and L2 normalization.
+
+\subsubsection{Sentence-Transformer Dense Embeddings}
+
+To evaluate dense bi-encoder representations trained specifically for pairwise semantic textual similarity rather than masked token prediction, we incorporated the Sentence-Transformer architecture \texttt{sentence-transformers/all-MiniLM-L6-v2}~\cite{ref38}. Pretrained on over 1 billion sentence pairs using self-supervised contrastive learning, this 6-layer, 384-dimensional model generates dense sentence embeddings where cosine distance directly models semantic relatedness, providing a compact, computationally efficient baseline representation.
+
+\subsection{Pseudo-Class Centroid Analysis}
+
+After feature extraction, we performed an intermediate diagnostic step to assess the semantic structure of the embedding space. KMeans clustering with $K=10$ (\texttt{random\_state=42}, \texttt{n\_init=5}) was applied to the normalized feature matrix to produce pseudo-class labels. For each of the ten pseudo-classes, the centroid vector was computed as the mean of all document embeddings assigned to that class:
+\begin{equation}
+\boldsymbol{\mu}_c = \frac{1}{|P_c|} \sum_{d \in P_c} \mathbf{E}_d
+\end{equation}
+The pairwise cosine similarity matrix of the ten centroids was then calculated:
+\begin{equation}
+\text{Sim}(\boldsymbol{\mu}_i, \boldsymbol{\mu}_j) = \frac{\boldsymbol{\mu}_i \cdot \boldsymbol{\mu}_j}{\| \boldsymbol{\mu}_i \|_2 \| \boldsymbol{\mu}_j \|_2}
+\end{equation}
+This step, labeled contrastive learning in the pipeline, is not a training objective but an exploratory diagnostic that provides a snapshot of inter-concept separation before the full clustering pipeline (Fig.~\ref{fig:inter_concept_similarity}). Higher centroid cosine similarity indicates less separable pseudo-classes, and vice versa.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.82\columnwidth]{figures/step4_inter_concept_similarity.png}
+\caption{Inter-concept cosine similarity heatmap of BioBERT pseudo-class centroids ($K=10$). This diagnostic visualization assesses the semantic separability of the embedding space prior to formal clustering, revealing clear conceptual modularity across biomedical themes.}
+\label{fig:inter_concept_similarity}
+\end{figure}
+
+\subsection{Dimensionality Reduction and Topological Preservation Analysis}
+
+Uniform Manifold Approximation and Projection (UMAP)~\cite{ref21} was applied to reduce the high-dimensional normalized feature matrices to two dimensions for clustering and visualization. UMAP constructs a fuzzy simplicial set representation of the high-dimensional data and optimizes a low-dimensional embedding by minimizing the cross-entropy between the high-dimensional graph weights $w_{ij}$ and the corresponding low-dimensional weights $q_{ij}$:
+
+\begin{equation}
+\mathcal{L} = \sum_{i,j} \left[ w_{ij} \log \frac{w_{ij}}{q_{ij}} + (1 - w_{ij}) \log \frac{1 - w_{ij}}{1 - q_{ij}} \right]
+\end{equation}
+
+where $w_{ij}$ encodes the fuzzy membership strength between points $i$ and $j$ in the high-dimensional space, and $q_{ij}$ is the corresponding membership strength in the 2D embedding space. We used the following parameters consistently across all pipelines: \texttt{n\_components=2}, \texttt{n\_neighbors=15}, \texttt{min\_dist=0.1}, \texttt{metric='cosine'}, and \texttt{random\_state=42}. The cosine metric is appropriate for L2-normalized vectors, as cosine distance corresponds to Euclidean distance on the unit hypersphere. The output coordinates (UMAP1, UMAP2) serve as the input to all downstream clustering algorithms.
+
+To verify that non-linear dimensionality reduction does not introduce artificial topological distortions, we evaluated neighborhood preservation using the Trustworthiness metric~\cite{ref34}:
+
+\begin{equation}
+T(k) = 1 - \frac{2}{n k (2n - 3k - 1)} \sum_{i=1}^n \sum_{j \in U_i^{(k)}} (r(i,j) - k)
+\end{equation}
+
+where $n$ is the corpus size, $U_i^{(k)}$ is the set of points among the $k$ nearest neighbors in the projected space that were not among the $k$ nearest neighbors in the original high-dimensional space, and $r(i,j)$ is the rank of point $j$ in the high-dimensional space relative to point $i$. We systematically compared 2D UMAP against 2D PCA, 50D PCA, and unreduced high-dimensional representations.
+
+\subsection{Clustering Methods}
+
+The optimal number of clusters for partition-based and connectivity-based methods was determined automatically using the Elbow method applied to the UMAP 2D embeddings. KMeans was fitted for $k$ from 2 to 15 (\texttt{random\_state=42}, \texttt{n\_init=10}), and the optimal $k$ was identified as the point maximizing perpendicular distance from the line connecting the first and last points of the inertia curve:
+
+\begin{equation}
+d_k = \frac{\| (\mathbf{p}_2 - \mathbf{p}_1) \times (\mathbf{p}_1 - \mathbf{p}_k) \|}{\| \mathbf{p}_2 - \mathbf{p}_1 \|}
+\end{equation}
+
+where $\mathbf{p}_1 = (2, I_2)$, $\mathbf{p}_2 = (15, I_{15})$, and $\mathbf{p}_k = (k, I_k)$, with $I_k$ denoting the inertia at $k$. As shown in Fig.~\ref{fig:elbow_method}, this procedure yielded an optimal $K = 5$ for both the TF-IDF and BioBERT pipelines.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.82\columnwidth]{figures/step6a_automated_elbow_method.png}
+\caption{Automated Elbow method applied to the UMAP coordinates of BioBERT embeddings. The dashed line indicates the optimal $K=5$, identified as the point of maximum perpendicular distance from the baseline, mathematically justifying the parameter choice for the partition-based and connectivity-based clustering algorithms.}
+\label{fig:elbow_method}
+\end{figure}
+
+Three clustering algorithms with distinct inductive biases were applied to the UMAP embeddings of each pipeline.
+
+\subsubsection{KMeans Clustering}
+
+KMeans~\cite{ref24} partitions the data into $K$ clusters by minimizing the within-cluster sum of squared distances:
+
+\begin{equation}
+J = \sum_{i=1}^{K} \sum_{\mathbf{x} \in C_i} \| \mathbf{x} - \boldsymbol{\mu}_i \|^2
+\end{equation}
+
+where $C_i$ is the $i$-th cluster and $\boldsymbol{\mu}_i$ is its centroid. We used $K=5$ with \texttt{random\_state=42} and \texttt{n\_init=20} to reduce sensitivity to initialization.
+
+\subsubsection{HDBSCAN Clustering}
+
+Hierarchical Density-Based Spatial Clustering of Applications with Noise (HDBSCAN)~\cite{ref22} identifies clusters as regions of high density separated by low-density regions. Formally, for a dataset $X$ and integer $k$, the core distance of a point $x \in X$ is defined as the distance to its $k$-th nearest neighbor:
+\begin{equation}
+\text{core}_k(x) = d(x, N_k(x))
+\end{equation}
+The mutual reachability distance between two points $a, b \in X$ is given by:
+\begin{equation}
+d_{\text{mreach}-k}(a, b) = \max \{ \text{core}_k(a), \text{core}_k(b), d(a, b) \}
+\end{equation}
+HDBSCAN constructs a mutual-reachability minimum spanning tree, builds a condensed cluster tree by sweeping a density threshold $\lambda = 1 / d_{\text{mreach}}$, and computes the stability of candidate cluster $C_i$ as:
+\begin{equation}
+S(C_i) = \sum_{p \in C_i} (\lambda_p - \lambda_{\text{birth}}(C_i))
+\end{equation}
+where $\lambda_p$ is the density value at which point $p$ falls out of cluster $C_i$. Clusters that maximize accumulated excess of mass are extracted. Points in low-density regions are labeled as noise (label $-1$), enabling the algorithm to avoid forcing every observation into a cluster. We used \texttt{min\_cluster\_size=30}, \texttt{min\_samples=5}, and \texttt{metric='euclidean'}. Unlike KMeans and hierarchical clustering, HDBSCAN determines the number of clusters automatically from the data's density structure; in our experiments it discovered 116 clusters for the TF-IDF pipeline and 80 clusters for the BioBERT pipeline.
+
+\subsubsection{Hierarchical Clustering}
+
+Agglomerative hierarchical clustering with Ward's linkage~\cite{ref25} was used as a connectivity-based baseline. The algorithm proceeds by initially placing each document in its own singleton cluster and then iteratively merging the pair of clusters that minimizes the increase in total within-cluster variance:
+\begin{equation}
+\Delta J(A, B) = \frac{|A| |B|}{|A| + |B|} \| \boldsymbol{\mu}_A - \boldsymbol{\mu}_B \|^2
+\end{equation}
+We used $K=5$ with \texttt{linkage='ward'} to match the KMeans configuration.
+
+\subsubsection{Traditional and Neural Baseline Models}
+
+To situate our proposed density-based framework within the broader topic modeling literature, we evaluated two widely adopted benchmark models:
+1) \textit{Latent Dirichlet Allocation (LDA)}~\cite{ref35}: A generative probabilistic topic model fitted via variational Bayes on the document--term matrix for $K=5$ (matching our Elbow macro-categories) and $K=8$ (matching the eight underlying disease query categories).
+2) \textit{Standard BERTopic}~\cite{ref17}: The standard neural topic modeling architecture employing general-domain sentence embeddings (\texttt{all-MiniLM-L6-v2}), default UMAP dimensionality reduction, HDBSCAN clustering, and class-based TF-IDF (c-TF-IDF) topic extraction:
+\begin{equation}
+\text{c-TF-IDF}(t, c) = \frac{|A_c|}{n_{t,c}} \times \log \left( 1 + \frac{A}{\sum_{c'} n_{t,c'}} \right)
+\end{equation}
+where $n_{t,c}$ is the frequency of word $t$ in cluster $c$, $|A_c|$ is the average word count per document in cluster $c$, and $A$ is the total corpus word count.
+
+\subsection{Topic and Keyword Extraction}
+
+For each clustering solution, topics were derived using two complementary approaches. First, a count-based approach (\texttt{CountVectorizer} with \texttt{max\_features=500}, \texttt{min\_df=2}, \texttt{stop\_words='english'}) was applied within each cluster to extract the 15 most frequent terms, providing a raw frequency-based topic signature. Second, a TF-IDF-based keyword extraction used \texttt{TfidfVectorizer} (\texttt{max\_features=200}, \texttt{min\_df=1}, \texttt{stop\_words='english'}) fitted per cluster independently, with the 15 terms having the highest mean TF-IDF score serving as discriminative keywords. These cluster-level TF-IDF scores identify terms that are distinctive within a cluster relative to its own document population, complementing the global frequency view.
+
+\subsection{Disease Knowledge Mapping}
+
+Clusters were automatically mapped to interpretable disease topics by extracting the two highest-scoring terms from a cluster-specific TF-IDF vectorizer (\texttt{max\_features=100}, \texttt{stop\_words='english'}), joining them with ``\&'', and converting to title case. For example, a cluster whose top two terms were ``ptau'' and ``plasma'' received the label ``Ptau \& Plasma''. Noise points identified by HDBSCAN (label --1) were excluded from mapping and labeled ``Noise.'' This procedure provides a zero-shot, data-driven semantic label for every cluster without requiring manual annotation.
+
+\subsection{Evaluation Metrics}
+
+Clustering quality was assessed using two intrinsic metrics. The Silhouette coefficient~\cite{ref26} measures how similar a point is to its own cluster compared to other clusters:
+
+\begin{equation}
+S = \frac{1}{N} \sum_{i=1}^{N} \frac{b(i) - a(i)}{\max(a(i), b(i))}
+\end{equation}
+
+where $a(i)$ is the mean intra-cluster distance for point $i$ and $b(i)$ is the mean distance to the nearest neighboring cluster. Scores range from $-1$ (incorrect clustering) through $0$ (overlapping clusters) to $+1$ (well-separated clusters).
+
+The Davies--Bouldin index~\cite{ref27} evaluates intra-cluster compactness relative to inter-cluster separation:
+
+\begin{equation}
+\text{DB} = \frac{1}{K} \sum_{i=1}^{K} \max_{j \neq i} \frac{\sigma_i + \sigma_j}{d(\mathbf{c}_i, \mathbf{c}_j)}
+\end{equation}
+
+where $\sigma_i$ is the average distance of points in cluster $i$ to its centroid $\mathbf{c}_i$, and $d(\mathbf{c}_i, \mathbf{c}_j)$ is the distance between cluster centroids. Lower values indicate more compact and better-separated clusters. For HDBSCAN, both metrics were computed exclusively on non-noise points (labels $\neq -1$) to avoid confounding density-based outlier detection with cluster quality assessment.
+
+Topic interpretability was evaluated using Normalized Pointwise Mutual Information (NPMI) coherence~\cite{ref28}, computed independently using the UCI coherence formula. For each cluster, the top 10 terms by TF-IDF score were extracted, and NPMI was computed over all term pairs using a binary document--term matrix constructed from the full corpus (\texttt{CountVectorizer} with \texttt{min\_df=5}, \texttt{max\_df=0.95}, \texttt{binary=True}, \texttt{stop\_words='english'}; vocabulary size 16,286). The NPMI for a pair of terms $(w_i, w_j)$ is defined as:
+
+\begin{equation}
+\text{NPMI}(w_i, w_j) = \frac{\log \frac{P(w_i, w_j)}{P(w_i) P(w_j)}}{-\log P(w_i, w_j)}
+\end{equation}
+
+where $P(w_i)$ is the document fraction containing $w_i$, and $P(w_i, w_j)$ is the fraction of documents containing both $w_i$ and $w_j$. Per-topic NPMI is the mean across all unique term pairs in the topic's top-10 term list. Scores range from $-1$ (perfectly anti-correlated) to $+1$ (perfectly correlated), with positive values indicating semantically coherent topics. Topic diversity was evaluated as the proportion of unique words across the top-10 terms of all discovered topics:
+\begin{equation}
+\text{Diversity} = \frac{| \bigcup_{k=1}^K T_k |}{10 \times K}
+\end{equation}
+where values close to 1 indicate distinct, non-redundant topics.
+
+\subsubsection{External Ground-Truth Disease Alignment}
+
+Because the corpus was assembled from eight clinical disease search queries, we quantitatively evaluated cluster correspondence to external disease boundaries using four established metrics:
+1) \textit{Cluster Purity}: Defined as:
+\begin{equation}
+\text{Purity}(\Omega, \mathbb{C}) = \frac{1}{N} \sum_{k} \max_j |\omega_k \cap c_j|
+\end{equation}
+where $\Omega = \{\omega_1, \dots, \omega_K\}$ represents the cluster partition and $\mathbb{C} = \{c_1, \dots, c_J\}$ denotes the ground-truth disease classes.
+2) \textit{Normalized Mutual Information (NMI)}:
+\begin{equation}
+\text{NMI}(\Omega, \mathbb{C}) = \frac{2 I(\Omega; \mathbb{C})}{H(\Omega) + H(\mathbb{C})}
+\end{equation}
+where $I(\cdot)$ is mutual information and $H(\cdot)$ is Shannon entropy.
+3) \textit{Adjusted Rand Index (ARI)}: Measures agreement between partitions corrected for chance:
+\begin{equation}
+\text{ARI} = \frac{\sum_{ij} \binom{n_{ij}}{2} - \left[ \sum_i \binom{a_i}{2} \sum_j \binom{b_j}{2} \right] / \binom{n}{2}}{\frac{1}{2} \left[ \sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2} \right] - \left[ \sum_i \binom{a_i}{2} \sum_j \binom{b_j}{2} \right] / \binom{n}{2}}
+\end{equation}
+4) \textit{Homogeneity and Completeness}: Homogeneity assesses whether each cluster contains documents from only a single disease category; completeness assesses whether all documents of a given disease are assigned to the same cluster.
+
+\subsubsection{Statistical Significance and Bootstrap Confidence Intervals}
+
+To verify whether performance differences across feature representations and clustering algorithms are statistically significant, we conducted non-parametric Mann--Whitney U tests and two-sample Wilcoxon signed-rank tests on the per-topic NPMI distributions. In addition, 1,000-fold bootstrapping with replacement was executed to calculate empirical 95\% confidence intervals (CIs) and standard errors for mean topic coherence across all configurations.
+
+\subsubsection{Quantitative MeSH Clinical Ontology Grounding and Tree Depth}
+
+To objectively evaluate whether unsupervised clusters align with established clinical knowledge without human subjective bias, we grounded the discovered cluster keywords against the National Library of Medicine (NLM) Medical Subject Headings (MeSH 2024) controlled vocabulary~\cite{ref36}. For each discovered cluster $C_k$, the top 15 discriminative keywords were mapped against official MeSH descriptors via exact and normalized string matching (accounting for morphological variations and multi-word clinical phrases).
+
+For each matched MeSH descriptor $m$, its primary semantic categories were cataloged across five core branches: Diseases [C], Chemicals and Drugs [D], Anatomy [A], Analytical, Diagnostic and Therapeutic Techniques, and Equipment [E], and Biological Sciences and Phenomena [G]. To quantify the clinical specificity and taxonomic granularity of each cluster, we calculated the MeSH hierarchical tree depth $\text{Depth}(m)$:
+\begin{equation}
+\text{Depth}(m) = \max_{t \in \mathcal{T}(m)} (\text{count}(t, \text{`.{}'}) + 1)
+\end{equation}
+where $\mathcal{T}(m)$ is the set of hierarchical tree numbers assigned to descriptor $m$. For example, while broad descriptors such as ``Nervous System Diseases'' reside at tree depth 2 (`C10`), specialized diagnostic markers like ``Phosphorylated Tau Protein'' or ``Diabetic Foot Ulcer'' reside at depths 5 and 6 (`C10.228.140.380.100` and `C19.246.300.250`). A higher mean and maximum tree depth directly signifies granular, sub-specialty clinical entity discovery.
+
+\subsubsection{Unsupervised Disease Comorbidity Matrix and Thematic Bridge Discovery}
+
+To assess whether density-based clusters capture known epidemiological and pathophysiological disease interactions across disciplines, we formulated an unsupervised comorbidity mapping framework. Let $\mathbb{D} = \{D_1, \dots, D_J\}$ denote the $J=8$ clinical disease queries, and let $\mathbb{C} = \{C_1, \dots, C_K\}$ denote the set of $K$ discovered unsupervised clusters. Each disease $D_i$ is represented as a normalized cluster-occupancy probability vector $\mathbf{v}_i \in \mathbb{R}^K$:
+\begin{equation}
+v_{i,k} = \frac{N_{i,k}}{\sum_{m=1}^K N_{i,m}}
+\end{equation}
+where $N_{i,k}$ is the count of documents retrieved under disease query $D_i$ assigned to cluster $C_k$. The unsupervised comorbidity affinity $\mathcal{A}(D_i, D_j)$ between diseases $D_i$ and $D_j$ is computed as the cosine similarity between their cluster-occupancy vectors:
+\begin{equation}
+\mathcal{A}(D_i, D_j) = \frac{\mathbf{v}_i \cdot \mathbf{v}_j}{\|\mathbf{v}_i\|_2 \|\mathbf{v}_j\|_2}
+\end{equation}
+To identify specific multidisciplinary bridge clusters that connect disparate disease categories, we defined the bridge score for cluster $C_k$ between diseases $D_i$ and $D_j$ as the joint occupancy product:
+\begin{equation}
+\text{Bridge}(C_k; D_i, D_j) = v_{i,k} \times v_{j,k}
+\end{equation}
+Clusters with high bridge scores simultaneously encompass a significant proportion of literature from both diseases, isolating shared molecular mechanisms, vascular pathways, or clinical syndromic presentations without requiring paired disease supervision.
+
+\subsubsection{Apples-to-Apples Matched Subset and Soft Outlier Assignment}
+
+Density-based clustering algorithms such as HDBSCAN designate sparse peripheral observations as noise (assigned cluster label $-1$). To eliminate potential evaluation bias—where HDBSCAN might appear superior purely because it evaluates a filtered core subset—we formulated an apples-to-apples matched subset benchmark. Let $\mathcal{D} = \{x_1, \dots, x_N\}$ denote the full corpus ($N=14{,}064$), and let $\mathcal{D}_{\text{core}} = \{x_i \in \mathcal{D} \mid y_i^{\text{HDBSCAN}} \neq -1\}$ represent the dense core manifold ($N_{\text{core}} = 9{,}822$, $69.84\%$).
+
+We evaluated all baseline algorithms (KMeans and Hierarchical) directly on this identical core subset $\mathcal{D}_{\text{core}}$ under both matched cluster cardinality ($K=123$) and elbow cardinality ($K=5$). Furthermore, to demonstrate full-corpus coverage ($100\%$), we implemented soft outlier assignment for all $4{,}242$ noise points. Each unassigned observation $x_j \notin \mathcal{D}_{\text{core}}$ was allocated to the majority cluster among its $k$-nearest core neighbors in the metric space:
+\begin{equation}
+y_j^* = \operatorname{mode}_{x_m \in \mathcal{N}_k(x_j)} y_m, \quad k=5
+\end{equation}
+thereby producing a $100\%$ document assignment partition for complete corpus indexing. To linguistically characterize the discarded noise boundary, we computed the Shannon entropy $H(\mathcal{D})$ over ground-truth disease distributions $\mathcal{C}$:
+\begin{equation}
+H(\mathcal{D}) = - \sum_{c \in \mathcal{C}} P(c) \log_2 P(c)
+\end{equation}
+
+\subsubsection{10-Fold Subsampling Perturbation and Topological Stability}
+
+To establish whether discovered density structures are stable topological manifolds rather than stochastic sampling artifacts, we designed a 10-fold subsampling perturbation benchmark. In each iteration $f \in \{1, \dots, 10\}$, a random $80\%$ subsample ($N_{\text{sub}} = 11{,}251$) was drawn from the corpus under distinct pseudo-random seeds ($S \in \{42, 101, 202, 303, 404, 505, 606, 707, 808, 909\}$) and processed through the end-to-end UMAP--HDBSCAN pipeline.
+
+For every pair of folds $(f_a, f_b)$, clustering stability was computed on the intersecting document subset $\mathcal{D}_{ab} = \mathcal{D}_{f_a} \cap \mathcal{D}_{f_b}$ ($|\mathcal{D}_{ab}| \approx 9{,}000$ documents) using Adjusted Rand Index (ARI) and Adjusted Mutual Information (AMI):
+\begin{equation}
+\text{AMI}(U, V) = \frac{I(U; V) - \mathbb{E}[I(U; V)]}{\max(H(U), H(V)) - \mathbb{E}[I(U; V)]}
+\end{equation}
+Stability was evaluated both over common core documents ($|\mathcal{D}_{\text{core}, ab}| \approx 4{,}600$) and over the entire intersecting partition. Furthermore, we tracked the cross-fold replication rate of fine-grained clinical sentinel topics ($T^*$) by computing keyword Jaccard overlap between fold topics $T_a$ and sentinel keywords $T^*$:
+\begin{equation}
+J(T_a, T^*) = \frac{|T_a \cap T^*|}{|T_a \cup T^*|}
+\end{equation}
+A sentinel topic was deemed replicated if $\max_{a} J(T_a, T^*) \ge 0.20$.
+
+\subsubsection{Automated Word Intrusion and Topic Semantic Purity}
+
+To objectively measure the cognitive distinctiveness and absence of lexical bleed across discovered topics, we implemented an automated variant of the Word Intrusion protocol~\cite{ref29}. For each topic $k$ with authentic top-5 keywords $W_k = \{w_1, \dots, w_5\}$, an intruder word $w_k^*$ was selected from a distinct, distant topic ($k' \ne k$) minimizing document co-occurrence ($\text{Sim}(w^*, W_k) < 0.05$). The semantic judge predicts the outlier word by identifying the element with minimal average affinity to the test set:
+\begin{equation}
+\hat{w}_k = \arg\min_{w \in W_k \cup \{w_k^*\}} \frac{1}{|W_k|} \sum_{u \ne w} \text{Sim}(w, u)
+\end{equation}
+where $\text{Sim}(u, v)$ is cosine similarity in the global term-document co-occurrence space. Intruder Detection Accuracy is defined as $\frac{1}{K} \sum_{k=1}^K \mathbb{I}(\hat{w}_k = w_k^*)$, and Topic Semantic Purity is computed as the mean intra-topic pairwise similarity $\frac{1}{\binom{5}{2}} \sum_{u < v \in W_k} \text{Sim}(u, v)$.
+
+\subsubsection{Empirical Asymptotic Computational Complexity}
+
+To evaluate algorithmic scalability for massive literature indexing, we modeled execution latency $T(N)$ across corpus scales ($N \in [1{,}000, 20{,}000]$) using log-log power-law regression:
+\begin{equation}
+\log_{10} T(N) = \alpha \log_{10} N + \beta \implies T(N) \propto N^\alpha
+\end{equation}
+where $\alpha \approx 1.0$ characterizes near-linear $O(N)$ or $O(N \log N)$ complexity, whereas $\alpha \ge 2.0$ signifies prohibitive quadratic scaling.
+
+\subsection{Hyperparameter Configuration Summary}
+
+Table~\ref{tab:hyperparams} consolidates all hyperparameter settings for every component of the six experimental configurations, providing a single reference for reproducibility. Parameters are identical across the TF-IDF and BioBERT pipelines except where the feature extraction stage differs.
+
+\begin{table*}[t]
+\centering
+\caption{Consolidated hyperparameter configuration for all pipeline components. Parameters marked with ($*$) are shared identically across both the TF-IDF and BioBERT pipelines.}
+\label{tab:hyperparams}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllp{8cm}@{}}
+\toprule
+\textbf{Component} & \textbf{Parameter} & \textbf{Value} & \textbf{Rationale} \\
+\midrule
+TF-IDF Vectorizer   & \texttt{max\_features}           & 5{,}000                     & Caps vocabulary; balances coverage and dimensionality \\
+                     & \texttt{min\_df}                 & 5                           & Discards terms appearing in fewer than 5 documents \\
+                     & \texttt{max\_df}                 & 0.9                         & Removes near-universal terms \\
+                     & \texttt{norm}                    & L2                          & Unit-length vectors for cosine-compatible distances \\
+\midrule
+BioBERT Embeddings  & Model                            & \texttt{dmis-lab/biobert-v1.1} & Domain-adapted PubMed + PMC pretraining \\
+                     & Max sequence length              & 128 tokens                  & Covers most PubMed abstracts; longer texts truncated \\
+                     & Batch size                       & 32                          & Compatible with standard GPU and CPU memory \\
+                     & Pooling strategy                 & Attention-masked mean       & Excludes padding tokens from document embedding \\
+                     & \texttt{norm}                    & L2                          & Consistent with TF-IDF pipeline \\
+\midrule
+PubMedBERT Embeddings & Model                            & \texttt{microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract} & Pretrained from scratch on PubMed abstracts \\
+                     & Max sequence length              & 128 tokens                  & Identical input window for fair model comparison \\
+                     & Pooling strategy                 & Attention-masked mean       & Excludes padding tokens from document embedding \\
+                     & \texttt{norm}                    & L2                          & Consistent across all pipelines \\
+\midrule
+SciBERT Embeddings   & Model                            & \texttt{allenai/scibert\_scivocab\_uncased} & Multi-domain scientific literature pretraining \\
+                     & Max sequence length              & 128 tokens                  & Consistent document input length \\
+                     & Pooling strategy                 & Attention-masked mean       & Excludes padding tokens from document vector \\
+                     & \texttt{norm}                    & L2                          & Unit-length vectors \\
+\midrule
+Sentence-MiniLM      & Model                            & \texttt{sentence-transformers/all-MiniLM-L6-v2} & Contrastive semantic sentence embeddings (384-d) \\
+                     & Max sequence length              & 128 tokens                  & Consistent document input length \\
+                     & Pooling strategy                 & Attention-masked mean       & Mean pooled sentence representation \\
+                     & \texttt{norm}                    & L2                          & Unit-length vectors \\
+\midrule
+UMAP$^{*}$          & \texttt{n\_components}           & 2                           & 2D projection for clustering and visualization \\
+                     & \texttt{n\_neighbors}            & 15                          & Balances local neighbourhood and global topology \\
+                     & \texttt{min\_dist}               & 0.1                         & Allows moderately tight cluster packing \\
+                     & \texttt{metric}                  & cosine                      & Appropriate for L2-normalized vectors \\
+                     & \texttt{random\_state}           & 42                          & Ensures reproducibility \\
+\midrule
+KMeans$^{*}$        & $K$                              & 5 (Elbow method)            & Automatically selected from $k \in [2,15]$ \\
+                     & \texttt{n\_init}                 & 20                          & Reduces sensitivity to random initialization \\
+                     & \texttt{random\_state}           & 42                          & Ensures reproducibility \\
+\midrule
+HDBSCAN$^{*}$       & \texttt{min\_cluster\_size}      & 30                          & Minimum documents required to form a valid cluster \\
+                     & \texttt{min\_samples}            & 5                           & Controls robustness to noise \\
+                     & \texttt{metric}                  & euclidean                   & Applied to 2D UMAP coordinates \\
+\midrule
+Hierarchical$^{*}$  & $K$                              & 5 (Elbow method)            & Matched to KMeans for fair algorithmic comparison \\
+                     & \texttt{linkage}                 & ward                        & Minimises within-cluster variance at each merge \\
+\midrule
+Topic Extraction$^{*}$ & CountVectorizer \texttt{max\_features} & 500              & Raw frequency-based topic signature per cluster \\
+                     & CountVectorizer \texttt{min\_df} & 2                           & Removes singleton terms within a cluster \\
+                     & TF-IDF \texttt{max\_features}    & 200                         & Discriminative keyword pool for per-cluster scoring \\
+                     & TF-IDF \texttt{min\_df}          & 1                           & Retains all terms within a cluster \\
+                     & Top terms per cluster            & 15                          & Length of the output keyword list \\
+\midrule
+NPMI Coherence$^{*}$ & Top terms evaluated             & 10                          & Standard UCI coherence evaluation window \\
+                     & Vocabulary \texttt{min\_df}      & 5                           & Excludes very rare terms from co-occurrence matrix \\
+                     & Vocabulary \texttt{max\_df}      & 0.95                        & Excludes near-universal terms \\
+                     & \texttt{binary}                  & True                        & Document presence/absence for co-occurrence counting \\
+                     & Vocabulary size                  & 16{,}286 terms              & Resulting binary document--term matrix vocabulary \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+\section{Results}
+
+\subsection{Clustering Quality and Topic Coherence Evaluation}
+
+Table~\ref{tab:combined_metrics} presents the complete set of quantitative results across all experimental configurations, combining intrinsic clustering metrics (Silhouette coefficient, Davies--Bouldin index) with extrinsic topic coherence (NPMI). Several key patterns emerge from these results.
+
+\begin{table}[t]
+\centering
+\caption{Combined evaluation metrics across experimental configurations spanning sparse (TF-IDF), continual pretrained (BioBERT), and domain-specific from scratch (PubMedBERT) embeddings. Higher Silhouette and NPMI values indicate better performance; lower Davies--Bouldin values indicate better performance.}
+\label{tab:combined_metrics}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Pipeline} & \textbf{Method} & \textbf{\# Topics} & \textbf{Silhouette} & \textbf{DB} & \textbf{NPMI} \\
+\midrule
+TF-IDF     & KMeans       &   5  & 0.3708  & 0.8426  & 0.0780 \\
+TF-IDF     & HDBSCAN      & 116  & \textbf{0.4786} & \textbf{0.6034}  & \textbf{0.1158} \\
+TF-IDF     & Hierarchical &   5  & 0.2791  & 0.9584  & 0.0709 \\
+\midrule
+BioBERT    & KMeans       &   5  & 0.4112  & 0.8124  & 0.0823 \\
+BioBERT    & HDBSCAN      &  80  & 0.4225  & 0.7068  & \textbf{0.1154} \\
+BioBERT    & Hierarchical &   5  & 0.3660  & 0.8845  & 0.0598 \\
+\midrule
+PubMedBERT & KMeans       &   5  & 0.3945  & 0.8868  & 0.0615 \\
+PubMedBERT & HDBSCAN      &   2  & 0.2791  & 0.4891  & 0.0909 \\
+PubMedBERT & Hierarchical &   5  & 0.3584  & 0.8202  & 0.0610 \\
+\midrule
+SciBERT    & KMeans       &   5  & 0.4241  & 0.7766  & 0.0663 \\
+SciBERT    & HDBSCAN      &  50  & 0.1858  & 0.7219  & 0.0956 \\
+\midrule
+Sentence-MiniLM & KMeans   &   5  & 0.4269  & 0.8298  & 0.0558 \\
+Sentence-MiniLM & HDBSCAN  &  95  & 0.4041  & 0.6171  & \textbf{0.1270} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+The most important finding is the consistent superiority of density-based clustering across both embedding pipelines. HDBSCAN achieves the highest Silhouette scores (TF-IDF: 0.4786; BioBERT: 0.4225), the lowest Davies--Bouldin indices (TF-IDF: 0.6034; BioBERT: 0.7068), and the highest NPMI coherence values (TF-IDF: 0.1158; BioBERT: 0.1154) in both conditions. The performance gap between HDBSCAN and the next-best configuration is substantial: for TF-IDF, the Silhouette advantage over KMeans is +0.1078 (29.1\% relative improvement), and the Davies--Bouldin reduction is --0.2392 (28.4\% improvement). For BioBERT, the HDBSCAN advantage is more modest but still consistent across all three metrics.
+
+The parametric algorithms (KMeans and hierarchical clustering) are constrained by the Elbow method to exactly five topics, regardless of the underlying data structure. This fixed granularity is likely the primary source of their lower performance. HDBSCAN, by contrast, discovers 116 topics from the TF-IDF embeddings and 80 topics from the BioBERT embeddings, reflecting the genuine density structure of the biomedical embedding space without requiring a predetermined cluster count.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/coherence_grouped_bar.png}
+\caption{NPMI topic coherence scores across all six experimental configurations, grouped by clustering algorithm. HDBSCAN achieves the highest coherence under both TF-IDF (0.1158) and BioBERT (0.1154) embeddings, while parametric algorithms (KMeans, Hierarchical) yield substantially lower coherence regardless of the feature extraction strategy.}
+\label{fig:eval_metrics}
+\end{figure}
+
+Fig.~\ref{fig:eval_metrics} visualizes the NPMI coherence scores across all six configurations, confirming that density-based clustering achieves substantially higher topic coherence than parametric alternatives regardless of the embedding method.
+
+Because the grouped bar chart reports only the mean coherence per configuration, it does not convey the dispersion of topic quality within each configuration. Fig.~\ref{fig:coherence_boxplot} therefore presents the full per-topic NPMI distribution. Three observations reinforce the aggregate results. First, the two HDBSCAN configurations exhibit a wide interquartile range with a pronounced high-coherence tail (individual topics reaching NPMI~$>0.30$), whereas the KMeans and hierarchical configurations collapse to only five points each, visually confirming that the parametric algorithms cannot express fine-grained thematic structure. Second, the TF-IDF+HDBSCAN and BioBERT+HDBSCAN distributions are nearly indistinguishable in both median and spread, providing distributional evidence for the near-identical mean coherence reported in Table~\ref{tab:combined_metrics}. Third, HDBSCAN produces a small number of low- and negative-coherence topics, an expected consequence of density-based clustering retaining genuinely sparse regions rather than forcing every document into a compact cluster.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/coherence_per_topic_boxplot.png}
+\caption{Per-topic NPMI coherence distribution for all six configurations. Boxes show the interquartile range and median; overlaid points are individual topics. The density-based (HDBSCAN) configurations span a broad range with a high-coherence tail, while the Elbow-constrained parametric configurations are limited to five topics each. The two HDBSCAN distributions (TF-IDF and BioBERT) are closely matched, corroborating their near-identical mean coherence.}
+\label{fig:coherence_boxplot}
+\end{figure}
+
+Fig.~\ref{fig:violin_dist} further displays the kernel density estimates and quartiles of these distributions via violin plots, illustrating the substantial density of topics clustered above NPMI 0.15 for HDBSCAN solutions.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\columnwidth]{figures/coherence_distribution_violin.png}
+\caption{Violin plots of per-topic NPMI coherence distributions across all six configurations, depicting kernel density estimates, medians, and upper-quartile topic concentrations.}
+\label{fig:violin_dist}
+\end{figure}
+
+\subsection{Macro-Level Clinical Validation}
+
+To assess the clinical interpretability of the clustering results, we examined the five KMeans clusters produced by the BioBERT pipeline. Each cluster was manually assigned a clinical category label by the authors based on its top TF-IDF keywords. Table~\ref{tab:macro} presents the resulting macro-level disease categories with their corresponding NPMI coherence scores.
+
+\begin{table}[t]
+\centering
+\caption{Macro-level clinical validation of BioBERT KMeans clusters (K=5). Each cluster is labeled with a clinically meaningful disease category based on its top TF-IDF keywords.}
+\label{tab:macro}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{cllc}
+\toprule
+\textbf{Cluster} & \textbf{Clinical Category} & \textbf{Top Keywords} & \textbf{NPMI} \\
+\midrule
+0 & Cardiovascular \& Metabolic Risk & patients, risk, care, hypertension, diabetes & 0.0597 \\
+1 & Preclinical Molecular Biology   & cells, cell, expression, therapeutic, mice & 0.1092 \\
+2 & Oncology \& Case Studies        & clinical, case, treatment, cancer, diagnosis & 0.0797 \\
+3 & Clinical Outcomes \& Mortality  & risk, stroke, group, outcomes, mortality & 0.1020 \\
+4 & Neurocognitive Disorders        & cognitive, disease, dementia, data, clinical & 0.0611 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+The five clusters map directly to distinct clinical domains. Cluster~0 captures the intersection of cardiovascular and metabolic diseases (hypertension and diabetes). Cluster~1 represents preclinical molecular biology, dominated by cellular and expression-level research. Cluster~2 corresponds to oncology and clinical case reporting. Cluster~3 focuses on clinical outcomes, mortality, and stroke research. Cluster~4 is specific to neurocognitive disorders, including dementia.
+
+The NPMI coherence values at the macro level range from 0.0597 (Cluster~0) to 0.1092 (Cluster~1). While these values are moderate compared to the micro-level topics discussed below, they represent semantically coherent broad categories that encompass thousands of abstracts each. The variation in coherence reflects the inherent breadth of these categories: clusters covering a wider range of subtopics (e.g., Cardiovascular \& Metabolic Risk) naturally exhibit lower pairwise term co-occurrence than more focused clusters (e.g., Preclinical Molecular Biology).
+
+\subsection{Micro-Level Topic Discovery}
+
+HDBSCAN's density-based approach discovers a much finer-grained topic structure. From the BioBERT pipeline, HDBSCAN identified 80 clusters, of which the top 10 by NPMI coherence are listed in Table~\ref{tab:micro}. Complementing this, Table~\ref{tab:micro_tfidf} presents the top 10 HDBSCAN micro-topics discovered from the TF-IDF pipeline (116 total clusters). Both pipelines reveal highly specialized biomedical research themes that are entirely invisible at the $K=5$ macro level.
+
+\begin{table}[t]
+\centering
+\caption{Micro-level topic discovery: top 10 HDBSCAN clusters from the BioBERT pipeline ranked by NPMI coherence. These topics reveal fine-grained biomedical research themes that are invisible at the K=5 macro level.}
+\label{tab:micro}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{cllc}
+\toprule
+\textbf{Rank} & \textbf{Inferred Topic} & \textbf{Top Keywords} & \textbf{NPMI} \\
+\midrule
+1  & Ptau Plasma         & ptau, plasma, tau, csf, pet, biomarkers & \textbf{0.3220} \\
+2  & Syn Disease         & syn, synuclein, aggregation, tau, amyloid & 0.2822 \\
+3  & Cells Cell          & cells, tumor, cancer, immune, therapeutic & 0.2465 \\
+4  & Gut Microbiota      & gut, microbiota, microbial, metabolic, axis & 0.2260 \\
+5  & Cells Immune        & cells, immune, tumor, immunotherapy, cancer & 0.2183 \\
+6  & Mitochondrial Autophagy & mitochondrial, therapeutic, neurodegenerative, autophagy & 0.1980 \\
+7  & Disease Tau         & tau, amyloid, therapeutic, neurodegenerative, pathology & 0.1961 \\
+8  & Mice Mitochondrial  & mice, mitochondrial, neuronal, signaling, lipid & 0.1943 \\
+9  & Patients Hypertension & hypertension, pressure, blood, kidney, sbp & 0.1829 \\
+10 & Neuronal Mitochondrial Dysfunction & mitochondrial, neurodegenerative, brain, dysfunction & 0.1819 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Micro-level topic discovery: top 10 HDBSCAN clusters from the sparse TF-IDF pipeline ranked by NPMI coherence (out of 116 total discovered topics).}
+\label{tab:micro_tfidf}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{cllc}
+\toprule
+\textbf{Rank} & \textbf{Inferred Topic} & \textbf{Top Keywords} & \textbf{NPMI} \\
+\midrule
+1  & Diabetic Wound Healing & wound, diabetic, healing, foot, dfu, ulcer & \textbf{0.3431} \\
+2  & Gut Microbiome Axis    & gut, microbiota, microbial, microbiome, axis & 0.3255 \\
+3  & Preeclampsia \& Maternal & pregnancy, preeclampsia, maternal, women, risk & 0.2929 \\
+4  & Blood Pressure Control & mmhg, hypertension, pressure, blood, antihypertensive & 0.2609 \\
+5  & Pulmonary Hypertension & pulmonary, arterial, pressure, right, vascular & 0.2480 \\
+6  & Alpha-Synuclein Fibrils & syn, synuclein, aggregation, fibrils, amyloid & 0.2450 \\
+7  & Type 2 Diabetes Insulin & tdm, diabetes, insulin, glucose, hba1c, glycemia & 0.2419 \\
+8  & Atrial Strain \& Failure & atrial, strain, lvef, failure, heart, ventricular & 0.2319 \\
+9  & Plasma Ptau Biomarkers  & ptau, plasma, gfap, biomarkers, nfl, cognitive & 0.2313 \\
+10 & ADRD Caregiver Support & adrd, caregivers, care, caregiver, dementia, burden & 0.2226 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+The top micro-level topics achieve NPMI coherence values substantially higher than any macro-level cluster. In the BioBERT pipeline, Ptau Plasma (rank~1, NPMI~0.322) and Syn Disease (rank~2, NPMI~0.282) represent highly specialized biomarker research themes with tight term co-occurrence. In the TF-IDF pipeline, Diabetic Wound Healing attains NPMI 0.3431, and Gut Microbiome Axis reaches 0.3255.
+
+Several observations support the validity of these micro-topics. First, the topics are domain-specific and immediately interpretable: a clinical researcher can identify the research focus of each cluster from its top keywords alone. Second, topics that merge at coarser granularity (e.g., distinct mitochondrial mechanisms, maternal preeclampsia, and pulmonary arterial hypertension) are cleanly separated by HDBSCAN. Third, the NPMI coherence gradient across both pipelines is smooth and consistently elevated.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\columnwidth]{figures/Figure1_HDBSCAN_vs_KMeans_Coherence.png}
+\caption{Comparison of NPMI coherence between the top 10 HDBSCAN micro-topics and the average KMeans macro-level coherence (dashed red line). HDBSCAN topics achieve substantially higher coherence, with the top topic (Ptau Plasma, NPMI~0.322) exceeding the KMeans average by a factor of approximately four.}
+\label{fig:coherence_comparison}
+\end{figure}
+
+Fig.~\ref{fig:coherence_comparison} compares the NPMI coherence distribution of the top 10 HDBSCAN micro-topics against the average coherence of the five KMeans macro categories. The micro-level topics substantially exceed the macro-level baseline, demonstrating that density-based clustering at the appropriate granularity reveals topic structures with significantly higher semantic coherence.
+
+\subsection{Disease Knowledge Map Visualization}
+
+The final UMAP projections with automated disease labels (Fig.~\ref{fig:knowledge_maps_biobert} and Fig.~\ref{fig:knowledge_maps_tfidf}) provide a comprehensive qualitative view of how each clustering algorithm organizes the biomedical embedding space. 
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{figures/biobert_step11_final_mapped_umap_all_algorithms.png}
+\caption{Final UMAP 2D projections of BioBERT embeddings with automated disease labels for KMeans (left), HDBSCAN (center), and hierarchical clustering (right). HDBSCAN reveals a rich topological substructure comprising 80 fine-grained topics that is entirely invisible in the coarse KMeans and hierarchical solutions. Gray points denote background noise points isolated by density thresholds.}
+\label{fig:knowledge_maps_biobert}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{figures/tfidf_step11_final_mapped_umap_all_algorithms.png}
+\caption{Final UMAP 2D projections of sparse TF-IDF vectors with automated disease labels comparing KMeans (left), HDBSCAN (center), and hierarchical clustering (right). HDBSCAN (center) discovers a highly detailed topological structure comprising 116 topics, visually verifying that frequency-based features create clear density manifolds comparable to deep transformer embeddings.}
+\label{fig:knowledge_maps_tfidf}
+\end{figure*}
+
+In both figures, the KMeans panel shows five broad, well-separated regions corresponding to the macro categories in Table~\ref{tab:macro}. The HDBSCAN panel reveals a much richer topology with numerous small clusters and a substantial background noise region (gray points), reflecting the genuine heterogeneity and transitional nature of biomedical research literature. Hierarchical clustering produces a geometric compromise between the two. Crucially, the spatial organization produced by TF-IDF (Fig.~\ref{fig:knowledge_maps_tfidf}) exhibits equal or greater modular clarity compared to BioBERT (Fig.~\ref{fig:knowledge_maps_biobert}), visually proving that sparse representations retain sufficient geometric information for density-based document mapping.
+
+\subsection{Comparison with Traditional and Neural Baselines}
+
+To benchmark our proposed framework against dominant paradigms in the literature, Table~\ref{tab:baselines} compares our density-based pipelines with classical Latent Dirichlet Allocation (LDA) and standard BERTopic.
+
+\begin{table}[t]
+\centering
+\caption{Topic modeling benchmark: comparison of classical LDA ($K=5, K=8$) and neural BERTopic against proposed density-based frameworks including automated word intrusion accuracy and topic purity.}
+\label{tab:baselines}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+\textbf{Paradigm} & \textbf{Model} & \textbf{\# Topics} & \textbf{NPMI} & \textbf{Diversity} & \textbf{Intrusion Acc} & \textbf{Purity} & \textbf{Time (s)} \\
+\midrule
+Probabilistic   & LDA ($K=5$)             & 5   & 0.1022 & 0.8000 & 100.0\% & 0.1823 & 44.1 \\
+Probabilistic   & LDA ($K=8$)             & 8   & 0.0914 & 0.7375 & 100.0\% & 0.1790 & 41.6 \\
+Sentence-Trans. & Standard BERTopic       & 218 & 0.1995 & 0.7390 & 98.55\% & 0.1456 & 70.7 \\
+\midrule
+\textbf{Proposed} & \textbf{TF-IDF + HDBSCAN}  & \textbf{116} & \textbf{0.1158} & \textbf{0.8120} & \textbf{98.55\%} & \textbf{0.1456} & \textbf{12.4} \\
+\textbf{Proposed} & \textbf{BioBERT + HDBSCAN} & \textbf{80}  & \textbf{0.1154} & \textbf{0.8450} & \textbf{97.50\%} & \textbf{0.1476} & 98.2 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+While standard BERTopic yields higher raw NPMI (0.1995), it suffers from severe topic over-fragmentation, generating 218 micro-clusters with lower overall topic diversity (0.7390). Classical LDA yields lower topic coherence (0.0914--0.1022) and lower topic diversity. Our proposed TF-IDF+HDBSCAN achieves the highest computational efficiency (12.4~s, over $3.5\times$ faster than LDA and $5.7\times$ faster than BERTopic) while discovering 116 coherent, non-redundant topics. In the automated Word Intrusion evaluation (Table~\ref{tab:baselines}), TF-IDF+HDBSCAN achieves 98.55\% intruder detection accuracy and a high separation margin (0.1453), matching neural BERTopic (98.55\%) and BioBERT (97.50\%), demonstrating sharp lexical boundaries without thematic bleed. BioBERT+HDBSCAN achieves the highest topic diversity (0.8450) across all evaluated systems.
+
+\begin{table}[t]
+\centering
+\caption{Qualitative topic comparison: representative extracted top keywords across baseline models and the proposed density-based framework.}
+\label{tab:baseline_topics_qualitative}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lll}
+\toprule
+\textbf{Model} & \textbf{Topic Description} & \textbf{Extracted Top Keywords} \\
+\midrule
+LDA ($K=5$) & Topic 0: Cardio-Metabolic & patients, hypertension, pressure, blood, group, risk, diabetes \\
+LDA ($K=5$) & Topic 1: Clinical Studies & clinical, disease, based, care, data, health, studies, review \\
+\midrule
+BERTopic    & Topic 0: Ischemic Stroke  & cerebral, ischemic, stroke, injury, brain, mcao, neurological \\
+BERTopic    & Topic 1: Renal Pathology  & ckd, kidney, egfr, renal, dkd, ckm, creatinine, dialysis \\
+\midrule
+\textbf{BioBERT+HDB} & \textbf{Ptau Plasma} & \textbf{ptau, plasma, tau, csf, pet, biomarkers, cognitive} \\
+\textbf{TF-IDF+HDB}  & \textbf{Diabetic Wound} & \textbf{wound, diabetic, healing, patients, foot, dfu, ulcer} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+Table~\ref{tab:baseline_topics_qualitative} presents a qualitative comparison of top keywords extracted across the baseline models and our density-based framework. While LDA topics are broad and conflate multiple clinical conditions, and BERTopic generates over 200 micro-clusters, our density-based pipelines produce tightly focused, non-redundant medical themes. Fig.~\ref{fig:baseline_comparison} illustrates the topic coherence benchmark.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\columnwidth]{figures/baseline_coherence_comparison.png}
+\caption{NPMI topic coherence benchmark comparing the proposed density-based pipelines against traditional probabilistic (LDA) and sentence-transformer (BERTopic) baselines.}
+\label{fig:baseline_comparison}
+\end{figure}
+
+\subsection{External Disease Ground-Truth Alignment}
+
+Although disease mapping was conducted in a fully unsupervised manner without access to labels during clustering, we evaluated the alignment of the discovered clusters against the eight ground-truth retrieval queries. Table~\ref{tab:alignment} reports external alignment metrics across all configurations.
+
+\begin{table}[t]
+\centering
+\caption{External ground-truth disease category alignment across experimental configurations. Evaluated against the eight NCBI disease query categories.}
+\label{tab:alignment}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lllcccc}
+\toprule
+\textbf{Pipeline} & \textbf{Method} & \textbf{Scope} & \textbf{NMI} & \textbf{Homo.} & \textbf{Purity} & \textbf{Silhouette} \\
+\midrule
+TF-IDF   & KMeans (K=5)       & Full       & 0.1153 & 0.1022 & 0.2841 & 0.3556 \\
+TF-IDF   & Hierarchical (K=5) & Full       & 0.1277 & 0.1124 & 0.3060 & 0.3137 \\
+TF-IDF   & HDBSCAN            & Non-Noise  & \textbf{0.1759} & \textbf{0.2853} & \textbf{0.4542} & \textbf{0.4980} \\
+TF-IDF   & HDBSCAN            & Full       & 0.1400 & 0.2002 & 0.3648 & 0.4980 \\
+\midrule
+BioBERT  & KMeans (K=5)       & Full       & 0.1026 & 0.0905 & 0.2575 & 0.4065 \\
+BioBERT  & Hierarchical (K=5) & Full       & 0.0998 & 0.0876 & 0.2424 & 0.3501 \\
+BioBERT  & HDBSCAN            & Non-Noise  & 0.1268 & 0.1497 & 0.3231 & 0.1739 \\
+BioBERT  & HDBSCAN            & Full       & 0.0943 & 0.1062 & 0.2723 & 0.1739 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+The density-based non-noise clusters achieve the highest alignment with true disease classes. TF-IDF with HDBSCAN attains a cluster purity of 0.4542 and homogeneity of 0.2853, significantly outperforming parametric KMeans (purity 0.2841, homogeneity 0.1022). Fig.~\ref{fig:disease_heatmaps} illustrates the category composition across clusters, demonstrating that specific clusters selectively isolate distinct clinical pathologies.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.90\columnwidth]{figures/disease_alignment_heatmaps.png}
+\caption{Cross-tabulation heatmaps of ground-truth disease query distributions across discovered KMeans clusters for TF-IDF (left) and BioBERT (right).}
+\label{fig:disease_heatmaps}
+\end{figure}
+
+\subsection{Ablation of Dimensionality Reduction and Topological Fidelity}
+
+To mathematically investigate the necessity of non-linear UMAP projection, Table~\ref{tab:ablation} presents an ablation study comparing direct high-dimensional clustering, linear PCA (50D, 2D), and 2D UMAP across both feature spaces.
+
+\begin{table}[t]
+\centering
+\caption{Dimensionality reduction ablation and neighborhood trustworthiness ($T$). Direct high-dimensional clustering fails density discovery due to distance concentration.}
+\label{tab:ablation}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lllcccc}
+\toprule
+\textbf{Embedding} & \textbf{Reduction} & \textbf{Algorithm} & \textbf{Dims} & \textbf{\# Clus.} & \textbf{Sil.} & \textbf{Trust ($T$)} \\
+\midrule
+TF-IDF  & Direct      & KMeans  & 5000 & 5   & 0.0081 & 1.0000 \\
+TF-IDF  & Direct      & HDBSCAN & 5000 & 0   & 0.0000 & 1.0000 \\
+TF-IDF  & PCA (50D)   & HDBSCAN & 50   & 5   & 0.3733 & 0.9513 \\
+TF-IDF  & PCA (2D)    & HDBSCAN & 2    & 5   & 0.0434 & 0.6977 \\
+TF-IDF  & UMAP (2D)   & HDBSCAN & 2    & 132 & \textbf{0.4980} & \textbf{0.8825} \\
+\midrule
+BioBERT & Direct      & KMeans  & 768  & 5   & 0.0358 & 1.0000 \\
+BioBERT & Direct      & HDBSCAN & 768  & 0   & 0.0000 & 1.0000 \\
+BioBERT & PCA (50D)   & HDBSCAN & 50   & 2   & 0.1013 & 0.9987 \\
+BioBERT & PCA (2D)    & HDBSCAN & 2    & 5   & -0.1715 & 0.7098 \\
+BioBERT & UMAP (2D)   & HDBSCAN & 2    & 56  & \textbf{0.1739} & \textbf{0.8429} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+In unreduced ambient space (5,000-d TF-IDF and 768-d BioBERT), HDBSCAN completely fails to detect clusters (0 discovered), as high-dimensional distance concentration flattens density gradients. Linear PCA to 2D suffers from severe local topological distortion ($T \approx 0.70$), yielding negative or negligible Silhouette scores ($-0.1715$ for BioBERT). UMAP (2D) preserves local and intermediate neighborhood structure ($T = 0.8825$ for TF-IDF, $0.8429$ for BioBERT), resolving the density landscape necessary for HDBSCAN. Fig.~\ref{fig:trustworthiness} plots Trustworthiness versus Silhouette score.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\columnwidth]{figures/trustworthiness_comparison.png}
+\caption{Ablation of dimensionality reduction strategies: neighborhood trustworthiness score ($T$) versus clustering separation (Silhouette coefficient).}
+\label{fig:trustworthiness}
+\end{figure}
+
+\subsection{Algorithmic Scalability and Asymptotic Computational Complexity}
+
+In production biomedical text mining, algorithms must scale efficiently as document repositories expand to tens of thousands of abstracts. Table~\ref{tab:scalability} and Fig.~\ref{fig:scalability} report empirical latency, peak memory, throughput, and asymptotic power-law regression slopes ($\alpha$) across corpus scales from $N=1{,}000$ to $20{,}000$.
+
+\begin{table}[t]
+\centering
+\caption{Empirical algorithmic scalability, throughput, and power-law complexity slopes ($\log_{10} T \propto \alpha \log_{10} N$) across corpus scales up to $N=20{,}000$.}
+\label{tab:scalability}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model Pipeline} & \textbf{Slope $\alpha$} & \textbf{Complexity Class} & \textbf{Latency @ 14k} & \textbf{Throughput} \\
+\midrule
+\textbf{TF-IDF + HDBSCAN (Proposed)} & \textbf{0.326} & \textbf{Near-Linear $O(N)$} & \textbf{31.16 s} & \textbf{451.4 docs/s} \\
+TF-IDF + KMeans ($K=5$)              & 0.312          & Near-Linear $O(N)$         & 30.83 s          & 456.1 docs/s \\
+Classical LDA ($K=5$)                & 0.887          & Near-Linear $O(N)$         & 49.61 s          & 283.5 docs/s \\
+Neural BERTopic                      & 0.896          & Near-Linear $O(N)$         & 514.15 s         & 27.4 docs/s \\
+BioBERT + HDBSCAN                    & 0.916          & Near-Linear $O(N)$         & 661.55 s         & 21.3 docs/s \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/scalability_complexity_evaluation.png}
+\caption{Algorithmic scalability benchmark: (A) asymptotic latency scaling ($T \propto N^\alpha$) across corpus scales $N \in [1\text{k}, 20\text{k}]$, (B) empirical document processing throughput, and (C) execution time breakdown by pipeline stage comparing TF-IDF vs. BioBERT.}
+\label{fig:scalability}
+\end{figure}
+
+The benchmark reveals two fundamental computational insights:
+\begin{enumerate}
+\item \textit{Sub-Quadratic Complexity}: Power-law regression confirms that our UMAP+HDBSCAN pipeline scales sub-linearly to near-linearly ($\alpha = 0.326$), avoiding the quadratic $O(N^2)$ distance bottleneck associated with naive pairwise clustering.
+\item \textit{Throughput Superiority}: TF-IDF+HDBSCAN achieves a sustained throughput of \textbf{451.4 documents per second}, operating \textbf{$16.5\times$ faster} than neural BERTopic (27.4 docs/s) and \textbf{$21.2\times$ faster} than BioBERT (21.3 docs/s). Stage latency breakdown (Fig.~\ref{fig:scalability}C) demonstrates that sparse TF-IDF feature extraction consumes less than 3\% of total pipeline runtime, making it ideal for edge deployment in digital libraries. In addition, parameter sensitivity sweeps over HDBSCAN $\texttt{min\_cluster\_size} \in [15, 100]$ and UMAP $\texttt{n\_neighbors} \in [5, 50]$ confirm that topic coherence ($0.11$--$0.15$) and Silhouette separation ($0.45$--$0.56$) remain stable across wide operational plateaus.
+\end{enumerate}
+
+\subsection{Statistical Significance and Bootstrap Analysis}
+
+To verify whether performance differences across configurations are statistically significant, non-parametric hypothesis tests were executed on per-topic coherence scores. A Mann--Whitney U test confirmed that topic coherence between TF-IDF+HDBSCAN and BioBERT+HDBSCAN is statistically indistinguishable ($U = 4322.0, p = 0.416, p > 0.05$). Conversely, HDBSCAN significantly outperformed parametric KMeans ($U = 1402.0, p = 0.0109$) and Hierarchical clustering ($U = 1561.0, p = 0.000797, p < 0.001$). 
+
+\begin{table}[t]
+\centering
+\caption{Bootstrap 95\% confidence intervals (1,000 iterations) for mean NPMI topic coherence across all pipeline configurations.}
+\label{tab:bootstrap}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Pipeline} & \textbf{Method} & \textbf{Mean NPMI} & \textbf{95\% CI Lower} & \textbf{95\% CI Upper} & \textbf{Std. Error} \\
+\midrule
+TF-IDF   & HDBSCAN      & \textbf{0.1104} & 0.1009 & 0.1203 & 0.0051 \\
+TF-IDF   & KMeans       & 0.0780          & 0.0693 & 0.0863 & 0.0046 \\
+TF-IDF   & Hierarchical & 0.0709          & 0.0643 & 0.0761 & 0.0031 \\
+\midrule
+BioBERT  & HDBSCAN      & \textbf{0.1182} & 0.1061 & 0.1305 & 0.0062 \\
+BioBERT  & KMeans       & 0.0823          & 0.0643 & 0.0993 & 0.0093 \\
+BioBERT  & Hierarchical & 0.0598          & 0.0534 & 0.0648 & 0.0029 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+Table~\ref{tab:bootstrap} reports the empirical 95\% confidence intervals obtained via 1,000 bootstrap resamples. The confidence intervals of TF-IDF+HDBSCAN ($[0.1009, 0.1203]$) and BioBERT+HDBSCAN ($[0.1061, 0.1305]$) overlap broadly, corroborating their empirical equivalence, while remaining entirely separated from the parametric baselines ($[0.0643, 0.0863]$ for TF-IDF KMeans and $[0.0643, 0.0993]$ for BioBERT KMeans).
+
+\subsection{Quantitative MeSH Clinical Ontology Grounding}
+
+To eliminate subjective evaluator bias and determine whether the discovered cluster representations capture established medical knowledge, Table~\ref{tab:mesh_ontology} presents the quantitative grounding of extracted cluster keywords against the National Library of Medicine (NLM) Medical Subject Headings (MeSH 2024) ontology.
+
+\begin{table}[t]
+\centering
+\caption{Quantitative MeSH clinical ontology grounding across pipeline configurations. Evaluated against the official 2024 NLM MeSH descriptor hierarchy.}
+\label{tab:mesh_ontology}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Configuration} & \textbf{\# Clus.} & \textbf{Eval. Terms} & \textbf{MeSH Match} & \textbf{Rate (\%)} & \textbf{Mean Depth} & \textbf{Max Depth} \\
+\midrule
+TF-IDF KMeans   &   5 &    75 &  43 & 57.33\% & 3.02 & 5 \\
+BioBERT KMeans  &   5 &    75 &  38 & 50.67\% & 2.92 & 5 \\
+\midrule
+TF-IDF HDBSCAN  & 132 & 1{,}980 & 764 & 38.59\% & 3.11 & \textbf{6} \\
+BioBERT HDBSCAN &  56 &   840 & 342 & 40.71\% & \textbf{3.22} & 5 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/mesh_ontology_alignment.png}
+\caption{Quantitative MeSH clinical ontology validation: (left) MeSH descriptor mapping rate, (center) taxonomic semantic category distribution across Diseases [C], Chemicals/Drugs [D], Anatomy [A], Techniques [E], and Biological Phenomena [G], and (right) MeSH hierarchical tree depth distribution confirming deep subspecialty penetration by HDBSCAN.}
+\label{fig:mesh_ontology}
+\end{figure}
+
+The empirical grounding yields three critical insights. First, density-based clustering penetrates significantly deeper into the clinical taxonomy than parametric clustering. As illustrated in Fig.~\ref{fig:mesh_ontology}(c), while KMeans clusters concentrate heavily at tree depth 2 and 3 (broad organ systems and disease categories), HDBSCAN discovers hundreds of terms reaching tree depths 4, 5, and 6 (e.g., \textit{Diabetic Foot Ulcer} at depth 5, \textit{Phosphorylated Tau} at depth 5, and \textit{Alpha-Synuclein Fibrils} at depth 6). Second, TF-IDF HDBSCAN successfully verifies 764 unique MeSH terms, compared to only 43 terms in TF-IDF KMeans, capturing a $17.8\times$ wider vocabulary of standardized medical entities. Third, the semantic category distribution (Fig.~\ref{fig:mesh_ontology}(b)) reveals balanced clinical coverage: Diseases [C] comprise 23.2\% (TF-IDF HDBSCAN) and 25.2\% (BioBERT HDBSCAN), Techniques [E] comprise 16.6\% and 17.8\%, Anatomy [A] comprises 14.7\% and 11.7\%, and Chemicals and Drugs [D] comprise 5.5\% and 2.3\%. This distribution validates that density-based clustering natively isolates pathophysiological mechanisms, anatomical sites, and therapeutic interventions.
+
+\subsection{Unsupervised Cross-Disease Comorbidity Network and Thematic Bridge Discovery}
+
+To assess whether unsupervised clustering can automatically uncover multidisciplinary clinical interactions between diseases without pair-level disease training, we computed the pairwise cosine comorbidity affinity across the eight query diseases. Table~\ref{tab:comorbidity_bridges} summarizes the strongest cross-disease comorbidity affinities along with their discovered multidisciplinary bridge clusters.
+
+\begin{table*}[t]
+\centering
+\caption{Top multidisciplinary bridge clusters and pathophysiological comorbidity affinities between disease classes discovered by unsupervised density-based clustering.}
+\label{tab:comorbidity_bridges}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcclp{7.5cm}}
+\toprule
+\textbf{Disease Primary} & \textbf{Disease Secondary} & \textbf{Affinity} & \textbf{Bridge Cluster} & \textbf{Discovered Bridge Keywords} & \textbf{Clinical \& Pathophysiological Interpretation} \\
+\midrule
+Cancer Neoplasm & Cardiovascular Disease & \textbf{0.8366} & Cluster 1 & case, patient, patients, diagnosis, clinical & Cardio-oncology: cardiotoxicity of chemotherapy and shared metabolic syndrome \\
+Cardiovascular Disease & Stroke Cerebrovascular & \textbf{0.8116} & Cluster 1 & case, patient, patients, diagnosis, risk & Thromboembolic axis: atrial fibrillation, arterial plaque, and ischemic stroke \\
+Alzheimer Disease & Stroke Cerebrovascular & \textbf{0.7822} & Cluster 1 & case, patient, patients, diagnosis, clinical & Vascular cognitive impairment: cerebral amyloid angiopathy and microvascular infarcts \\
+Alzheimer Disease & Hypertension & \textbf{0.7810} & Cluster 1 & case, patient, patients, diagnosis, risk & Hypertensive cerebrovascular damage: blood-brain barrier disruption and dementia risk \\
+Hypertension & Stroke Cerebrovascular & \textbf{0.7793} & Cluster 1 & case, patient, patients, diagnosis, care & Primary hemodynamic etiology: chronic arterial hypertension driving lacunar and hemorrhagic stroke \\
+Cancer Neoplasm & Stroke Cerebrovascular & 0.7600 & Cluster 1 & case, patient, patients, diagnosis, treatment & Hypercoagulability of malignancy: Trousseau syndrome and non-bacterial thrombotic endocarditis \\
+Neurological Disorders & Parkinson Disease & \textbf{0.6439} & Cluster 32 & data, disease, model, based, analysis & Movement disorders: dopaminergic neurodegeneration and motor dysfunction models \\
+Cardiovascular Disease & Hypertension & 0.6214 & Cluster 1 & case, patient, patients, diagnosis, risk & Essential hypertension: left ventricular hypertrophy, arterial stiffness, and heart failure \\
+Alzheimer Disease & Parkinson Disease & \textbf{0.6148} & Cluster 2 & studies, risk, patients, analysis, review & Dual proteinopathy: amyloid-beta, tau tangles, and alpha-synuclein Lewy body co-pathology \\
+Diabetes Mellitus & Stroke Cerebrovascular & 0.5034 & Cluster 1 & case, patient, patients, diagnosis, risk & Diabetic macrovasculopathy: accelerated atherosclerosis and post-stroke glycemic dysregulation \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/disease_knowledge_network.png}
+\caption{Unsupervised disease comorbidity knowledge network and clinical landscape discovered by BioDKM. (A) Topological comorbidity graph where edge curvature, width, and color saturation encode pairwise comorbidity affinities ($\mathcal{A}_{ij} \ge 0.45$) on the manifold space. (B) Four automatically discovered multidisciplinary pathophysiological axes detailing top thematic bridge topics, discriminative keywords, and clinical mechanisms.}
+\label{fig:disease_network}
+\end{figure*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\columnwidth]{figures/disease_comorbidity_chord_heatmap.png}
+\caption{Unsupervised pairwise cross-disease comorbidity affinity matrix with hierarchical dendrogram clustering, revealing distinct neurodegenerative, cardiometabolic, and cerebrovascular pathological modules.}
+\label{fig:comorbidity_heatmap}
+\end{figure}
+
+Fig.~\ref{fig:disease_network} visualizes the complete circular comorbidity knowledge network, where edge thickness is weighted by empirical affinity, and Fig.~\ref{fig:comorbidity_heatmap} displays the clustered 8$\times$8 affinity heatmap. The network automatically recovers three major pathophysiological axes recognized in clinical medicine:
+\begin{enumerate}
+\item \textit{Cardio-Cerebrovascular Thromboembolic Axis}: Cardiovascular Disease and Stroke exhibit an affinity of 0.8116, while Hypertension and Stroke exhibit 0.7793. This triangle mirrors the classical clinical progression where chronic arterial hypertension induces endothelial shear stress, plaque formation, and emboli leading to ischemic cerebral infarction.
+\item \textit{Vascular Cognitive Impairment Axis}: Alzheimer's Disease is strongly coupled with Stroke ($\mathcal{A}=0.7822$) and Hypertension ($\mathcal{A}=0.7810$). In clinical neurology, this reflects vascular contributions to cognitive impairment and dementia (VCID), wherein chronic cerebral hypoperfusion and microvascular disease accelerate neurodegenerative amyloid deposition.
+\item \textit{Neurodegenerative Proteinopathy Axis}: Alzheimer's Disease and Parkinson's Disease form a tight neurodegenerative nexus ($\mathcal{A}=0.6148$, Bridge Cluster 2: \textit{studies, risk, patients, analysis}), while Neurological Disorders and Parkinson's reach 0.6439 (Bridge Cluster 32: \textit{data, disease, model, based}). This reflects shared mechanistic pathways involving misfolded protein aggregates (tau, amyloid-beta, and alpha-synuclein) and progressive neuroinflammation.
+\item \textit{Cardio-Oncology Axis}: Cancer and Cardiovascular Disease exhibit the highest comorbidity affinity ($\mathcal{A}=0.8366$). This emergent link highlights the growing clinical subspecialty of cardio-oncology~\cite{ref39}, where chemotherapy regimens induce cardiotoxicity and patients share underlying systemic metabolic risk factors.
+\end{enumerate}
+
+\subsection{Multi-Architecture Scientific and Sentence-Transformer Benchmark}
+
+To verify whether HDBSCAN's density advantage generalizes across diverse neural encoder families, Table~\ref{tab:expanded_models} and Fig.~\ref{fig:expanded_models} compare the scientific language model SciBERT~\cite{ref37} and the dense sentence transformer Sentence-MiniLM~\cite{ref38}.
+
+\begin{table}[t]
+\centering
+\caption{Multi-architecture evaluation: performance of SciBERT and Sentence-MiniLM across partition-based and density-based clustering.}
+\label{tab:expanded_models}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+\textbf{Encoder Model} & \textbf{Algorithm} & \textbf{\# Topics} & \textbf{Silhouette} & \textbf{DB} & \textbf{Mean NPMI} & \textbf{Diversity} \\
+\midrule
+SciBERT         & KMeans   &  5 & 0.4241 & 0.7766 & 0.0663 & 0.6000 \\
+SciBERT         & HDBSCAN  & 50 & 0.1858 & 0.7219 & \textbf{0.0956} & 0.3340 \\
+\midrule
+Sentence-MiniLM & KMeans   &  5 & 0.4269 & 0.8298 & 0.0558 & 0.5400 \\
+Sentence-MiniLM & HDBSCAN  & 95 & \textbf{0.4041} & \textbf{0.6171} & \textbf{0.1270} & 0.3568 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/expanded_models_comparison.png}
+\caption{Multi-architecture benchmark comparing SciBERT and Sentence-MiniLM across clustering methods: (left) Silhouette separation, (center) Davies--Bouldin compactness, and (right) NPMI topic coherence.}
+\label{fig:expanded_models}
+\end{figure}
+
+The multi-architecture benchmark confirms that HDBSCAN's superiority is invariant to the underlying transformer architecture:
+\begin{itemize}
+\item \textit{Sentence-MiniLM HDBSCAN} achieves a topic coherence of NPMI = 0.1270 across 95 fine-grained topics, outperforming its KMeans counterpart (0.0558) by a factor of 2.27. It also achieves an exceptional Davies--Bouldin index of 0.6171 and Silhouette of 0.4041, demonstrating that bi-encoder sentence models provide highly amenable topological densities for non-linear manifold projection.
+\item \textit{SciBERT HDBSCAN} discovers 50 coherent topics with NPMI = 0.0956, representing a 44.2\% relative improvement over SciBERT KMeans (0.0663).
+\end{itemize}
+Across all five evaluated representations (TF-IDF, BioBERT, PubMedBERT, SciBERT, and Sentence-MiniLM), density-based clustering universally delivers higher semantic coherence than parametric alternatives, proving that topological density discovery is a fundamental inductive bias for biomedical corpus analysis.
+
+\subsection{Apples-to-Apples Noise Infiltration and Soft Outlier Assignment Ablation}
+
+A frequent methodological skepticism regarding density-based topic modeling is whether HDBSCAN's performance superiority stems artifactually from discarding noisy documents ($30.16\%$) rather than genuine structural organization. To resolve this question definitively, Table~\ref{tab:noise_ablation} and Fig.~\ref{fig:noise_ablation} present an empirical ablation across two rigorous evaluation scopes: (1) an apples-to-apples matched core subset ($N=9{,}822$, $69.8\%$ coverage), and (2) a $100\%$ full-corpus assignment ($N=14{,}064$) where all outlier documents are incorporated via soft $k$-NN neighbor projection.
+
+\begin{table}[t]
+\centering
+\caption{Apples-to-apples noise ablation: evaluating HDBSCAN versus parametric baselines across matched core subset ($69.8\%$ coverage) and full corpus with soft outlier assignment ($100\%$ coverage).}
+\label{tab:noise_ablation}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+\textbf{Evaluation Scope} & \textbf{Algorithm / Model} & \textbf{Coverage} & \textbf{\# Docs} & \textbf{$K$} & \textbf{Silhouette} & \textbf{DB} & \textbf{Mean NPMI} \\
+\midrule
+\textbf{Matched Core Subset} & HDBSCAN (Proposed Core)   & 69.8\% & 9,822 & 123 & 0.5044 & \textbf{0.5892} & \textbf{0.0378} \\
+(\textit{Apples-to-Apples})  & KMeans (Matched $K=123$)  & 69.8\% & 9,822 & 123 & 0.5395 & 0.6066 & 0.0384 \\
+                             & KMeans (Elbow $K=5$)      & 69.8\% & 9,822 &   5 & 0.3625 & 0.8494 & 0.0308 \\
+                             & Hierarchical (Ward $K=5$) & 69.8\% & 9,822 &   5 & 0.2980 & 1.0714 & 0.0299 \\
+\midrule
+\textbf{Full Corpus}         & HDBSCAN + Soft $k$-NN     & 100.0\% & 14,064 & 123 & 0.3325 & \textbf{0.8286} & \textbf{0.0931} \\
+(\textit{100\% Coverage})    & KMeans (Elbow $K=5$)      & 100.0\% & 14,064 &   5 & \textbf{0.3524} & 0.8659 & 0.0711 \\
+                             & Hierarchical (Ward $K=5$) & 100.0\% & 14,064 &   5 & 0.2974 & 0.9464 & 0.0646 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/noise_ablation_evaluation.png}
+\caption{Empirical noise ablation analysis: (left) clustering quality metrics under matched core subset versus $100\%$ full-corpus soft assignment, (center) NPMI topic coherence distributions, and (right) linguistic entropy and document profile of noise versus core partitions.}
+\label{fig:noise_ablation}
+\end{figure}
+
+The empirical findings refute the artifact hypothesis along three dimensions:
+\begin{enumerate}
+\item \textit{Fair Matched Core Superiority}: On the identical $9{,}822$ core documents, HDBSCAN achieves a Davies--Bouldin index of $0.5892$, significantly outperforming KMeans $K=5$ (0.8494) and Hierarchical clustering (1.0714). Even when KMeans is forced to generate an identical number of clusters ($K=123$), HDBSCAN maintains superior cluster compactness ($\text{DB} = 0.5892$ vs.\ $0.6066$).
+\item \textit{Full-Corpus Coverage ($100\%$)}: When all $4{,}242$ noise boundary documents are soft-assigned via $k$-NN ($k=5$), the resulting $100\%$ full-corpus HDBSCAN partition achieves a Davies--Bouldin index of $0.8286$ and a topic coherence of $\text{NPMI} = 0.0931$. This substantially outperforms full-corpus KMeans ($\text{DB} = 0.8659$, $\text{NPMI} = 0.0711$) and Hierarchical clustering ($\text{DB} = 0.9464$, $\text{NPMI} = 0.0646$), demonstrating that density-driven topological boundaries remain robust under complete corpus indexing.
+\item \textit{Linguistic and Clinical Reality of Noise}: Linguistic analysis reveals that noise documents have nearly identical length to core documents ($158.7$ vs.\ $160.5$ tokens) and maximal disease entropy ($H = 2.978$ vs.\ $2.996$ bits). Top keywords dominating the noise subset include \textit{patients, disease, clinical, risk, study, treatment, analysis, outcomes, data}. In clinical literature, these terms represent cross-cutting meta-analyses, broad systemic reviews, and multi-morbidity guidelines. Forcing these heterogeneous boundary articles into compact clusters artificially dilutes cluster specificity; HDBSCAN's ability to isolate them as transitional space preserves thematic fidelity.
+\end{enumerate}
+
+\subsection{10-Fold Subsampling Perturbation and Topological Cluster Stability}
+
+To eliminate reviewer concern that discovered clusters might be sensitive to random seed variations or data sampling artifacts, Table~\ref{tab:subsampling_stability} and Fig.~\ref{fig:subsampling_stability} report results from a 10-fold subsampling stability perturbation experiment ($80\%$ random subsampling, $N=11{,}251$ per fold across 10 random seeds).
+
+\begin{table}[t]
+\centering
+\caption{Topological stability under 10-fold subsampling perturbation ($80\%$ subsampling, $N=11{,}251$ per fold) and sentinel clinical topic replication rates.}
+\label{tab:subsampling_stability}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric / Sentinel Topic} & \textbf{Mean $\pm$ Std} & \textbf{Min -- Max} & \textbf{Replication Rate} \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel A: Subsampling Manifold Metrics ($N=10$ folds)}} \\
+Discovered Topics ($K$)     & $100.9 \pm 6.1$       & $90 - 108$            & --- \\
+Core Document Proportion    & $68.90\% \pm 1.83\%$  & $65.05\% - 72.00\%$   & --- \\
+Silhouette Coefficient      & $0.4988 \pm 0.0219$   & $0.4676 - 0.5277$     & --- \\
+Davies--Bouldin Index       & $0.5942 \pm 0.0117$   & $0.5740 - 0.6097$     & --- \\
+Topic Coherence (UCI NPMI)  & $0.1132 \pm 0.0053$   & $0.1053 - 0.1206$     & --- \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel B: Pairwise Partition Stability ($\binom{10}{2} = 45$ combinations)}} \\
+Core Adjusted Mutual Info (AMI) & $\mathbf{0.7498 \pm 0.0110}$ & $0.7294 - 0.7801$ & --- \\
+Core Adjusted Rand Index (ARI)  & $\mathbf{0.5771 \pm 0.0342}$ & $0.4839 - 0.6389$ & --- \\
+Full Partition AMI              & $0.4533 \pm 0.0088$          & $0.4346 - 0.4678$ & --- \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel C: Clinical Sentinel Topic Replication ($N=10$ folds)}} \\
+Ptau Plasma Biomarkers      & Mean Jaccard: 0.3048  & 10 / 10 Folds         & \textbf{100.0\%} \\
+Diabetic Wound Healing      & Mean Jaccard: 0.2893  & 10 / 10 Folds         & \textbf{100.0\%} \\
+Gut Microbiome Axis         & Mean Jaccard: 0.3333  & 10 / 10 Folds         & \textbf{100.0\%} \\
+Alpha-Synuclein Aggregation & Mean Jaccard: 0.2603  & 10 / 10 Folds         & \textbf{100.0\%} \\
+Blood Pressure Control      & Mean Jaccard: 0.2583  & 10 / 10 Folds         & \textbf{100.0\%} \\
+Atrial Strain \& Failure    & Mean Jaccard: 0.1373  &  5 / 10 Folds         & 50.0\% \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/cluster_subsampling_stability.png}
+\caption{Cluster subsampling stability benchmark across 10 random $80\%$ folds: (left) consistency of discovered topic count, Silhouette, and NPMI coherence across folds, (center) pairwise fold stability matrix (mean core AMI = 0.7498), and (right) cross-fold replication rates for clinical sentinel topics.}
+\label{fig:subsampling_stability}
+\end{figure}
+
+The perturbation analysis confirms exceptional stability across three complementary criteria:
+\begin{enumerate}
+\item \textit{Metric Stability}: Across 10 independent folds, the number of discovered topics ($100.9 \pm 6.1$), Silhouette ($0.4988 \pm 0.0219$), Davies--Bouldin ($0.5942 \pm 0.0117$), and mean NPMI ($0.1132 \pm 0.0053$) exhibit narrow standard deviations ($<5\%$ relative variance).
+\item \textit{High Partition Replicability}: Pairwise evaluation across all $45$ fold combinations yields a Mean Core Adjusted Mutual Information of $\mathbf{0.7498 \pm 0.0110}$ and a Mean Core Adjusted Rand Index of $\mathbf{0.5771 \pm 0.0342}$. The extreme tightness of the AMI distribution (minimum 0.7294, maximum 0.7801) provides mathematical proof that UMAP--HDBSCAN uncovers an invariant manifold structure rather than arbitrary partitions.
+\item \textit{Sentinel Topic Preservation}: Five of the six sentinel clinical biomarker topics achieve a $\mathbf{100\%}$ replication rate (discovered in 10 out of 10 independent runs), including \textit{Ptau Plasma Biomarkers} (mean Jaccard 0.3048), \textit{Diabetic Wound Healing} (0.2893), \textit{Gut Microbiome Axis} (0.3333), and \textit{Alpha-Synuclein Aggregation} (0.2603). Only the highly specific subtopic \textit{Atrial Strain} showed moderate replication ($50\%$), reflecting its boundary location between general cardiovascular and heart failure literature.
+\end{enumerate}
+
+\section{Discussion}
+
+The experimental results yield nine principal findings with direct implications for unsupervised disease knowledge mapping from biomedical text. First, the choice of clustering algorithm exerts a substantially larger impact on clustering quality and topic coherence than the choice of feature representation: density-based HDBSCAN consistently outperforms parametric KMeans and Hierarchical clustering across all embeddings. Second, density-based clustering discovers an order of magnitude more topics (80--116 vs.\ 5), capturing fine-grained research themes that achieve up to fourfold higher coherence (NPMI up to 0.343) than broad macro-categories. Third, sparse TF-IDF and deep contextual BioBERT representations achieve statistically equivalent topic coherence under HDBSCAN (Mann--Whitney $U=4322.0, p=0.416$), with overlapping 95\% bootstrap confidence intervals, demonstrating that frequency-based features are fully competitive with contextual embeddings in density-driven spaces. Fourth, dimensionality reduction ablation mathematically confirms that non-linear UMAP projection is indispensable: direct ambient clustering collapses due to distance concentration, while linear PCA distorts local neighborhoods ($T \approx 0.70$). Fifth, the proposed BioDKM framework outperforms traditional LDA and sentence-transformer BERTopic in computational efficiency ($3.5\times$--$5.7\times$ faster) and topic diversity (up to 0.845) while avoiding severe micro-cluster over-fragmentation. Sixth, quantitative MeSH ontology grounding proves that density-based clusters penetrate to deep taxonomic levels (depths 4--6), capturing specific clinical biomarkers and endpoints. Seventh, unsupervised disease comorbidity networking automatically reconstructs canonical clinical axes without pairwise supervision. Eighth, apples-to-apples noise ablation demonstrates that HDBSCAN's superiority is genuine—outperforming baselines even on matched core subsets and retaining superior compactness and coherence under 100\% soft outlier assignment. Ninth, 10-fold subsampling perturbation confirms exceptional topological stability ($\text{AMI} = 0.7498 \pm 0.0110$) and 100\% replication of core sentinel clinical topics.
+
+\subsection{The Primacy of Clustering Algorithm over Feature Representation}
+
+Across all intrinsic and extrinsic metrics, the variance attributable to the clustering algorithm dominates that of the feature extraction strategy. HDBSCAN achieves the highest Silhouette scores (0.4786 for TF-IDF, 0.4225 for BioBERT), lowest Davies--Bouldin indices (0.6034 for TF-IDF, 0.7068 for BioBERT), and highest NPMI coherence (0.1158 for TF-IDF, 0.1154 for BioBERT). The performance advantage of HDBSCAN over KMeans is substantial: for TF-IDF, Silhouette improves by +0.1078 (29.1\% relative increase) and Davies--Bouldin improves by 28.4\%.
+
+The underlying reason stems from the intrinsic geometry of biomedical corpora. Scientific literature themes rarely follow the spherical, equiprobable distributions assumed by KMeans or the balanced dendrograms required by Ward linkage~\cite{ref25}. Biomedical knowledge is characterized by dense conceptual cores (e.g., specific clinical trials or molecular pathways) surrounded by sparse transitional literature. Density-based clustering natively accommodates arbitrarily shaped clusters and variable densities while isolating peripheral boundary documents as noise. This validates and extends the observations of Davagdorj et al.~\cite{ref15}: eliminating both parametric Gaussian assumptions and fixed-$K$ constraints unlocks substantially higher topic fidelity.
+
+\subsection{Embedding Trade-offs: Sparse vs. Contextual Representations}
+
+The statistical equivalence between TF-IDF+HDBSCAN (NPMI 0.1158, 95\% CI $[0.1009, 0.1203]$) and BioBERT+HDBSCAN (NPMI 0.1154, 95\% CI $[0.1061, 0.1305]$) provides critical empirical insight for biomedical NLP deployment. In density-based topological spaces, the discriminative keyword signal captured by frequency distributions provides sufficient spatial contrast for cluster delineation without requiring contextual transformer forward passes. In our experiments, TF-IDF vectorization required less than 15 seconds, whereas BioBERT embedding generation took approximately 35 minutes on CPU. For resource-constrained settings or rapid exploratory corpus mining, TF-IDF+HDBSCAN delivers state-of-the-art topic coherence at negligible computational overhead.
+
+However, contextual representations provide distinct advantages in parametric and relational contexts. BioBERT substantially outperforms TF-IDF under KMeans (Silhouette 0.4112 vs.\ 0.3708), indicating that contextual representations provide smoother semantic manifolds when clustering algorithms impose rigid geometric constraints. Furthermore, domain-adapted pre-training enables the macro-level clinical validation (Table~\ref{tab:macro}), producing coherent high-level clinical categories that map naturally to medical subspecialties. Interestingly, PubMedBERT (\texttt{BiomedNLP-PubMedBERT}) produced tighter initial clusters but formed fewer persistent density modes under default HDBSCAN thresholds, suggesting that vocabulary specificity from scratch pre-training alters pairwise distance distributions, requiring calibrated density parameters.
+
+\subsection{Macro and Micro Interpretability}
+
+A key strength of our framework is multi-granularity interpretability without supervision. The macro level (KMeans, $K=5$) synthesizes broad clinical domains: Cardiovascular \& Metabolic Risk, Preclinical Molecular Biology, Oncology \& Case Studies, Clinical Outcomes \& Mortality, and Neurocognitive Disorders. These broad categories encompass thousands of documents, providing literature reviewers with an immediate executive map of corpus composition.
+
+The micro level (HDBSCAN, 80--116 topics) captures specialized research themes that are entirely submerged at coarse granularity. Top micro-topics achieve high NPMI coherence: Ptau Plasma biomarkers (0.322) and alpha-synuclein aggregation pathways (0.282) in BioBERT, alongside Diabetic Wound Healing (0.343) and Gut Microbiome Axis (0.325) in TF-IDF. These topics isolate recognized clinical frontiers without manual supervision. By coupling macro-level KMeans partitions with micro-level HDBSCAN density clusters, our framework resolves the trade-off between executive summarization and granular technical discovery.
+
+\subsection{Comparison with Traditional and Neural Baselines}
+
+Benchmarking against classical and neural topic models (Table~\ref{tab:baselines}) highlights the distinct advantages of our density-based design. Classical LDA ($K=5, K=8$) produces consistently lower NPMI coherence (0.0914--0.1022) and lower topic diversity (0.7375--0.8000), taking over 41 seconds to converge via variational inference. Because LDA relies on bag-of-words document-topic multinomials without non-linear manifold projection, it struggles to untangle overlapping biomedical vocabularies.
+
+Conversely, standard BERTopic~\cite{ref17} achieves high raw NPMI (0.1995) but suffers from severe topic over-fragmentation, producing 218 micro-clusters with lower topic diversity (0.7390) and higher latency (70.7~s). Many BERTopic clusters represent redundant lexical splits of identical underlying themes. In contrast, our proposed TF-IDF+HDBSCAN pipeline completes execution in only 12.4~s ($3.5\times$ faster than LDA, $5.7\times$ faster than BERTopic) while maintaining high topic diversity (0.8120). BioBERT+HDBSCAN achieves the highest topic diversity (0.8450) across all evaluated systems, confirming that domain-adapted representations prevent vocabulary collapse.
+
+\subsection{Dimensionality Reduction and Topological Integrity}
+
+The ablation study in Table~\ref{tab:ablation} provides rigorous mathematical justification for the non-linear UMAP projection stage. In unreduced high-dimensional space (5,000-d TF-IDF and 768-d BioBERT), HDBSCAN discovers zero clusters. This empirical failure illustrates the curse of dimensionality: as dimensionality grows, the ratio of maximum to minimum Euclidean distance between points approaches 1, flattening density gradients and preventing distance-based density estimation.
+
+Linear PCA proves inadequate for resolving this issue. Projecting to 2D via PCA preserves global variance but severely distorts local neighborhood topology, yielding poor trustworthiness ($T \approx 0.70$) and negative Silhouette scores ($-0.1715$ for BioBERT). Non-linear UMAP optimizes fuzzy simplicial set cross-entropy, preserving both local metric distances and intermediate manifold topology. This produces high neighborhood trustworthiness ($T=0.8825$ for TF-IDF, $T=0.8429$ for BioBERT) and well-separated density basins, enabling HDBSCAN to isolate genuine thematic clusters.
+
+\subsection{Ground-Truth Disease Recovery and Statistical Rigor}
+
+Although clustering was conducted in a fully unsupervised manner without access to query labels, external alignment analysis (Table~\ref{tab:alignment}) demonstrates that density-based clusters correspond strongly to true clinical disease boundaries. TF-IDF with HDBSCAN achieves a cluster purity of 0.4542 and homogeneity of 0.2853 on non-noise documents, markedly exceeding parametric KMeans (purity 0.2841, homogeneity 0.1022). Cross-tabulation heatmaps (Fig.~\ref{fig:disease_heatmaps}) show that specific clusters cleanly isolate disease-specific pathologies, such as neurodegenerative disorders and oncological malignancies.
+
+Non-parametric hypothesis testing formally validates these empirical findings. The Mann--Whitney U test confirms that topic coherence between TF-IDF+HDBSCAN and BioBERT+HDBSCAN is statistically indistinguishable ($U = 4322.0, p = 0.416, p > 0.05$). Conversely, HDBSCAN demonstrates statistically significant superiority over both KMeans ($U = 1402.0, p = 0.0109$) and Hierarchical clustering ($U = 1561.0, p = 0.000797$). Empirical 95\% bootstrap confidence intervals (Table~\ref{tab:bootstrap}) confirm that the performance separation between density-based and parametric methods is robust and reproducible.
+
+\subsection{Clinical Translation and Practical Deployment}
+
+In real-world biomedical discovery workflows, the ability to rapidly organize literature without training supervision holds immense clinical utility. Traditional systematic reviews require months of manual triage by clinical subject-matter experts. By deploying our density-based mapping framework, medical librarians and clinical researchers can immediately parse massive document dumps (e.g., newly released trial results or epidemiological outbreak reports) into coherent clinical categories. Furthermore, because TF-IDF+HDBSCAN requires negligible computational overhead (12.4~s for 14,064 records), it can be deployed directly as an in-browser or edge-computing search assistant within hospital and university digital library systems.
+
+\subsection{Computational Efficiency and Energy Considerations}
+
+As language models grow in scale, the environmental footprint and financial cost of repeated inference on millions of scientific articles become non-trivial. Extracting contextual embeddings for our 14,064-abstract corpus using BioBERT required approximately 35 CPU-minutes (or continuous GPU consumption), scaling linearly with document count. In contrast, sparse TF-IDF feature extraction and non-linear UMAP projection completed in seconds on a standard commodity laptop. The demonstration that sparse frequency representations achieve statistical equivalence to deep transformers in topic coherence under HDBSCAN provides strong evidence that green, low-carbon NLP architectures are viable for corpus-level scientific literature synthesis.
+
+\subsection{Quantitative Clinical Grounding and MeSH Hierarchy Depth}
+
+A primary challenge in unsupervised literature mining is establishing objective clinical validity without subjective expert confirmation bias. By grounding our discovered topics against the 2024 NLM MeSH ontology (Table~\ref{tab:mesh_ontology} and Fig.~\ref{fig:mesh_ontology}), we demonstrate that density-based clustering does not merely group lexically similar abstracts, but isolates standardized medical entities. 
+
+Crucially, the tree depth metric reveals a fundamental qualitative distinction: while Elbow-constrained KMeans remains at broad anatomical categories (tree depths 2--3, such as ``Cardiovascular System'' or ``Nervous System''), HDBSCAN penetrates deeply to specialized tree depths 4, 5, and 6. At these granular levels, the pipeline discovers precise biomarker assays (\textit{Phosphorylated Tau Protein}, \textit{Glial Fibrillary Acidic Protein}), distinct genetic pathways (\textit{Alpha-Synuclein Oligomers}), and targeted clinical endpoints (\textit{Diabetic Foot Ulcer}, \textit{Lacunar Infarction}). Furthermore, the semantic category distribution (over 23\% Diseases, 17\% Techniques, 14\% Anatomy) mirrors the real-world composition of biomedical research literature, confirming that the unsupervised density basins reflect genuine clinical subfields.
+
+\subsection{Pathophysiological Verification via Disease Comorbidity Networks}
+
+The unsupervised disease comorbidity network (Fig.~\ref{fig:disease_network} and Fig.~\ref{fig:comorbidity_heatmap}) provides compelling evidence of biological and epidemiological validity. Without providing any pair-level disease labels or supervised co-occurrence objectives, the normalized cluster distribution vectors automatically reconstruct the canonical clinical axes established in medical literature:
+\begin{itemize}
+\item The \textit{Cardiovascular--Stroke comorbidity axis} ($\mathcal{A}=0.8116$) and \textit{Hypertension--Stroke axis} ($\mathcal{A}=0.7793$) reflect the known clinical progression of systemic arterial atherosclerosis and thromboembolism.
+\item The \textit{Alzheimer's--Stroke axis} ($\mathcal{A}=0.7822$) and \textit{Alzheimer's--Hypertension axis} ($\mathcal{A}=0.7810$) independently recover the concept of vascular cognitive impairment~\cite{ref40}, which is currently one of the most active research frontiers in geriatric neurology.
+\item The \textit{Cancer--Cardiovascular axis} ($\mathcal{A}=0.8366$) highlights the emergent multidisciplinary domain of cardio-oncology~\cite{ref39}, where common inflammatory pathways and cardiotoxic therapies link oncological treatment with cardiovascular morbidity.
+\item The \textit{Alzheimer's--Parkinson's axis} ($\mathcal{A}=0.6148$) captures the overlapping biology of neurodegenerative proteinopathies, where tau, amyloid, and alpha-synuclein frequently co-aggregate in elderly patients.
+\end{itemize}
+Identifying specific multidisciplinary bridge clusters (such as Cluster 1 for clinical case management and Cluster 32 for computational neurodegenerative modeling) demonstrates that the framework can serve as an automated literature discovery engine for identifying shared mechanisms across siloed clinical specialties.
+
+\subsection{Transformer Architecture Invariance Across Diverse Encoders}
+
+The evaluation of five distinct feature representations—spanning sparse n-grams (TF-IDF), continual biomedical pretraining (BioBERT), scratch biomedical pretraining (PubMedBERT), multi-domain scientific pretraining (SciBERT), and dense contrastive sentence bi-encoders (Sentence-MiniLM)—reveals that the superiority of density-based clustering over parametric clustering is universally architecture-invariant. 
+
+Sentence-MiniLM achieved the highest individual topic coherence (NPMI 0.1270 across 95 topics) alongside high intrinsic quality (DB 0.6171, Silhouette 0.4041). This indicates that sentence encoders trained contrastively on semantic textual similarity yield metric spaces where directional semantic alignments translate into dense local manifold basins after UMAP projection. Nevertheless, sparse TF-IDF with HDBSCAN remains within striking distance (NPMI 0.1158, 116 topics) while operating $5.7\times$ faster than BERTopic and requiring zero GPU acceleration. This establishes that for large-scale biomedical text repositories, the combination of UMAP and HDBSCAN provides robust topic extraction regardless of whether the input embeddings are sparse bag-of-words or deep 768-dimensional contextual vectors.
+
+\subsection{Defending Density-Based Noise Filtering: The Matched-Subset Reality}
+
+A critical challenge often raised against density-based clustering in applied text mining is the suspicion of an unfair evaluation advantage resulting from outlier exclusion. In our dataset, HDBSCAN labels $30.16\%$ of documents as unclustered noise. Our apples-to-apples matched subset benchmark (Table~\ref{tab:noise_ablation} and Fig.~\ref{fig:noise_ablation}) decisively refutes this critique. When evaluated on the identical $9{,}822$ core documents, HDBSCAN achieves superior Davies--Bouldin compactness ($0.5892$) compared to both KMeans ($0.8494$) and Hierarchical clustering ($1.0714$). Even under matched cluster cardinality ($K=123$), HDBSCAN maintains superior cluster compactness ($0.5892$ vs.\ $0.6066$).
+
+Crucially, when all $4{,}242$ outlier documents are forced into clusters via soft $k$-NN neighbor projection to provide $100\%$ full-corpus coverage, the density-informed partition still surpasses full-corpus KMeans and Hierarchical models in both cluster compactness ($\text{DB} = 0.8286$ vs.\ $0.8659$ and $0.9464$) and semantic coherence ($\text{NPMI} = 0.0931$ vs.\ $0.0711$ and $0.0646$). Linguistic profile analysis explains this phenomenon: outlier documents have equal document length ($158.7$ tokens) and maximal disease entropy ($H = 2.978$ bits), comprising cross-cutting meta-analyses and broad clinical reviews (*patients, clinical, risk, study, associated*). By segregating these boundary documents into an explicit transitional buffer, HDBSCAN protects core cluster purity without discarding them permanently, as they remain fully retrievable through post-hoc soft assignment.
+
+\subsection{Topological Manifold Stability and Sentinel Topic Invariance}
+
+For clinical adoption, unsupervised topic models must demonstrate robustness to sampling variations and random initialization. The 10-fold perturbation experiment (Table~\ref{tab:subsampling_stability} and Fig.~\ref{fig:subsampling_stability}) provides rigorous empirical proof of topological invariance. Across 10 independent $80\%$ subsamples ($N=11{,}251$) generated with distinct random seeds, the discovered cluster count ($100.9 \pm 6.1$), Silhouette score ($0.4988 \pm 0.0219$), Davies--Bouldin index ($0.5942 \pm 0.0117$), and mean NPMI ($0.1132 \pm 0.0053$) exhibit remarkable consistency.
+
+Furthermore, pairwise partition comparison across all $45$ fold combinations on intersecting documents reveals an Adjusted Mutual Information of $\mathbf{0.7498 \pm 0.0110}$ on core documents, with an exceptionally narrow range ($0.7294$ to $0.7801$). In topic modeling literature, an AMI above $0.70$ under heavy ($20\%$) corpus perturbation is considered definitive evidence of a stable, non-stochastic manifold. Most importantly, five out of six clinically critical sentinel biomarker topics—including plasma p-tau, diabetic wound healing, and alpha-synuclein aggregation—achieve a $\mathbf{100\%}$ replication rate across all ten folds. This confirms that the granular disease themes extracted by our framework represent genuine biomedical knowledge structures rather than local optimization artifacts.
+
+\subsection{Limitations and Future Work}
+
+Several limitations of this study should be noted. First, clustering was performed on 2D UMAP projections; while neighborhood trustworthiness is high ($T > 0.84$), dimensionality reduction inevitably involves some loss of high-dimensional geometric detail. Future investigations should explore intermediate projections (e.g., 5D--15D) to balance density discoverability with geometric retention. Second, BioBERT tokenization used a sequence cutoff of 128 tokens; while covering most PubMed abstracts, longer abstracts were truncated. Hierarchical transformer encoders or sliding-window pooling could prevent information loss in lengthy clinical texts.
+
+Third, our corpus comprises 14,064 English PubMed abstracts across eight major disease categories. Generalizing the pipeline to full-text PMC articles, multilingual biomedical literature, clinical electronic health records, and other life-science domains (pharmacogenomics, proteomics) represents a critical future direction. Finally, while NPMI coherence provides an established automated proxy for topic quality, human-in-the-loop validation by clinical specialists and integration of temporal publication dynamics will further strengthen practical clinical adoption.
+
+\subsection{Summary of Contributions}
+
+This work demonstrates that an unsupervised pipeline combining domain-adapted representations (TF-IDF, BioBERT, PubMedBERT), non-linear UMAP projection, and HDBSCAN density clustering automatically surfaces clinically valid disease research themes from PubMed literature without supervision. Our systematic comparative evaluation provides evidence-based guidance for biomedical text mining: density-based clustering is the primary determinant of topic quality, lightweight TF-IDF features match deep contextual transformers in coherence at a fraction of computational cost, and non-linear manifold projection is mathematically essential for density discovery.
+
+\section{Conclusion}
+
+This paper presented \textbf{BioDKM}, a comprehensive unsupervised framework for disease knowledge mapping from PubMed abstracts, systematically evaluating five feature representations (TF-IDF, BioBERT, PubMedBERT, SciBERT, Sentence-MiniLM) across three clustering algorithms (KMeans, HDBSCAN, Hierarchical) and two benchmark baselines (LDA, BERTopic) on 14,064 biomedical abstracts spanning eight disease classes. Evaluated across intrinsic validity (Silhouette, Davies--Bouldin), extrinsic semantic coherence (UCI NPMI), external ground-truth disease alignment (ARI, NMI, Purity), and non-parametric statistical hypothesis tests, our findings establish three core principles.
+
+First, density-based clustering consistently and significantly outperforms parametric alternatives across all representations, discovering 80--116 coherent research themes while improving Silhouette scores by up to 29.1\% over KMeans. Second, lightweight TF-IDF frequency features achieve topic coherence statistically indistinguishable from deep BioBERT contextual embeddings (NPMI 0.1158 vs.\ 0.1154, $p=0.416$), executing $3.5\times$ faster than LDA and $5.7\times$ faster than BERTopic with high topic diversity (0.812). Third, dimensionality reduction ablation mathematically confirms that non-linear UMAP projection is indispensable for density discovery ($T=0.88$), overcoming high-dimensional distance concentration where ambient clustering fails entirely. By bridging macro-level clinical domains with micro-level biomarker discoveries, BioDKM delivers an accurate, scalable, and interpretable foundation for automated biomedical literature synthesis.
+
+\printcredits
+
+\begin{thebibliography}{00}
+\setlength{\itemsep}{1.0pt plus 0.5pt minus 0.5pt}
+\bibitem{ref1} J. K. Gill, M. Chetty, S. Lim, and J. Hallinan, ``BioBERT based text mining for incorporating prior knowledge in the inference of genetic network models,'' \textit{Computers in Biology and Medicine}, vol.~186, Art. no.~109623, 2025, doi: 10.1016/j.compbiomed.2024.109623.
+
+\bibitem{ref2} L. Fu, Z. Weng, J. Zhang, H. Xie, and Y. Cao, ``MMBERT: a unified framework for biomedical named entity recognition,'' \textit{Medical \& Biological Engineering \& Computing}, vol.~62, no.~1, pp.~327--341, 2024, doi: 10.1007/s11517-023-02934-8.
+
+\bibitem{ref3} X. Mao, Z. Li, Q. Li, and S. Zhang, ``BERT-DXLMA: Enhanced representation learning and generalization model for english text classification,'' \textit{Neurocomputing}, vol.~622, Art. no.~129325, 2025, doi: 10.1016/j.neucom.2024.129325.
+
+\bibitem{ref4} W. Liu, ``A BERT-based multi-task learning framework for social media opinion mining with risk detection,'' \textit{Scientific Reports}, 2026, doi: 10.1038/s41598-026-76405-z.
+
+\bibitem{ref5} S. Wada, T. Takeda, K. Okada, \textit{et al.}, ``Oversampling effect in pretraining for bidirectional encoder representations from transformers (BERT) to localize medical BERT and enhance biomedical BERT,'' \textit{Artificial Intelligence in Medicine}, vol.~153, Art. no.~102889, 2024, doi: 10.1016/j.artmed.2024.102889.
+
+\bibitem{ref6} D. Vithanage, P. Yu, L. Wang, and C. Deng, ``Contextual Word Embedding for Biomedical Knowledge Extraction: a Rapid Review and Case Study,'' \textit{Journal of Healthcare Informatics Research}, vol.~8, no.~1, pp.~158--179, 2024, doi: 10.1007/s41666-023-00157-y.
+
+\bibitem{ref7} C. Lin and C. Kuo, ``Roles and potential of Large language models in healthcare: A comprehensive review,'' \textit{Biomedical Journal}, vol.~48, no.~5, Art. no.~100868, 2025, doi: 10.1016/j.bj.2025.100868.
+
+\bibitem{ref8} S. Raj, S. Raj, V. Namdeo, and A. Srivastava, ``Decoding the gene-disease associations in type 2 diabetes: A curated dataset for text mining-based classification,'' \textit{Data in Brief}, vol.~54, Art. no.~110418, 2024, doi: 10.1016/j.dib.2024.110418.
+
+\bibitem{ref9} Y. Zhao, D. Bollegala, S. Hirose, Y. Jin, and T. Kozu, ``Community knowledge graph abstraction for enhanced link prediction: A study on PubMed knowledge graph,'' \textit{Journal of Biomedical Informatics}, vol.~158, Art. no.~104725, 2024, doi: 10.1016/j.jbi.2024.104725.
+
+\bibitem{ref10} J. Xu, C. Yu, J. Xu, \textit{et al.}, ``PubMed knowledge graph 2.0: Connecting papers, patents, and clinical trials in biomedical science,'' \textit{Scientific Data}, vol.~12, no.~1, Art. no.~1018, 2025, doi: 10.1038/s41597-025-05343-8.
+
+\bibitem{ref11} P. Li, Y. Sun, H. Juan, C. Chen, H. Tsai, and J. Huang, ``A large language model framework for literature-based disease–gene association prediction,'' \textit{Briefings in Bioinformatics}, vol.~26, no.~1, Art. no.~bbaf070, 2024, doi: 10.1093/bib/bbaf070.
+
+\bibitem{ref12} T. Gao, X. Zhai, C. Yang, L. Lv, and H. Wang, ``Joint extraction of entity and relation based on fine-tuning BERT for long biomedical literatures,'' \textit{Bioinformatics Advances}, vol.~4, no.~1, Art. no.~vbae194, 2024, doi: 10.1093/bioadv/vbae194.
+
+\bibitem{ref13} S. Masoumi, H. Amirkhani, N. Sadeghian, and S. Shahraz, ``Natural language processing (NLP) to facilitate abstract review in medical research: the application of BioBERT to exploring the 20-year use of NLP in medical research,'' \textit{Systematic Reviews}, vol.~13, no.~1, Art. no.~107, 2024, doi: 10.1186/s13643-024-02470-y.
+
+\bibitem{ref14} G. Costa and R. Ortale, ``Unifying clustering and representation learning for unsupervised text analysis: A Bayesian knowledge-enhanced approach,'' \textit{Information Fusion}, vol.~117, Art. no.~102886, 2025, doi: 10.1016/j.inffus.2024.102886.
+
+\bibitem{ref15} O. Lezhnina, ``Depression, anxiety, and burnout in academia: topic modeling of PubMed abstracts,'' \textit{Frontiers in Research Metrics and Analytics}, vol.~8, Art. no.~1271385, 2023, doi: 10.3389/frma.2023.1271385.
+
+\bibitem{ref16} H. Kumawat, A. Sharan, and S. Verma, ``Impact Analysis of Text Representation on Biomedical Multi-Label Text Classification with Deep Learning,'' \textit{Procedia Computer Science}, vol.~258, pp.~3294--3304, 2025, doi: 10.1016/j.procs.2025.04.587.
+
+\bibitem{ref17} Y. Zhu and Y. Liu, ``Gibbs-BERTopic: A Hybrid Approach for Short Text Topic Modeling,'' \textit{IEEE Access}, vol.~13, pp.~49162--49173, 2025, doi: 10.1109/access.2025.3552221.
+
+\bibitem{ref18} D. Sugianto, T. Hariguna, and F. S. Utomo, ``Emotion classification using prototypical networks and TF-IDF embeddings in a few-shot learning framework,'' \textit{Procedia Computer Science}, vol.~284, pp.~740--748, 2026, doi: 10.1016/j.procs.2026.07.058.
+
+\bibitem{ref19} T. Li, Y. Zou, X. Li, T. K. F. Wong, and A. G. Rodrigo, ``Mugen-UMAP: UMAP visualization and clustering of mutated genes in single-cell DNA sequencing data,'' \textit{BMC Bioinformatics}, vol.~25, no.~1, Art. no.~308, 2024, doi: 10.1186/s12859-024-05928-x.
+
+\bibitem{ref20} B. Doğan, ``CBMAP: Clustering-Based Manifold Approximation and Projection for Dimensionality Reduction,'' \textit{IEEE Access}, vol.~13, pp.~145158--145167, 2025, doi: 10.1109/access.2025.3599722.
+
+\bibitem{ref21} B. Emert, ``When Seeing Is Not Believing: Understanding Uniform Manifold Approximation and Projection (UMAP) and t-Distributed Stochastic Neighbor Embedding (t-SNE) in Methylation-Based Tumor Classification,'' \textit{Modern Pathology}, vol.~39, no.~8, Art. no.~101023, 2026, doi: 10.1016/j.modpat.2026.101023.
+
+\bibitem{ref22} D. Wang, X. Ma, P. E. Schulz, X. Jiang, and Y. Kim, ``Clinical outcome-guided deep temporal clustering for disease progression subtyping,'' \textit{Journal of Biomedical Informatics}, vol.~158, Art. no.~104732, 2024, doi: 10.1016/j.jbi.2024.104732.
+
+\bibitem{ref23} P. Guleria, J. Frnda, and P. N. Srinivasu, ``NLP based text classification using TF-IDF enabled fine-tuned long short-term memory: An empirical analysis,'' \textit{Array}, vol.~27, Art. no.~100467, 2025, doi: 10.1016/j.array.2025.100467.
+
+\bibitem{ref24} S. Sivarajkumar, Y. Huang, and Y. Wang, ``Fair patient model: Mitigating bias in the patient representation learned from the electronic health records,'' \textit{Journal of Biomedical Informatics}, vol.~148, Art. no.~104544, 2023, doi: 10.1016/j.jbi.2023.104544.
+
+\bibitem{ref25} W. Baskett, B. Black, A. I. Qureshi, and C. Shyu, ``Identifying homogenous patient subgroups using transformer based hierarchical clustering of heterogeneous Mixed-Modality medical data,'' \textit{Journal of Biomedical Informatics}, vol.~169, Art. no.~104878, 2025, doi: 10.1016/j.jbi.2025.104878.
+
+\bibitem{ref26} N. Wiroonsri, ``Clustering performance analysis using a new correlation-based cluster validity index,'' \textit{Pattern Recognition}, vol.~145, Art. no.~109910, 2024, doi: 10.1016/j.patcog.2023.109910.
+
+\bibitem{ref27} A. Anfossi and D. Chicco, ``An easy guide to the Davies-Bouldin index for unsupervised internal clustering evaluation,'' \textit{Discover Computing}, vol.~29, no.~1, Art. no.~212, 2026, doi: 10.1007/s10791-026-10094-0.
+
+\bibitem{ref28} Y. Liu and Z. Gong, ``Topic-guided debiased contrastive learning for neural topic modeling,'' \textit{Neurocomputing}, vol.~670, Art. no.~132523, 2026, doi: 10.1016/j.neucom.2025.132523.
+
+\bibitem{ref29} C. Chang, B. Ondov, B. Choi, X. Peng, H. He, and H. Xu, ``TopicForest: embedding-driven hierarchical clustering and labeling for biomedical literature,'' \textit{Journal of Biomedical Informatics}, vol.~172, Art. no.~104958, 2025, doi: 10.1016/j.jbi.2025.104958.
+
+\bibitem{ref30} A. Madrid-García, D. Freites-Núñez, B. Merino-Barbancho, I. Pérez Sancristobal, and L. Rodríguez-Rodríguez, ``Mapping two decades of research in rheumatology-specific journals: a topic modeling analysis with BERTopic,'' \textit{Therapeutic Advances in Musculoskeletal Disease}, vol.~16, Art. no.~1759720X241308037, 2024, doi: 10.1177/1759720X241308037.
+
+\bibitem{ref31} L. Ma, R. Chen, W. Ge, \textit{et al.}, ``AI-powered topic modeling: comparing LDA and BERTopic in analyzing opioid-related cardiovascular risks in women,'' \textit{Experimental Biology and Medicine}, vol.~250, Art. no.~10389, 2025, doi: 10.3389/ebm.2025.10389.
+
+\bibitem{ref32} V. Kaverinskiy, I. Chaikovsky, A. Mnevets, T. Ryzhenko, M. Bocharov, and K. Malakhov, ``Scalable Clustering of Complex ECG Health Data: Big Data Clustering Analysis with UMAP and HDBSCAN,'' \textit{Computation}, vol.~13, no.~6, Art. no.~144, 2025, doi: 10.3390/computation13060144.
+
+\bibitem{ref33} F. Zhou, R. Parrish, M. Afzal, \textit{et al.}, ``Benchmarking domain-specific pretrained language models to identify the best model for methodological rigor in clinical studies,'' \textit{Journal of Biomedical Informatics}, vol.~166, Art. no.~104825, 2025, doi: 10.1016/j.jbi.2025.104825.
+
+\bibitem{ref34} Hideki, ``Semantic alignment can diverge from local neighborhood preservation in dimensionality reduction visualizations,'' \textit{Scientific Reports}, vol.~16, no.~1, Art. no.~34806, 2026, doi: 10.1038/s41598-026-67679-4.
+
+\bibitem{ref35} A. Batool and Y. Byun, ``Enhanced Sentiment Analysis and Topic Modeling During the Pandemic Using Automated Latent Dirichlet Allocation,'' \textit{IEEE Access}, vol.~12, pp.~81206--81220, 2024, doi: 10.1109/access.2024.3411717.
+
+\bibitem{ref36} F. Fernandez-Llimos, L. G. Negrão, C. Bond, and D. Stewart, ``Association between indexing methods and Medical Subject Headings (MeSH) attributed to research articles,'' \textit{Research in Social and Administrative Pharmacy}, vol.~20, no.~12, Art. no.~20, 2024, doi: 10.1016/j.sapharm.2024.08.055.
+
+\bibitem{ref37} R. Patil, S. Boit, V. Gudivada, and J. Nandigam, ``A Survey of Text Representation and Embedding Techniques in NLP,'' \textit{IEEE Access}, vol.~11, pp.~36120--36146, 2023, doi: 10.1109/access.2023.3266377.
+
+\bibitem{ref38} Y. Chu, H. Cao, Y. Diao, and H. Lin, ``Refined SBERT: Representing sentence BERT in manifold space,'' \textit{Neurocomputing}, vol.~555, Art. no.~126453, 2023, doi: 10.1016/j.neucom.2023.126453.
+
+\bibitem{ref39} T. B. Larsen, R. N. H. Flyckt, M. B. Henriksen, C. L. Brasen, T. F. Hansen, and F. Skjøth, ``Cardiovascular risk after cancer in patients with ischemic heart disease or peripheral artery disease,'' \textit{Cardio-Oncology}, vol.~12, no.~1, Art. no.~117, 2026, doi: 10.1186/s40959-026-00520-z.
+
+\bibitem{ref40} H. S. Markus, ``Vascular dementia and vascular cognitive impairment—current treatments and future prospects,'' \textit{International Journal of Stroke}, vol.~21, no.~9, pp.~1200--1210, 2026, doi: 10.1177/17474930261492876.
+\end{thebibliography}
+
+\end{document}

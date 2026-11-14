@@ -1,0 +1,5 @@
+Model,Method,Num_Topics,Silhouette,Davies_Bouldin,Mean_NPMI,Topic_Diversity
+SciBERT,KMeans,5,0.4241,0.7766,0.0663,0.6
+SciBERT,HDBSCAN,50,0.1858,0.7219,0.0956,0.334
+Sentence-MiniLM,KMeans,5,0.4269,0.8298,0.0558,0.54
+Sentence-MiniLM,HDBSCAN,95,0.4041,0.6171,0.127,0.3568

@@ -1,0 +1,3 @@
+Partition,Document_Count,Proportion,Disease_Entropy,Mean_Token_Length,Clinical_Nature
+Core Dense Documents (Clustered),9822,69.84%,2.9962,160.5,Specialized disease-specific investigations and biomarker assays
+Noise Boundary Documents (Outliers),4242,30.16%,2.9781,158.7,"Broad multi-disease reviews, meta-analyses, and cross-cutting clinical guidelines"
