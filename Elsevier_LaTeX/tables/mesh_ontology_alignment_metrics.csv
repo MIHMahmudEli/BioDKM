@@ -1,5 +1,0 @@
-Configuration,Discovered_Clusters,Total_Evaluated_Keywords,Matched_MeSH_Keywords,MeSH_Mapping_Rate,Mean_MeSH_Tree_Depth,Median_MeSH_Tree_Depth,Max_MeSH_Tree_Depth
-TF-IDF KMeans,5,75,43,0.5733,3.02,3.0,5
-TF-IDF HDBSCAN,132,1980,764,0.3859,3.11,3.0,6
-BioBERT KMeans,5,75,38,0.5067,2.92,3.0,5
-BioBERT HDBSCAN,56,840,342,0.4071,3.22,3.0,5

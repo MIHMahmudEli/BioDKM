@@ -8,6 +8,11 @@ env/
 .env
 *.env
 
+# Local Manuscript and Internal Documentation
+Elsevier_LaTeX/
+AJSE_LaTeX/
+AGENTS.md
+
 # Scratch and Temporary
 scratch/
 *.kaggle-partial

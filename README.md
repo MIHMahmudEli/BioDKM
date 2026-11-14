@@ -3,12 +3,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Hugging Face Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-orange)](https://huggingface.co/datasets/MohsinElis/pubmed-disease-mapping)
-[![Manuscript: Elsevier CAS-DC](https://img.shields.io/badge/Manuscript-Elsevier%20CAS--DC-red)](Elsevier_LaTeX/main.pdf)
+[![Manuscript](https://img.shields.io/badge/Manuscript-Under%20Review-informational)](https://github.com/MIHMahmudEli/BioDKM)
 
-Official source code, empirical benchmark suite, and replication repository for the research paper:
+Official open-source implementation, cloud GPU replication suite, and empirical benchmarks for the research paper:
 
 > **BioDKM: An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature**  
-> *Targeted for Elsevier CAS Double-Column Journal Format.*
+> *(Under Review)*
 
 ---
 
@@ -71,12 +71,6 @@ Biomedical literature is expanding exponentially, creating acute challenges for 
 BioDKM/
 ├── data/
 │   └── pubmed_dataset.csv             # Corpus: 14,064 records across 8 disease classes
-├── Elsevier_LaTeX/                    # Publication-grade LaTeX source & compiled manuscript
-│   ├── main.tex                       # Complete Elsevier CAS-DC manuscript
-│   ├── main.pdf                       # Compiled 24-page publication PDF
-│   ├── cas-dc.cls                     # Elsevier CAS double-column layout class
-│   ├── figures/                       # Vector & high-resolution manuscript figures
-│   └── tables/                        # Machine-readable evaluation matrices and tables
 ├── notebooks/                         # Interactive Jupyter replication notebooks
 │   ├── API.ipynb                      # Step 1: PubMed query retrieval via E-utilities
 │   ├── TF-IDF_disease_mapping.ipynb   # Step 2: Stream A (11-step TF-IDF + UMAP + HDBSCAN)
@@ -93,10 +87,10 @@ BioDKM/
 │   ├── tfidf/                         # 11 Steps of artifacts for Stream A
 │   ├── biobert/                       # 11 Steps of artifacts for Stream B
 │   ├── coherence/                     # Combined evaluation metrics and NPMI plots
-│   ├── manuscript/                    # Publication tables and comparative figures
+│   ├── manuscript/                    # Macro/micro tables and comparative figures
 │   └── benchmarks/                    # Empirical data from all 13 benchmark experiments
 ├── requirements.txt                   # Environment dependencies
-├── AGENTS.md                          # Research specifications & execution guidelines
+├── LICENSE                            # MIT License
 └── README.md                          # Repository documentation
 ```
 
@@ -194,18 +188,10 @@ Each benchmark module contains its standalone runner and metadata:
 
 ---
 
-## 📄 Manuscript & Citation
+## 📄 Citation
 
-The complete LaTeX manuscript formatted for Elsevier CAS double-column layout is located in [`Elsevier_LaTeX/`](Elsevier_LaTeX/):
-- Source file: [`Elsevier_LaTeX/main.tex`](Elsevier_LaTeX/main.tex)
-- Precompiled PDF: [`Elsevier_LaTeX/main.pdf`](Elsevier_LaTeX/main.pdf)
+If you find this codebase, benchmark replication suite, or preprocessed datasets useful in your research, please cite:
 
-To compile locally:
-```bash
-pdflatex -interaction=nonstopmode -output-directory=Elsevier_LaTeX Elsevier_LaTeX/main.tex
-```
-
-### Citation
 ```bibtex
 @article{biodkm2026,
   title={BioDKM: An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature},

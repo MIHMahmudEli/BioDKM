@@ -1,6 +1,0 @@
-Model,Evaluated_Topics,Intruder_Detection_Accuracy_Pct,Mean_Topic_Purity_Score,Mean_Separation_Margin
-TF-IDF + HDBSCAN (Proposed),207,98.55,0.1456,0.1453
-TF-IDF + KMeans (K=5),5,100.0,0.2236,0.2003
-Classical LDA (K=5),5,100.0,0.1823,0.1644
-BioBERT + HDBSCAN,80,97.5,0.1476,0.1474
-Neural BERTopic,207,98.55,0.1456,0.1453

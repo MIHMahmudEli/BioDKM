@@ -1,7 +1,0 @@
-Clinical_Topic,Keywords_Target,Folds_Discovered,Replication_Rate_Pct,Mean_Keyword_Jaccard
-Ptau Plasma Biomarkers,"pet, tau, ptau, biomarkers",10,100.0%,0.3048
-Diabetic Wound Healing,"wound, dfu, ulcer, healing",10,100.0%,0.2893
-Gut Microbiome Axis,"gut, axis, microbial, microbiome",10,100.0%,0.3333
-Alpha-Synuclein Aggregation,"fibrils, synuclein, aggregation, amyloid",10,100.0%,0.2603
-Blood Pressure Control,"antihypertensive, pressure, hypertension, blood",10,100.0%,0.2583
-Atrial Strain & Failure,"lvef, atrial, strain, ventricular",5,50.0%,0.1373
