@@ -1,0 +1,6 @@
+Model,LogLog_Slope_Alpha,Intercept_Beta,Empirical_Complexity,Latency_N14064_s,Throughput_N14064_docs_s
+TF-IDF + HDBSCAN (Proposed),0.326,0.221,Near-Linear O(N),31.158,451.4
+TF-IDF + KMeans (K=5),0.312,0.27,Near-Linear O(N),30.834,456.1
+Classical LDA (K=5),0.887,-1.994,Near-Linear O(N),49.613,283.5
+BioBERT + HDBSCAN,0.916,-0.979,Near-Linear O(N),661.55,21.3
+Neural BERTopic,0.896,-1.003,Near-Linear O(N),514.151,27.4

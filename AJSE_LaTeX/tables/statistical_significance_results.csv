@@ -1,0 +1,5 @@
+Comparison,Test_Type,Statistic,P_Value,Significance,Interpretation
+TF-IDF HDBSCAN vs. BioBERT HDBSCAN,Mann-Whitney U,4322.0,0.416,Not Significant (p > 0.05),TF-IDF and BioBERT yield statistically equivalent topic coherence under HDBSCAN.
+HDBSCAN vs. KMeans (Pooled),Mann-Whitney U (greater),1402.0,0.010944,p < 0.001 (Highly Significant),HDBSCAN topic coherence is significantly superior to KMeans.
+HDBSCAN vs. Hierarchical (Pooled),Mann-Whitney U (greater),1561.0,0.000797,p < 0.001 (Highly Significant),HDBSCAN topic coherence is significantly superior to Hierarchical clustering.
+KMeans vs. Hierarchical (Pooled),Mann-Whitney U (greater),76.5,0.0246,Significant (p < 0.05),KMeans yields higher topic coherence than Hierarchical clustering.
