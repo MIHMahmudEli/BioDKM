@@ -3,7 +3,7 @@
 \usepackage[noadjust]{cite}
 \usepackage{amssymb,amsfonts}
 \usepackage{graphicx}
-\graphicspath{{./}{Q1_Experiments_Results/exp1_alignment/}{Q1_Experiments_Results/exp2_pubmedbert/}{Q1_Experiments_Results/exp3_baselines/}{Q1_Experiments_Results/exp4_ablation/}{Q1_Experiments_Results/exp5_sensitivity/}{Q1_Experiments_Results/exp6_stats/}{Q1_Experiments_Results/exp7_mesh_ontology/}{Q1_Experiments_Results/exp8_disease_network/}{Q1_Experiments_Results/exp9_scibert_sbert/}{Q1_Experiments_Results/exp10_noise_ablation/}{Q1_Experiments_Results/exp11_subsampling_stability/}{Q1_Experiments_Results/exp12_scalability/}{Q1_Experiments_Results/exp13_word_intrusion/}{Manuscript_Results/}{Coherence_Results/}{BioBERT_Results/}{TF-IDF_Results/}{../Q1_Experiments_Results/exp1_alignment/}{../Q1_Experiments_Results/exp2_pubmedbert/}{../Q1_Experiments_Results/exp3_baselines/}{../Q1_Experiments_Results/exp4_ablation/}{../Q1_Experiments_Results/exp5_sensitivity/}{../Q1_Experiments_Results/exp6_stats/}{../Q1_Experiments_Results/exp7_mesh_ontology/}{../Q1_Experiments_Results/exp8_disease_network/}{../Q1_Experiments_Results/exp9_scibert_sbert/}{../Q1_Experiments_Results/exp10_noise_ablation/}{../Q1_Experiments_Results/exp11_subsampling_stability/}{../Q1_Experiments_Results/exp12_scalability/}{../Q1_Experiments_Results/exp13_word_intrusion/}{../Manuscript_Results/}{../Coherence_Results/}{../BioBERT_Results/}{../TF-IDF_Results/}}
+\graphicspath{{figures/}{./figures/}}
 \usepackage{textcomp}
 \usepackage{hyperref}
 \usepackage{array}
@@ -498,7 +498,7 @@ This step, labeled contrastive learning in the pipeline, is not a training objec
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.82\columnwidth]{BioBERT_Results/step4_inter_concept_similarity.png}
+\includegraphics[width=0.82\columnwidth]{figures/step4_inter_concept_similarity.png}
 \caption{Inter-concept cosine similarity heatmap of BioBERT pseudo-class centroids ($K=10$). This diagnostic visualization assesses the semantic separability of the embedding space prior to formal clustering, revealing clear conceptual modularity across biomedical themes.}
 \label{fig:inter_concept_similarity}
 \end{figure}
@@ -533,7 +533,7 @@ where $\mathbf{p}_1 = (2, I_2)$, $\mathbf{p}_2 = (15, I_{15})$, and $\mathbf{p}_
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.82\columnwidth]{BioBERT_Results/step6a_automated_elbow_method.png}
+\includegraphics[width=0.82\columnwidth]{figures/step6a_automated_elbow_method.png}
 \caption{Automated Elbow method applied to the UMAP coordinates of BioBERT embeddings. The dashed line indicates the optimal $K=5$, identified as the point of maximum perpendicular distance from the baseline, mathematically justifying the parameter choice for the partition-based and connectivity-based clustering algorithms.}
 \label{fig:elbow_method}
 \end{figure}
@@ -829,7 +829,7 @@ The parametric algorithms (KMeans and hierarchical clustering) are constrained b
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{Coherence_Results/coherence_grouped_bar.png}
+\includegraphics[width=\columnwidth]{figures/coherence_grouped_bar.png}
 \caption{NPMI topic coherence scores across all six experimental configurations, grouped by clustering algorithm. HDBSCAN achieves the highest coherence under both TF-IDF (0.1158) and BioBERT (0.1154) embeddings, while parametric algorithms (KMeans, Hierarchical) yield substantially lower coherence regardless of the feature extraction strategy.}
 \label{fig:eval_metrics}
 \end{figure}
@@ -840,7 +840,7 @@ Because the grouped bar chart reports only the mean coherence per configuration,
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{Coherence_Results/coherence_per_topic_boxplot.png}
+\includegraphics[width=\columnwidth]{figures/coherence_per_topic_boxplot.png}
 \caption{Per-topic NPMI coherence distribution for all six configurations. Boxes show the interquartile range and median; overlaid points are individual topics. The density-based (HDBSCAN) configurations span a broad range with a high-coherence tail, while the Elbow-constrained parametric configurations are limited to five topics each. The two HDBSCAN distributions (TF-IDF and BioBERT) are closely matched, corroborating their near-identical mean coherence.}
 \label{fig:coherence_boxplot}
 \end{figure}
@@ -849,7 +849,7 @@ Fig.~\ref{fig:violin_dist} further displays the kernel density estimates and qua
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\columnwidth]{coherence_distribution_violin.png}
+\includegraphics[width=0.88\columnwidth]{figures/coherence_distribution_violin.png}
 \caption{Violin plots of per-topic NPMI coherence distributions across all six configurations, depicting kernel density estimates, medians, and upper-quartile topic concentrations.}
 \label{fig:violin_dist}
 \end{figure}
@@ -939,7 +939,7 @@ Several observations support the validity of these micro-topics. First, the topi
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\columnwidth]{Manuscript_Results/Figure1_HDBSCAN_vs_KMeans_Coherence.png}
+\includegraphics[width=0.88\columnwidth]{figures/Figure1_HDBSCAN_vs_KMeans_Coherence.png}
 \caption{Comparison of NPMI coherence between the top 10 HDBSCAN micro-topics and the average KMeans macro-level coherence (dashed red line). HDBSCAN topics achieve substantially higher coherence, with the top topic (Ptau Plasma, NPMI~0.322) exceeding the KMeans average by a factor of approximately four.}
 \label{fig:coherence_comparison}
 \end{figure}
@@ -952,14 +952,14 @@ The final UMAP projections with automated disease labels (Fig.~\ref{fig:knowledg
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{BioBERT_Results/step11_final_mapped_umap_all_algorithms.png}
+\includegraphics[width=\textwidth]{figures/biobert_step11_final_mapped_umap_all_algorithms.png}
 \caption{Final UMAP 2D projections of BioBERT embeddings with automated disease labels for KMeans (left), HDBSCAN (center), and hierarchical clustering (right). HDBSCAN reveals a rich topological substructure comprising 80 fine-grained topics that is entirely invisible in the coarse KMeans and hierarchical solutions. Gray points denote background noise points isolated by density thresholds.}
 \label{fig:knowledge_maps_biobert}
 \end{figure*}
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{TF-IDF_Results/step11_final_mapped_umap_all_algorithms.png}
+\includegraphics[width=\textwidth]{figures/tfidf_step11_final_mapped_umap_all_algorithms.png}
 \caption{Final UMAP 2D projections of sparse TF-IDF vectors with automated disease labels comparing KMeans (left), HDBSCAN (center), and hierarchical clustering (right). HDBSCAN (center) discovers a highly detailed topological structure comprising 116 topics, visually verifying that frequency-based features create clear density manifolds comparable to deep transformer embeddings.}
 \label{fig:knowledge_maps_tfidf}
 \end{figure*}
@@ -1018,7 +1018,7 @@ Table~\ref{tab:baseline_topics_qualitative} presents a qualitative comparison of
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.85\columnwidth]{baseline_coherence_comparison.png}
+\includegraphics[width=0.85\columnwidth]{figures/baseline_coherence_comparison.png}
 \caption{NPMI topic coherence benchmark comparing the proposed density-based pipelines against traditional probabilistic (LDA) and sentence-transformer (BERTopic) baselines.}
 \label{fig:baseline_comparison}
 \end{figure}
@@ -1054,7 +1054,7 @@ The density-based non-noise clusters achieve the highest alignment with true dis
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.90\columnwidth]{disease_alignment_heatmaps.png}
+\includegraphics[width=0.90\columnwidth]{figures/disease_alignment_heatmaps.png}
 \caption{Cross-tabulation heatmaps of ground-truth disease query distributions across discovered KMeans clusters for TF-IDF (left) and BioBERT (right).}
 \label{fig:disease_heatmaps}
 \end{figure}
@@ -1092,7 +1092,7 @@ In unreduced ambient space (5,000-d TF-IDF and 768-d BioBERT), HDBSCAN completel
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.85\columnwidth]{trustworthiness_comparison.png}
+\includegraphics[width=0.85\columnwidth]{figures/trustworthiness_comparison.png}
 \caption{Ablation of dimensionality reduction strategies: neighborhood trustworthiness score ($T$) versus clustering separation (Silhouette coefficient).}
 \label{fig:trustworthiness}
 \end{figure}
@@ -1122,7 +1122,7 @@ BioBERT + HDBSCAN                    & 0.916          & Near-Linear $O(N)$      
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{scalability_complexity_evaluation.png}
+\includegraphics[width=\columnwidth]{figures/scalability_complexity_evaluation.png}
 \caption{Algorithmic scalability benchmark: (A) asymptotic latency scaling ($T \propto N^\alpha$) across corpus scales $N \in [1\text{k}, 20\text{k}]$, (B) empirical document processing throughput, and (C) execution time breakdown by pipeline stage comparing TF-IDF vs. BioBERT.}
 \label{fig:scalability}
 \end{figure}
@@ -1185,7 +1185,7 @@ BioBERT HDBSCAN &  56 &   840 & 342 & 40.71\% & \textbf{3.22} & 5 \\
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{mesh_ontology_alignment.png}
+\includegraphics[width=\columnwidth]{figures/mesh_ontology_alignment.png}
 \caption{Quantitative MeSH clinical ontology validation: (left) MeSH descriptor mapping rate, (center) taxonomic semantic category distribution across Diseases [C], Chemicals/Drugs [D], Anatomy [A], Techniques [E], and Biological Phenomena [G], and (right) MeSH hierarchical tree depth distribution confirming deep subspecialty penetration by HDBSCAN.}
 \label{fig:mesh_ontology}
 \end{figure}
@@ -1222,14 +1222,14 @@ Diabetes Mellitus & Stroke Cerebrovascular & 0.5034 & Cluster 1 & case, patient,
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.88\textwidth]{disease_knowledge_network.png}
+\includegraphics[width=0.88\textwidth]{figures/disease_knowledge_network.png}
 \caption{Unsupervised disease comorbidity knowledge network. Node sizes reflect publication volumes; edge widths and color intensities represent cosine comorbidity affinities $\mathcal{A}(D_i, D_j)$ computed across unsupervised cluster distributions. Callout boxes highlight discovered multidisciplinary bridge clusters that connect distinct disease categories.}
 \label{fig:disease_network}
 \end{figure*}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\columnwidth]{disease_comorbidity_chord_heatmap.png}
+\includegraphics[width=0.88\columnwidth]{figures/disease_comorbidity_chord_heatmap.png}
 \caption{Unsupervised pairwise cross-disease comorbidity affinity matrix with hierarchical dendrogram clustering, revealing distinct neurodegenerative, cardiometabolic, and cerebrovascular pathological modules.}
 \label{fig:comorbidity_heatmap}
 \end{figure}
@@ -1267,7 +1267,7 @@ Sentence-MiniLM & HDBSCAN  & 95 & \textbf{0.4041} & \textbf{0.6171} & \textbf{0.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{expanded_models_comparison.png}
+\includegraphics[width=\columnwidth]{figures/expanded_models_comparison.png}
 \caption{Multi-architecture benchmark comparing SciBERT and Sentence-MiniLM across clustering methods: (left) Silhouette separation, (center) Davies--Bouldin compactness, and (right) NPMI topic coherence.}
 \label{fig:expanded_models}
 \end{figure}
@@ -1307,7 +1307,7 @@ A frequent methodological skepticism regarding density-based topic modeling is w
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{noise_ablation_evaluation.png}
+\includegraphics[width=\columnwidth]{figures/noise_ablation_evaluation.png}
 \caption{Empirical noise ablation analysis: (left) clustering quality metrics under matched core subset versus $100\%$ full-corpus soft assignment, (center) NPMI topic coherence distributions, and (right) linguistic entropy and document profile of noise versus core partitions.}
 \label{fig:noise_ablation}
 \end{figure}
@@ -1358,7 +1358,7 @@ Atrial Strain \& Failure    & Mean Jaccard: 0.1373  &  5 / 10 Folds         & 50
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{cluster_subsampling_stability.png}
+\includegraphics[width=\columnwidth]{figures/cluster_subsampling_stability.png}
 \caption{Cluster subsampling stability benchmark across 10 random $80\%$ folds: (left) consistency of discovered topic count, Silhouette, and NPMI coherence across folds, (center) pairwise fold stability matrix (mean core AMI = 0.7498), and (right) cross-fold replication rates for clinical sentinel topics.}
 \label{fig:subsampling_stability}
 \end{figure}
