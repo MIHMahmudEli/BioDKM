@@ -37,16 +37,38 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
 
-% Colour palette for the TikZ pipeline figure
-\definecolor{pipeData}{HTML}{1F6FEB}
-\definecolor{pipePrep}{HTML}{0E7C86}
-\definecolor{pipeFeat}{HTML}{6E40AA}
-\definecolor{pipeDiag}{HTML}{B45309}
-\definecolor{pipeUmap}{HTML}{9A3412}
-\definecolor{pipeClus}{HTML}{15803D}
-\definecolor{pipeTopic}{HTML}{2563EB}
-\definecolor{pipeMap}{HTML}{BE123C}
-\definecolor{pipeBg}{HTML}{F1F5F9}
+% Colour palette for the high-visibility TikZ pipeline figure
+\definecolor{cTealBorder}{RGB}{13, 148, 136}
+\definecolor{cTealBg}{RGB}{240, 253, 250}
+\definecolor{cTealBadge}{RGB}{15, 118, 110}
+
+\definecolor{cSlateBorder}{RGB}{71, 85, 105}
+\definecolor{cSlateBg}{RGB}{248, 250, 252}
+\definecolor{cSlateBadge}{RGB}{51, 65, 85}
+
+\definecolor{cBlueBorder}{RGB}{37, 99, 235}
+\definecolor{cBlueBg}{RGB}{239, 246, 255}
+\definecolor{cBlueBadge}{RGB}{29, 78, 216}
+
+\definecolor{cAmberBorder}{RGB}{217, 119, 6}
+\definecolor{cAmberBg}{RGB}{255, 251, 235}
+\definecolor{cAmberBadge}{RGB}{180, 83, 9}
+
+\definecolor{cGreenBorder}{RGB}{16, 185, 129}
+\definecolor{cGreenBg}{RGB}{236, 253, 245}
+\definecolor{cGreenBadge}{RGB}{5, 150, 105}
+
+\definecolor{cPurpleBorder}{RGB}{139, 92, 246}
+\definecolor{cPurpleBg}{RGB}{245, 243, 255}
+\definecolor{cPurpleBadge}{RGB}{109, 40, 217}
+
+\definecolor{cRoseBorder}{RGB}{225, 29, 72}
+\definecolor{cRoseBg}{RGB}{255, 241, 242}
+\definecolor{cRoseBadge}{RGB}{190, 18, 60}
+
+\definecolor{busSlate}{RGB}{71, 85, 105}
+\definecolor{textDark}{RGB}{15, 23, 42}
+\definecolor{textSub}{RGB}{51, 65, 85}
 
 \hypersetup{
   colorlinks=true,
@@ -125,83 +147,267 @@ Fig.~\ref{fig:pipeline} presents the comprehensive experimental architecture of 
 
 \begin{figure*}[!t]
 \centering
-\resizebox{0.95\textwidth}{!}{%
+\resizebox{0.98\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\sffamily,
-  stage/.style={rectangle, rounded corners=3pt, draw=#1, line width=0.8pt,
-                top color=white, bottom color=#1!12, text=black,
-                align=center, inner sep=4pt, minimum height=9mm, text width=50mm},
-  sub/.style={rectangle, rounded corners=2pt, draw=#1, line width=0.6pt,
-              top color=white, bottom color=#1!15, text=black,
-              align=center, inner sep=3pt, minimum height=8.5mm, text width=26mm},
-  eval/.style={rectangle, rounded corners=2pt, draw=#1, line width=0.6pt,
-               top color=white, bottom color=#1!15, text=black,
-               align=center, inner sep=2.5pt, minimum height=8.5mm, text width=27mm},
-  arr/.style={-{Stealth[length=2.5mm]}, line width=1.0pt, draw=gray!70},
-  splitarr/.style={-{Stealth[length=2.0mm]}, line width=0.7pt, draw=gray!60},
+  >=Stealth,
+  card/.style={draw=#1Border, fill=#1Bg, line width=1.0pt, rounded corners=5pt, align=center, inner sep=5pt, text=textDark},
+  subcard/.style={draw=#1Border!85, fill=white, line width=0.75pt, rounded corners=3.5pt, align=center, inner sep=4pt, text=textDark},
+  badge/.style={draw=#1Border!95, fill=#1Badge, text=white, font=\sffamily\bfseries\fontsize{6.5pt}{7.5pt}\selectfont, rounded corners=3pt, inner sep=3pt, anchor=center},
+  bus/.style={line width=1.3pt, draw=busSlate},
+  branch/.style={-{Stealth[length=4.5pt, width=3.2pt]}, line width=0.95pt, draw=busSlate},
+  junc/.style={circle, fill=busSlate, inner sep=0pt, minimum size=4pt}
 ]
 
-% Row 1: Data Acquisition & Preprocessing
-\node[stage=pipeData] (data) {\textbf{1. Data Acquisition}\\[1pt]\scriptsize NCBI E-utilities $\cdot$ 8 disease queries\\[-1pt]\scriptsize 14{,}065 PubMed abstracts};
-\node[stage=pipePrep, right=14mm of data] (prep) {\textbf{2. Text Preprocessing}\\[1pt]\scriptsize Clean, tokenize, stop-words, length $>2$\\[-1pt]\scriptsize $\rightarrow$ 14{,}064 verified documents};
+% ─── ROW 1: ACQUISITION & PREPROCESSING ─────────────────────────────────────
+\node[card=cTeal, text width=120mm, minimum height=18mm] (cStage1) at (-63mm, 0) {
+  \vspace{1.5mm}\\
+  {\fontsize{9pt}{10.5pt}\selectfont\textbf{NCBI Entrez E-Utilities Data Acquisition Engine}}\\[2pt]
+  {\fontsize{7.2pt}{8.6pt}\selectfont Automated retrieval across 8 clinical queries ($N = 14{,}065$ PubMed abstracts)}\\[1.5pt]
+  {\fontsize{6.4pt}{7.6pt}\selectfont\color{textSub} Neoplasm (1,951) $\cdot$ Diabetes (1,922) $\cdot$ Stroke (1,880) $\cdot$ Alzheimer's (1,753) $\cdot$ Hypertension (1,747) $\cdot$ CVD (1,722) $\cdot$ Neuro (1,586) $\cdot$ Parkinson's (1,504)}
+};
+\node[badge=cTeal] at (cStage1.north) {STAGE 1: CORPUS ACQUISITION};
 
-% Row 2: Multi-Representation Feature Extraction
-\node[sub=pipeFeat, below=8mm of data, xshift=-25mm] (tfidf) {\textbf{3a. Sparse TF-IDF}\\[-1pt]\scriptsize $14{,}064 \times 5{,}000$};
-\node[sub=pipeFeat, right=4mm of tfidf] (biobert) {\textbf{3b. BioBERT}\\[-1pt]\scriptsize 768-d Continual};
-\node[sub=pipeFeat, right=4mm of biobert] (pmb) {\textbf{3c. PubMedBERT}\\[-1pt]\scriptsize 768-d Scratch};
-\node[sub=pipeFeat, right=4mm of pmb] (scibert) {\textbf{3d. SciBERT / SBERT}\\[-1pt]\scriptsize Scientific \& Sentence};
+\node[card=cSlate, text width=120mm, minimum height=18mm] (cStage2) at (63mm, 0) {
+  \vspace{1.5mm}\\
+  {\fontsize{9pt}{10.5pt}\selectfont\textbf{Biomedical Text Standardization \& Cleaning Pipeline}}\\[2pt]
+  {\fontsize{7.2pt}{8.6pt}\selectfont Lowercase normalisation $\cdot$ Regex non-alphabetic filtering ($[\text{\textasciicircum a-zA-Z}\backslash\text{s}]$) $\cdot$ NLTK tokenisation}\\[1.5pt]
+  {\fontsize{6.4pt}{7.6pt}\selectfont\color{textSub} Stop-word removal $\cdot$ Length thresholding ($\text{len} > 2$) $\cdot$ Strict deduplication $\rightarrow$ \textbf{14{,}064 Verified Documents}}
+};
+\node[badge=cSlate] at (cStage2.north) {STAGE 2: BIOMEDICAL TEXT PREPROCESSING};
 
-% Row 3: Diagnostic & Dimensionality Reduction Ablation
-\node[stage=pipeDiag, below=8mm of biobert, xshift=14mm] (diag) {\textbf{4. Centroid Diagnostic Analysis}\\[-1pt]\scriptsize Pairwise cosine similarity matrix of $K{=}10$ pseudo-classes};
-\node[stage=pipeUmap, right=14mm of diag] (umap) {\textbf{5. Dimensionality Reduction \& Ablation}\\[-1pt]\scriptsize UMAP 2D vs. PCA (2D/50D) vs. High-Dim\\[-1pt]\scriptsize Trustworthiness score validation};
+\draw[branch] (cStage1.east) -- (cStage2.west);
 
-% Row 4: Clustering & Topic Modeling Baselines
-\node[sub=pipeClus, below=8mm of diag, xshift=-25mm] (kmeans) {\textbf{6a. KMeans}\\[-1pt]\scriptsize Partition ($K{=}5$)};
-\node[sub=pipeClus, right=4mm of kmeans] (hdbscan) {\textbf{6b. HDBSCAN}\\[-1pt]\scriptsize Density-based};
-\node[sub=pipeClus, right=4mm of hdbscan] (hier) {\textbf{6c. Hierarchical}\\[-1pt]\scriptsize Ward linkage};
-\node[sub=pipeClus, right=4mm of hier] (baselines) {\textbf{6d. Baselines}\\[-1pt]\scriptsize LDA \& BERTopic};
+% ─── ROW 2: MULTI-REPRESENTATION EXTRACTION ─────────────────────────────────
+\coordinate (r2Center) at (0, -35mm);
 
-% Row 5: Topic Interpretation
-\node[stage=pipeTopic, below=8mm of hdbscan, xshift=15mm] (topic) {\textbf{7. Cluster-Level Interpretation}\\[-1pt]\scriptsize Class-specific TF-IDF keyword extraction $\cdot$ Title-case automated disease topic labels};
+\node[subcard=cBlue, text width=56mm, minimum height=22mm] at ($(r2Center) + (-93mm, 0)$) (c3a) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{3a. Sparse TF-IDF Vectorizer}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont Term Salience \& Inverse Doc Frequency}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} $\text{vocab} = 5{,}000$ (unigram + bigram) $\cdot$ $\text{min\_df} = 5$\\[0.5pt] Output: $\mathbf{X} \in \mathbb{R}^{14{,}064 \times 5{,}000}$ ($\ell_2$-norm)}
+};
 
-% Row 6: Multi-Perspective Evaluation Suite
-\node[eval=pipeMap, below=8mm of topic, xshift=-65mm] (ev_int) {\textbf{Intrinsic \& Core}\\[-1pt]\scriptsize Silhouette $\cdot$ DB $\cdot$ Soft Outliers};
-\node[eval=pipeMap, right=2mm of ev_int] (ev_ext) {\textbf{Coherence \& Purity}\\[-1pt]\scriptsize NPMI $\cdot$ Word Intrusion};
-\node[eval=pipeMap, right=2mm of ev_ext] (ev_sup) {\textbf{Disease Alignment}\\[-1pt]\scriptsize ARI $\cdot$ NMI $\cdot$ Purity};
-\node[eval=pipeMap, right=2mm of ev_sup] (ev_mesh) {\textbf{MeSH Grounding}\\[-1pt]\scriptsize Categories $\cdot$ Depths};
-\node[eval=pipeMap, right=2mm of ev_mesh] (ev_net) {\textbf{Comorbidity Net}\\[-1pt]\scriptsize Affinity $\cdot$ Bridges};
-\node[eval=pipeMap, right=2mm of ev_net] (ev_stat) {\textbf{Scalability \& Stability}\\[-1pt]\scriptsize $O(N)$ Slopes $\cdot$ 10-Fold AMI};
+\node[subcard=cBlue, text width=56mm, minimum height=22mm] at ($(r2Center) + (-31mm, 0)$) (c3b) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{3b. BioBERT v1.1 Encoder}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont PubMed + PMC Continual Pretraining}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} 12-layer, 768-d Contextual BERT $\cdot$ Mean pool\\[0.5pt] Output: $\mathbf{X} \in \mathbb{R}^{14{,}064 \times 768}$ ($\ell_2$-norm)}
+};
 
-% Connectors
-\draw[arr] (data) -- (prep);
-\draw[splitarr] (prep.south) -- ++(0,-3mm) -| (tfidf.north);
-\draw[splitarr] (prep.south) -- ++(0,-3mm) -| (biobert.north);
-\draw[splitarr] (prep.south) -- ++(0,-3mm) -| (pmb.north);
-\draw[splitarr] (prep.south) -- ++(0,-3mm) -| (scibert.north);
+\node[subcard=cBlue, text width=56mm, minimum height=22mm] at ($(r2Center) + (31mm, 0)$) (c3c) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{3c. Scientific BERT Encoders}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont Scratch \& Multi-Domain Encoders}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} \textbf{PubMedBERT}: 768-d from scratch on PubMed\\[0.5pt] \textbf{SciBERT}: 768-d scientific \textit{scivocab} ($\ell_2$-norm)}
+};
 
-\draw[splitarr] (tfidf.south) -- ++(0,-3mm) -| (diag.north);
-\draw[splitarr] (biobert.south) -- ++(0,-3mm) -| (diag.north);
-\draw[splitarr] (pmb.south) -- ++(0,-3mm) -| (diag.north);
-\draw[splitarr] (scibert.south) -- ++(0,-3mm) -| (diag.north);
+\node[subcard=cBlue, text width=56mm, minimum height=22mm] at ($(r2Center) + (93mm, 0)$) (c3d) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{3d. Sentence-Transformer}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont Contrastive Bi-Encoder Architecture}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} \textbf{all-MiniLM-L6-v2}: 384-d dense embedding\\[0.5pt] 1B+ sentence pair contrastive pretraining}
+};
 
-\draw[arr] (diag) -- (umap);
+\begin{scope}[on background layer]
+  \node[card=cBlue, inner xsep=4.5pt, inner ysep=7.5pt, yshift=2.2mm, fit=(c3a) (c3d)] (boxStage3) {};
+\end{scope}
+\node[badge=cBlue] at (boxStage3.north) {STAGE 3: MULTI-REPRESENTATION FEATURE EXTRACTION};
 
-\draw[splitarr] (umap.south) -- ++(0,-3mm) -| (kmeans.north);
-\draw[splitarr] (umap.south) -- ++(0,-3mm) -| (hdbscan.north);
-\draw[splitarr] (umap.south) -- ++(0,-3mm) -| (hier.north);
-\draw[splitarr] (umap.south) -- ++(0,-3mm) -| (baselines.north);
+% ─── ROW 3: DIAGNOSTIC & TOPOLOGICAL REDUCTION ──────────────────────────────
+\coordinate (r3Center) at (0, -70mm);
 
-\draw[splitarr] (kmeans.south) -- ++(0,-3mm) -| (topic.north);
-\draw[splitarr] (hdbscan.south) -- ++(0,-3mm) -| (topic.north);
-\draw[splitarr] (hier.south) -- ++(0,-3mm) -| (topic.north);
-\draw[splitarr] (baselines.south) -- ++(0,-3mm) -| (topic.north);
+\node[card=cAmber, text width=120mm, minimum height=18mm] at ($(r3Center) + (-63mm, 0)$) (c4a) {
+  \vspace{1.5mm}\\
+  {\fontsize{9pt}{10.5pt}\selectfont\textbf{Centroid Diagnostic Analysis (Exploratory Separability)}}\\[2pt]
+  {\fontsize{7.2pt}{8.6pt}\selectfont $K = 10$ pseudo-class partitioning $\cdot$ Centroid vectors $\boldsymbol{\mu}_c = \frac{1}{|P_c|}\sum_{d \in P_c}\mathbf{E}_d$}\\[1.5pt]
+  {\fontsize{6.4pt}{7.6pt}\selectfont\color{textSub} Pairwise centroid cosine similarity matrix $\cdot$ Verification of embedding space modularity}
+};
+\node[badge=cAmber] at (c4a.north) {STAGE 4A: CENTROID DIAGNOSTICS};
 
-\draw[splitarr] (topic.south) -- ++(0,-3mm) -| (ev_int.north);
-\draw[splitarr] (topic.south) -- ++(0,-3mm) -| (ev_ext.north);
-\draw[splitarr] (topic.south) -- ++(0,-3mm) -| (ev_sup.north);
-\draw[splitarr] (topic.south) -- ++(0,-3mm) -| (ev_mesh.north);
-\draw[splitarr] (topic.south) -- ++(0,-3mm) -| (ev_net.north);
-\draw[splitarr] (topic.south) -- ++(0,-3mm) -| (ev_stat.north);
+\node[card=cAmber, text width=120mm, minimum height=18mm] at ($(r3Center) + (63mm, 0)$) (c4b) {
+  \vspace{1.5mm}\\
+  {\fontsize{9pt}{10.5pt}\selectfont\textbf{Topological Manifold Projection \& Dimensionality Ablation}}\\[2pt]
+  {\fontsize{7.2pt}{8.6pt}\selectfont UMAP 2D Manifold Approximation: Fuzzy simplicial cross-entropy minimization ($\text{cosine}, k{=}15$)}\\[1.5pt]
+  {\fontsize{6.4pt}{7.6pt}\selectfont\color{textSub} Full Ablation: High-Dim vs. PCA (50D/2D) vs. UMAP 2D $\cdot$ Trustworthiness preservation score $T(k) = 0.982$}
+};
+\node[badge=cAmber] at (c4b.north) {STAGE 4B: TOPOLOGICAL MANIFOLD PROJECTION};
+
+% ─── ROW 4: CLUSTERING & BASELINES ──────────────────────────────────────────
+\coordinate (r4Center) at (0, -105mm);
+
+\node[subcard=cGreen, text width=56mm, minimum height=22mm] at ($(r4Center) + (-93mm, 0)$) (c5a) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{5a. HDBSCAN Density}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont Hierarchical Density Clustering}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Mutual reachability $\cdot$ MST condensation\\[0.5pt] \textbf{80--116 Fine-grained Topics + Noise}}
+};
+
+\node[subcard=cGreen, text width=56mm, minimum height=22mm] at ($(r4Center) + (-31mm, 0)$) (c5b) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{5b. KMeans Partitioning}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont Centroid Distance Optimization}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Spherical Voronoi tessellation $\cdot$ Elbow sweep\\[0.5pt] \textbf{Optimal $K = 5$ Macro Categories}}
+};
+
+\node[subcard=cGreen, text width=56mm, minimum height=22mm] at ($(r4Center) + (31mm, 0)$) (c5c) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{5c. Agglomerative Hier.}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont Bottom-up Dendrogram Clustering}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} Ward minimum variance $\cdot$ Pairwise Euclidean\\[0.5pt] \textbf{Hierarchical Tree Cut ($K = 5$)}}
+};
+
+\node[subcard=cGreen, text width=56mm, minimum height=22mm] at ($(r4Center) + (93mm, 0)$) (c5d) {
+  {\fontsize{8.2pt}{9.8pt}\selectfont\textbf{5d. Literature Baselines}}\\[2pt]
+  {\fontsize{6.8pt}{8.2pt}\selectfont Classical \& Neural Benchmarks}\\[1.5pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont\color{textSub} \textbf{LDA}: Latent Dirichlet Allocation (VB)\\[0.5pt] \textbf{BERTopic}: Transformer + HDBSCAN + c-TF-IDF}
+};
+
+\begin{scope}[on background layer]
+  \node[card=cGreen, inner xsep=4.5pt, inner ysep=7.5pt, yshift=2.2mm, fit=(c5a) (c5d)] (boxStage5) {};
+\end{scope}
+\node[badge=cGreen] at (boxStage5.north) {STAGE 5: CLUSTERING \& BASELINES};
+
+% ─── ROW 5: TOPIC INTERPRETATION ───────────────────────────────────────────
+\coordinate (r5Center) at (0, -138mm);
+
+\node[card=cPurple, text width=248mm, minimum height=17mm] at (r5Center) (cStage6) {
+  \vspace{1.5mm}\\
+  {\fontsize{9pt}{10.5pt}\selectfont\textbf{Topic Semantic Interpretation \& Complete Noise Partition Allocation}}\\[2pt]
+  {\fontsize{7.2pt}{8.6pt}\selectfont Class-based TF-IDF ($c\text{-TF-IDF}$): $W_{t,c} = \frac{tf_{t,c}}{tf_c} \cdot \log\left(1 + \frac{A}{tf_t}\right)$ $\cdot$ Automated Title-Case Clinical Label Synthesis}\\[1.5pt]
+  {\fontsize{6.4pt}{7.6pt}\selectfont\color{textSub} Soft $k$-NN classification protocol for noise boundary papers $\rightarrow$ Guaranteed 100\% complete corpus document assignment}
+};
+\node[badge=cPurple] at (cStage6.north) {STAGE 6: TOPIC SEMANTIC INTERPRETATION \& NOISE RE-ALLOCATION};
+
+% ─── ROW 6: MULTI-PILLAR EMPIRICAL VALIDATION SUITE ────────────────────────
+\coordinate (r6Center) at (0, -174mm);
+
+\node[subcard=cRose, text width=37mm, minimum height=22mm] at ($(r6Center) + (-104.5mm, 0)$) (c7a) {
+  {\fontsize{8pt}{9.5pt}\selectfont\textbf{7a. Intrinsic Quality}}\\[2pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont Silhouette (0.4786)\\[0.5pt] Davies-Bouldin (0.6034)\\[0.5pt] Matched-Core Ablation}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=22mm] at ($(r6Center) + (-62.7mm, 0)$) (c7b) {
+  {\fontsize{8pt}{9.5pt}\selectfont\textbf{7b. Semantic Purity}}\\[2pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont NPMI Coherence (0.1158)\\[0.5pt] Word Intrusion (98.55\%)\\[0.5pt] Purity Margin (+0.145)}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=22mm] at ($(r6Center) + (-20.9mm, 0)$) (c7c) {
+  {\fontsize{8pt}{9.5pt}\selectfont\textbf{7c. Disease Alignment}}\\[2pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont Adjusted Rand Index (ARI)\\[0.5pt] Normalized MI (NMI)\\[0.5pt] Ground-Truth Matrix}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=22mm] at ($(r6Center) + (20.9mm, 0)$) (c7d) {
+  {\fontsize{8pt}{9.5pt}\selectfont\textbf{7d. MeSH Grounding}}\\[2pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont 2024 NLM MeSH Tree\\[0.5pt] Depths 1--8 Alignment\\[0.5pt] Granular Depths 4--6}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=22mm] at ($(r6Center) + (62.7mm, 0)$) (c7e) {
+  {\fontsize{8pt}{9.5pt}\selectfont\textbf{7e. Comorbidity Net}}\\[2pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont Unsupervised Cosine Net\\[0.5pt] Cardiovasc-Stroke 0.812\\[0.5pt] Alzheimer-Stroke 0.782}
+};
+
+\node[subcard=cRose, text width=37mm, minimum height=22mm] at ($(r6Center) + (104.5mm, 0)$) (c7f) {
+  {\fontsize{8pt}{9.5pt}\selectfont\textbf{7f. Scalability/Stab.}}\\[2pt]
+  {\fontsize{6.2pt}{7.4pt}\selectfont 10-Fold Perturb. ($0.750$)\\[0.5pt] Near-Linear ($\alpha = 0.326$)\\[0.5pt] 451 docs/s ($16.5\times$ BERTopic)}
+};
+
+\begin{scope}[on background layer]
+  \node[card=cRose, inner xsep=4.5pt, inner ysep=8.5pt, yshift=2.5mm, fit=(c7a) (c7f)] (boxStage7) {};
+\end{scope}
+\node[badge=cRose] at (boxStage7.north) {STAGE 7: MULTI-PILLAR EMPIRICAL VALIDATION SUITE};
+
+% ─── ORTHOGONAL BUS ROUTING & INTERCONNECTS ─────────────────────────────────
+
+\coordinate (originX) at (0,0);
+
+% Bus 1: Stage 2 -> Stage 3
+\coordinate (bus1Center) at ($(cStage2.south)!0.48!(boxStage3.north)$);
+\draw[bus] (cStage2.south) -- (cStage2.south |- bus1Center) -- (originX |- bus1Center);
+\draw[branch] (originX |- bus1Center) -- (boxStage3.north);
+\node[junc] at (cStage2.south) {};
+\node[junc] at (cStage2.south |- bus1Center) {};
+\node[junc] at (originX |- bus1Center) {};
+
+\coordinate (bus3In) at ($(boxStage3.north)!0.45!(c3b.north)$);
+\draw[bus] (boxStage3.north) -- (originX |- bus3In);
+\draw[bus] (c3a.north |- bus3In) -- (c3d.north |- bus3In);
+\node[junc] at (originX |- bus3In) {};
+\node[junc] at (c3a.north |- bus3In) {};
+\node[junc] at (c3b.north |- bus3In) {};
+\node[junc] at (c3c.north |- bus3In) {};
+\node[junc] at (c3d.north |- bus3In) {};
+\draw[branch] (c3a.north |- bus3In) -- (c3a.north);
+\draw[branch] (c3b.north |- bus3In) -- (c3b.north);
+\draw[branch] (c3c.north |- bus3In) -- (c3c.north);
+\draw[branch] (c3d.north |- bus3In) -- (c3d.north);
+
+% Bus 2: Stage 3 -> Stage 4
+\coordinate (bus2Y) at ($(boxStage3.south)!0.5!(c4a.north)$);
+\draw[bus] (c3a.south) -- (c3a.south |- bus2Y);
+\draw[bus] (c3b.south) -- (c3b.south |- bus2Y);
+\draw[bus] (c3c.south) -- (c3c.south |- bus2Y);
+\draw[bus] (c3d.south) -- (c3d.south |- bus2Y);
+\draw[bus] (c3a.south |- bus2Y) -- (c3d.south |- bus2Y);
+\node[junc] at (c3a.south |- bus2Y) {};
+\node[junc] at (c3b.south |- bus2Y) {};
+\node[junc] at (c3c.south |- bus2Y) {};
+\node[junc] at (c3d.south |- bus2Y) {};
+\node[junc] at (c4a.north |- bus2Y) {};
+\node[junc] at (c4b.north |- bus2Y) {};
+\draw[branch] (c4a.north |- bus2Y) -- (c4a.north);
+\draw[branch] (c4b.north |- bus2Y) -- (c4b.north);
+
+% Bus 3: Stage 4 -> Stage 5
+\coordinate (bus3CollectY) at ($(c4a.south)!0.48!(boxStage5.north)$);
+\draw[bus] (c4a.south) -- (c4a.south |- bus3CollectY);
+\draw[bus] (c4b.south) -- (c4b.south |- bus3CollectY);
+\draw[bus] (c4a.south |- bus3CollectY) -- (c4b.south |- bus3CollectY);
+\draw[branch] (originX |- bus3CollectY) -- (boxStage5.north);
+\node[junc] at (c4a.south |- bus3CollectY) {};
+\node[junc] at (c4b.south |- bus3CollectY) {};
+\node[junc] at (originX |- bus3CollectY) {};
+
+\coordinate (bus5In) at ($(boxStage5.north)!0.45!(c5b.north)$);
+\draw[bus] (boxStage5.north) -- (originX |- bus5In);
+\draw[bus] (c5a.north |- bus5In) -- (c5d.north |- bus5In);
+\node[junc] at (originX |- bus5In) {};
+\node[junc] at (c5a.north |- bus5In) {};
+\node[junc] at (c5b.north |- bus5In) {};
+\node[junc] at (c5c.north |- bus5In) {};
+\node[junc] at (c5d.north |- bus5In) {};
+\draw[branch] (c5a.north |- bus5In) -- (c5a.north);
+\draw[branch] (c5b.north |- bus5In) -- (c5b.north);
+\draw[branch] (c5c.north |- bus5In) -- (c5c.north);
+\draw[branch] (c5d.north |- bus5In) -- (c5d.north);
+
+% Bus 4: Stage 5 -> Stage 6
+\coordinate (bus4Y) at ($(boxStage5.south)!0.5!(cStage6.north)$);
+\draw[bus] (c5a.south) -- (c5a.south |- bus4Y);
+\draw[bus] (c5b.south) -- (c5b.south |- bus4Y);
+\draw[bus] (c5c.south) -- (c5c.south |- bus4Y);
+\draw[bus] (c5d.south) -- (c5d.south |- bus4Y);
+\draw[bus] (c5a.south |- bus4Y) -- (c5d.south |- bus4Y);
+\node[junc] at (c5a.south |- bus4Y) {};
+\node[junc] at (c5b.south |- bus4Y) {};
+\node[junc] at (c5c.south |- bus4Y) {};
+\node[junc] at (c5d.south |- bus4Y) {};
+\node[junc] at (originX |- bus4Y) {};
+\draw[branch] (originX |- bus4Y) -- (cStage6.north);
+
+% Bus 5: Stage 6 -> Stage 7
+\draw[branch] (cStage6.south) -- (boxStage7.north);
+\node[junc] at (cStage6.south) {};
+
+\coordinate (bus7In) at ($(boxStage7.north)!0.45!(c7c.north)$);
+\draw[bus] (boxStage7.north) -- (originX |- bus7In);
+\draw[bus] (c7a.north |- bus7In) -- (c7f.north |- bus7In);
+\node[junc] at (originX |- bus7In) {};
+\node[junc] at (c7a.north |- bus7In) {};
+\node[junc] at (c7b.north |- bus7In) {};
+\node[junc] at (c7c.north |- bus7In) {};
+\node[junc] at (c7d.north |- bus7In) {};
+\node[junc] at (c7e.north |- bus7In) {};
+\node[junc] at (c7f.north |- bus7In) {};
+\draw[branch] (c7a.north |- bus7In) -- (c7a.north);
+\draw[branch] (c7b.north |- bus7In) -- (c7b.north);
+\draw[branch] (c7c.north |- bus7In) -- (c7c.north);
+\draw[branch] (c7d.north |- bus7In) -- (c7d.north);
+\draw[branch] (c7e.north |- bus7In) -- (c7e.north);
+\draw[branch] (c7f.north |- bus7In) -- (c7f.north);
 
 \end{tikzpicture}%
 }
