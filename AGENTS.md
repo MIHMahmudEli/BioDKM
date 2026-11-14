@@ -23,11 +23,11 @@ No CI, no tests, no linting, no formatter, no typechecker. Open `.ipynb` files d
 
 | Step | Notebook | Purpose |
 |---|---|---|
-| 1 | `API.ipynb` | Collect PubMed abstracts (Biopython/E-utilities) |
-| 2 | `TF-IDF_disease_mapping.ipynb` | 11-step: preprocessing → TF-IDF → UMAP → KMeans/HDBSCAN/Hierarchical → disease topic mapping |
-| 3 | `BioBERT_disease_mapping.ipynb` | Same 11 steps, replaces TF-IDF with `dmis-lab/biobert-v1.1` 768-dim embeddings |
-| 4 | `Topic_Coherence.ipynb` | NPMI coherence comparison across all 6 configurations (2 pipelines × 3 algorithms) |
-| 5 | `Manuscript_Analysis.ipynb` | Publication-ready tables: macro (KMeans clinical labels) and micro (HDBSCAN top-10 topics) |
+| 1 | `notebooks/API.ipynb` | Collect PubMed abstracts (Biopython/E-utilities) |
+| 2 | `notebooks/TF-IDF_disease_mapping.ipynb` | 11-step: preprocessing → TF-IDF → UMAP → KMeans/HDBSCAN/Hierarchical → disease topic mapping |
+| 3 | `notebooks/BioBERT_disease_mapping.ipynb` | Same 11 steps, replaces TF-IDF with `dmis-lab/biobert-v1.1` 768-dim embeddings |
+| 4 | `notebooks/Topic_Coherence.ipynb` | NPMI coherence comparison across all 6 configurations (2 pipelines × 3 algorithms) |
+| 5 | `notebooks/Manuscript_Analysis.ipynb` | Publication-ready tables: macro (KMeans clinical labels) and micro (HDBSCAN top-10 topics) |
 
 ### R implementation
 
