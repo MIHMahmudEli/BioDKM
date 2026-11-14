@@ -123,4 +123,4 @@ Or upload `main.tex` + figure CSVs/PNGs to Overleaf project root.
 - Notebooks handle GPU/CPU fallback automatically (`torch.device('cuda' if torch.cuda.is_available() else 'cpu')`).
 - All notebooks save outputs to disk as CSVs/PNGs — check those directories for results, not notebook outputs.
 - Journal format: IEEEtran, double-blind (no author names), ~150-word abstract, max 20 pages.
-- The `.doc` template (`AJSE Template 2020-OTH.doc`) is the official IEEE Word template (Feb 2017) — use the LaTeX version for submission.
+- Journal format: IEEEtran LaTeX template (`AJSE_LaTeX/main.tex` -> `main.pdf`), double-blind, strictly 20 pages max.
