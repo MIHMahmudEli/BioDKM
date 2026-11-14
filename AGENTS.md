@@ -1,6 +1,6 @@
 # AGENTS.md — BioDKM: Biomedical Disease Knowledge Mapping
 
-Research project: **BioDKM** — An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature (IEEEtran format, targeted for AJSE).
+Research project: **BioDKM** — An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature (Elsevier CAS double-column format).
 
 ## Quick start
 
@@ -53,25 +53,26 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 
 ## Output directories
 
+All experimental outputs are organized under `results/`:
+
 | Directory | Contents |
 |---|---|
-| `TF-IDF_Results/` | 11 CSVs + 11 PNGs (every pipeline step) |
-| `BioBERT_Results/` | 11 CSVs + 11 PNGs (same structure) |
-| `Coherence_Results/` | 3 CSVs + 4 PNGs (combined metrics, per-topic coherence) |
-| `Manuscript_Results/` | 2 CSVs + 4 PNGs (macro/micro tables, pipeline architecture, comparison figure) |
-| `Q1_Experiments_Results/` | 13 subdirectories containing all empirical CSV metrics and PNG plots for Q1 benchmarks |
-| `kaggle_experiments/` | 13 self-contained reproduction scripts and metadata for cloud execution on Kaggle |
+| `results/tfidf/` | 11 CSVs + 11 PNGs (every pipeline step for sparse TF-IDF) |
+| `results/biobert/` | 11 CSVs + 11 PNGs (every pipeline step for contextual BioBERT) |
+| `results/coherence/` | 3 CSVs + 4 PNGs (combined metrics, per-topic coherence) |
+| `results/manuscript/` | 2 CSVs + 4 PNGs (macro/micro tables, pipeline architecture, comparison figure) |
+| `results/benchmarks/` | 13 subdirectories containing empirical CSV metrics and PNG plots for benchmark evaluations |
+| `kaggle_experiments/` | 16 self-contained reproduction packages (3 core + 13 benchmarks) for cloud execution on Kaggle |
 
 ## LaTeX manuscript
 
 - **Title**: *BioDKM: An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature*
-- **File**: `AJSE_LaTeX/main.tex`
-- **Output PDF**: `AJSE_LaTeX/main.pdf` (compiled, exactly 20 pages)
-- **Journal**: AJSE (Arabian Journal for Science and Engineering), IEEEtran format
-- **Specs**: A4, double-blind, max 20 pages, ~180-word abstract (strictly 20 pages, adhering to the 20-page ceiling)
-- **Status**: Publication-grade manuscript with 40 verified 2023–2026 IEEE references (100% top-tier: Elsevier, Springer Nature, IEEE, Oxford, Frontiers, MDPI, SAGE with verified DOIs), expanded TikZ architecture diagram, 19 figures, and 16 comprehensive tables.
-- **Figures Directory**: `AJSE_LaTeX/figures/` (self-contained directory containing all 18 manuscript image figures + standalone vector/raster architecture diagrams).
-- **Tables & Data Directory**: `AJSE_LaTeX/tables/` (self-contained directory containing all 41 manuscript table CSVs, evaluation matrices, and empirical metrics for full replication; mirrored at `AJSE_LaTeX/data/`).
+- **File**: `Elsevier_LaTeX/main.tex`
+- **Output PDF**: `Elsevier_LaTeX/main.pdf` (compiled, 23 pages)
+- **Journal**: Elsevier CAS double-column (`cas-dc` format)
+- **Status**: Publication-grade manuscript with 40 verified 2023–2026 references (100% top-tier: Elsevier, Springer Nature, IEEE, Oxford, Frontiers, MDPI, SAGE with verified DOIs), expanded TikZ architecture diagram, 19 figures, and 16 comprehensive tables.
+- **Figures Directory**: `Elsevier_LaTeX/figures/` (self-contained directory containing all manuscript figures + vector/raster architecture diagrams).
+- **Tables & Data Directory**: `Elsevier_LaTeX/tables/` (self-contained directory containing all manuscript table CSVs, evaluation matrices, and empirical metrics for full replication; mirrored at `Elsevier_LaTeX/data/`).
 
 ### Manuscript sections
 
@@ -82,42 +83,15 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 5. Results (13 empirical subsections including baselines, ablation, disease alignment, hyperparameter sweeps, statistical tests, MeSH ontology grounding, comorbidity network, expanded transformer benchmark, apples-to-apples noise ablation, 10-fold subsampling stability, algorithmic scalability, and word intrusion purity)
 6. Discussion (comprehensive synthesis across all 13 experiments, clinical translation, limitations, energy considerations, defense of noise filtering, and topological manifold stability)
 7. Conclusion (crisp summary of principles and future outlook)
-8. References (40 verified 2023–2026 IEEE entries with valid DOIs from Elsevier, Springer Nature, IEEE, Oxford, Frontiers, MDPI, and SAGE)
-
-### Layout fixes applied
-
-- Removed `float`/`caption` packages (incompatible with IEEEtran)
-- Changed `[H]` → `[t]` on all floats
-- Figure width: `\textwidth` → `\columnwidth`
-- Wide table: converted to `table*` (double-column) with `\small`
-- Long URL: changed to `\href` with short label
-- `\textsuperscript` → `$^{n}$` math mode
-- Added `\raggedbottom`, `\interdisplaylinepenalty`, `flushend`, `stfloats`
-- IEEE `\appendices` environment
+8. References (40 verified 2023–2026 entries with valid DOIs from Elsevier, Springer Nature, IEEE, Oxford, Frontiers, MDPI, and SAGE)
 
 ### Compile
 
 ```powershell
-pdflatex -output-directory=AJSE_LaTeX AJSE_LaTeX\main.tex
+pdflatex -interaction=nonstopmode -output-directory=Elsevier_LaTeX Elsevier_LaTeX\main.tex
 ```
 
-Or upload `main.tex` + figure CSVs/PNGs to Overleaf project root.
-
-## Scratch utilities
-
-| Script | Purpose |
-|---|---|
-| `scratch/update_model_id.py` | Replace BioBERT model ID in notebook JSON |
-| `scratch/convert_to_biobert.py` | Convert TF-IDF notebook → BioBERT notebook (replace imports, step 3, paths) |
-| `scratch/upload_to_hf.py` | Host `pubmed_dataset.csv` directly on Hugging Face Hub |
-| `scratch/verify_workers.py` | Test and authenticate Kaggle API tokens from `.env` |
-| `scratch/launch_experiments.py` | Dispatch and push all experiment kernels to Kaggle cloud |
-| `scratch/monitor_and_download.py` | Poll kernel runtimes and pull output CSVs/PNGs locally |
-| `scratch/wait_and_pull.py` | Automatic monitoring loop for kernel outputs |
-| `scratch/launch_stability_noise_experiments.py` | Launch Exp 10 and Exp 11 on Kaggle cloud workers |
-| `scratch/monitor_exp10_exp11.py` | Poll and pull Exp 10 and Exp 11 results locally |
-| `scratch/launch_exp12_exp13.py` | Launch Exp 12 and Exp 13 on Kaggle cloud workers |
-| `scratch/run_exp13.py` | Monitor and pull Exp 13 results locally |
+Or upload `Elsevier_LaTeX/` contents to Overleaf.
 
 ## Key gotchas
 
@@ -125,5 +99,4 @@ Or upload `main.tex` + figure CSVs/PNGs to Overleaf project root.
 - Two pipeline scripts are gitignored (`run_biobert_pipeline.py`, `run_pipeline_step5_9.py`).
 - Notebooks handle GPU/CPU fallback automatically (`torch.device('cuda' if torch.cuda.is_available() else 'cpu')`).
 - All notebooks save outputs to disk as CSVs/PNGs — check those directories for results, not notebook outputs.
-- Journal format: IEEEtran, double-blind (no author names), ~150-word abstract, max 20 pages.
-- Journal format: IEEEtran LaTeX template (`AJSE_LaTeX/main.tex` -> `main.pdf`), double-blind, strictly 20 pages max.
+- Journal format: Elsevier CAS double-column format (`Elsevier_LaTeX/main.tex` -> `Elsevier_LaTeX/main.pdf`), with full author metadata.

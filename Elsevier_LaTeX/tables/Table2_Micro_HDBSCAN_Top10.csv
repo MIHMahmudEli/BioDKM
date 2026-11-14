@@ -1,11 +1,11 @@
 Cluster,Inferred_Micro_Topic,Top Keywords,Coherence (NPMI)
-43,Ptau Plasma,"ptau, plasma, amyloid, tau, cognitive, csf, pet, biomarkers, disease, gfap",0.322
-65,Syn Disease,"syn, disease, synuclein, aggregation, tau, amyloid, proteins, protein, fibrils, formation",0.2822
-46,Cells Cell,"cells, cell, tumor, cancer, immune, expression, therapeutic, breast, resistance, gene",0.2465
-67,Gut Microbiota,"gut, microbiota, microbial, disease, metabolic, axis, evidence, microbiome, health, review",0.226
-45,Cells Immune,"cells, immune, tumor, cell, cancer, clinical, therapeutic, immunotherapy, therapy, tumors",0.2183
-71,Disease Mitochondrial,"disease, mitochondrial, therapeutic, protein, neurodegenerative, autophagy, including, neuroinflammation, synaptic, proteins",0.198
-69,Disease Tau,"disease, tau, amyloid, cognitive, therapeutic, neurodegenerative, neurons, clinical, neurodegeneration, pathology",0.1961
-75,Mice Mitochondrial,"mice, mitochondrial, disease, therapeutic, neuronal, signaling, lipid, neuroinflammation, expression, diseases",0.1943
-68,Patients Hypertension,"patients, hypertension, ipi, pressure, blood, associated, risk, sbp, kidney, abpm",0.1829
-74,Disease Mitochondrial,"disease, mitochondrial, neurodegenerative, therapeutic, neuronal, including, brain, dysfunction, review, synaptic",0.1819
+43,Tau Plasma,"tau, plasma, amyloid, pet, cognitive",0.2956
+67,Gut Microbiota,"gut, microbiota, brain, disease, microbiome",0.2482
+65,Syn Aggregation,"syn, aggregation, tau, synuclein, disease",0.2476
+15,Dbs Patients,"dbs, patients, motor, stimulation, stn",0.2336
+55,Patients Coronary,"patients, coronary, pci, group, risk",0.2104
+46,Tumor Cell,"tumor, cell, cells, immune, cancer",0.1969
+45,Tumor Cells,"tumor, cells, immune, cell, car",0.1945
+69,Disease Tau,"disease, tau, amyloid, cell, cognitive",0.1873
+41,Glp Sglt,"glp, sglt, patients, risk, ras",0.1824
+68,Patients Hypertension,"patients, hypertension, pressure, risk, blood",0.1817

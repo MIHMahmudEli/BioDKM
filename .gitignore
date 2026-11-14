@@ -6,9 +6,11 @@ __pycache__/
 venv/
 env/
 .env
+*.env
 
-
-
+# Scratch and Temporary
+scratch/
+*.kaggle-partial
 
 # Notebooks
 .ipynb_checkpoints/

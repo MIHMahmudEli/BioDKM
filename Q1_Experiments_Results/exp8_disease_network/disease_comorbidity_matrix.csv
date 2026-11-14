@@ -1,9 +1,0 @@
-,Alzheimer Disease,Cancer Neoplasm,Cardiovascular Disease,Diabetes Mellitus,Hypertension,Neurological Disorders,Parkinson Disease,Stroke Cerebrovascular
-Alzheimer Disease,1.0,0.6896,0.6859,0.6054,0.781,0.4696,0.6148,0.7822
-Cancer Neoplasm,0.6896,1.0,0.8366,0.4825,0.5908,0.2994,0.3552,0.76
-Cardiovascular Disease,0.6859,0.8366,1.0,0.4536,0.6214,0.3164,0.328,0.8116
-Diabetes Mellitus,0.6054,0.4825,0.4536,1.0,0.4124,0.1759,0.2489,0.5034
-Hypertension,0.781,0.5908,0.6214,0.4124,1.0,0.2038,0.2718,0.7793
-Neurological Disorders,0.4696,0.2994,0.3164,0.1759,0.2038,1.0,0.6439,0.3103
-Parkinson Disease,0.6148,0.3552,0.328,0.2489,0.2718,0.6439,1.0,0.3719
-Stroke Cerebrovascular,0.7822,0.76,0.8116,0.5034,0.7793,0.3103,0.3719,1.0

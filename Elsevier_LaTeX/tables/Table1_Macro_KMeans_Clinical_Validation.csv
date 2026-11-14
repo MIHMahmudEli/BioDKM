@@ -1,6 +1,6 @@
 Cluster,Clinical_Category,Top Keywords,Coherence (NPMI)
-0,Cardiovascular & Metabolic Risk,"patients, risk, care, studies, hypertension, study, health, diabetes, associated, disease",0.0597
-1,Preclinical Molecular Biology,"disease, cells, cell, expression, therapeutic, potential, clinical, effects, mice, including",0.1092
-2,Oncology & Case Studies,"patients, clinical, case, treatment, patient, disease, cancer, diagnosis, tumor, therapy",0.0797
-3,Clinical Outcomes & Mortality,"patients, risk, stroke, group, ipi, associated, study, outcomes, mortality, clinical",0.102
-4,Neurocognitive Disorders,"patients, cognitive, disease, clinical, risk, study, using, dementia, data, associated",0.0611
+0,Cardiovascular & Metabolic Risk,"risk, patients, care, hypertension, studies",0.066
+1,Preclinical Molecular Biology,"disease, sup, cell, cells, brain",0.0835
+2,Oncology & Case Studies,"patients, clinical, treatment, case, patient",0.0362
+3,Clinical Outcomes & Mortality,"patients, risk, stroke, group, associated",0.0729
+4,Neurocognitive Disorders,"patients, cognitive, disease, clinical, risk",0.0448

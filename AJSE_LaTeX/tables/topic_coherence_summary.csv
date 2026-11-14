@@ -1,7 +1,0 @@
-Pipeline,Method,Num_Topics,NPMI_Coherence
-TF-IDF,KMeans,5,0.078
-TF-IDF,HDBSCAN,116,0.1158
-TF-IDF,Hierarchical,5,0.0709
-BioBERT,KMeans,5,0.0823
-BioBERT,HDBSCAN,80,0.1154
-BioBERT,Hierarchical,5,0.0598

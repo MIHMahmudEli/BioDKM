@@ -1,7 +1,0 @@
-Pipeline,Method,Num_Topics,Silhouette,Davies_Bouldin,NPMI_Coherence
-BioBERT,HDBSCAN,80,0.4225,0.7068,0.1154
-BioBERT,Hierarchical,5,0.366,0.8845,0.0598
-BioBERT,KMeans,5,0.4112,0.8124,0.0823
-TF-IDF,HDBSCAN,116,0.4786,0.6034,0.1158
-TF-IDF,Hierarchical,5,0.2791,0.9584,0.0709
-TF-IDF,KMeans,5,0.3708,0.8426,0.078

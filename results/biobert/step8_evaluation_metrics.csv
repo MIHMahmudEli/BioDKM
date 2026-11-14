@@ -1,0 +1,4 @@
+Silhouette,Davies_Bouldin,Method
+0.4065,0.8102,KMeans
+0.1739,0.6948,HDBSCAN
+0.3501,0.9157,Hierarchical

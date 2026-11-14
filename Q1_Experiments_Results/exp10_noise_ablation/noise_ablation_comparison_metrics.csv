@@ -1,8 +1,0 @@
-Evaluation_Scope,Model,Coverage_Pct,Doc_Count,Num_Clusters,Silhouette,Davies_Bouldin,Mean_NPMI
-Matched Core Subset (Apples-to-Apples),HDBSCAN (Proposed Core),69.8%,9822,123,0.5044,0.5892,0.0378
-Matched Core Subset (Apples-to-Apples),KMeans (Matched K),69.8%,9822,123,0.5395,0.6066,0.0384
-Matched Core Subset (Apples-to-Apples),KMeans (Elbow K=5),69.8%,9822,5,0.3625,0.8494,0.0308
-Matched Core Subset (Apples-to-Apples),Hierarchical (Ward K=5),69.8%,9822,5,0.298,1.0714,0.0299
-Full Corpus (100% Coverage),HDBSCAN + Soft k-NN Assignment,100.0%,14064,123,0.3325,0.8286,0.0931
-Full Corpus (100% Coverage),KMeans (Elbow K=5),100.0%,14064,5,0.3524,0.8659,0.0711
-Full Corpus (100% Coverage),Hierarchical (Ward K=5),100.0%,14064,5,0.2974,0.9464,0.0646

@@ -2106,13 +2106,7 @@
   belowtbl  .skip_set:N  =  \l_tbl_belowtbl_skip ,
   full      .bool_gset:N =  \g_tbl_full_bool ,
   unknown   .code:n      = { 
-                              \ifstrempty { #1 } 
-                                 {
-                                   \tl_set:Nn \l_fig_pos_tl { \l_keys_key_tl }
-                                 } 
-                                 {
-                                   \l_keys_key_tl=#1
-                                 }  
+                              \tl_set:Nx \l_tbl_pos_tl { \l_keys_key_str }
                            }  
 }
 
@@ -2128,12 +2122,13 @@
   
 }
 
-\RenewDocumentEnvironment { table } { O{} }
+\RenewDocumentEnvironment { table } { O{tbp} }
 {
   \__reset_tbl:
   \bool_gset_false:N \g_tbl_full_bool
   \dim_set:Nn \l_tbl_width_dim { \linewidth }
   \keys_set:nn { cas / tbl } { #1 }
+  \tl_if_empty:NT \l_tbl_pos_tl { \tl_set:Nn \l_tbl_pos_tl { tbp } }
   \csxdef{fps@table}{\l_tbl_pos_tl}
   \csgdef{tblwidth}{\dim_use:N \l_tbl_width_dim}
   \cs_set_eq:NN \@makecaption \__make_tbl_caption:nn 
@@ -2202,13 +2197,7 @@
   belowfig  .skip_set:N  =  \l_fig_belowfig_skip ,
   full      .bool_gset:N =  \g_fig_full_bool ,
   unknown   .code:n      = { 
-                              \ifstrempty { #1 } 
-                                 {
-                                   \tl_set:Nn \l_fig_pos_tl { \l_keys_key_tl }
-                                 } 
-                                 {
-                                   \l_keys_key_tl=#1,
-                                 }  
+                              \tl_set:Nx \l_fig_pos_tl { \l_keys_key_str }
                            }  
 }
 
@@ -2224,12 +2213,13 @@
   
 }
 
-\RenewDocumentEnvironment { figure } { O{} }
+\RenewDocumentEnvironment { figure } { O{tbp} }
   {
     \__reset_fig: 
     \bool_gset_false:N \g_fig_full_bool
     \dim_set:Nn \l_fig_width_dim { \linewidth }
     \keys_set:nn { cas / fig } { #1 }
+    \tl_if_empty:NT \l_fig_pos_tl { \tl_set:Nn \l_fig_pos_tl { tbp } }
     \csxdef{fps@figure}{\l_fig_pos_tl}
     \csgdef{figwidth}{\dim_use:N \l_fig_width_dim}
     \cs_set_eq:NN \@makecaption \__make_fig_caption:nn 
@@ -2242,12 +2232,13 @@
   }
 
     
-\RenewDocumentEnvironment { figure* } { O{width=\textwidth} }
+\RenewDocumentEnvironment { figure* } { O{tp} }
 {
   \__reset_fig:
   \bool_gset_true:N \g_fig_full_bool
   \dim_set:Nn \l_fig_width_dim { \FullWidth }
   \keys_set:nn { cas / fig } { #1 }
+  \tl_if_empty:NT \l_fig_pos_tl { \tl_set:Nn \l_fig_pos_tl { tp } }
   \csxdef{fps@figure}{\l_fig_pos_tl}
   \csgdef{figwidth}{\dim_use:N \l_fig_width_dim}
   \cs_set_eq:NN \@makecaption \__make_fig_caption:nn 

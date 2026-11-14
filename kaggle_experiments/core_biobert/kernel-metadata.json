@@ -1,0 +1,14 @@
+{
+  "id": "zarinprionty/biodkm-core-biobert",
+  "title": "BioDKM Core BioBERT GPU Pipeline",
+  "code_file": "core_biobert.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}
