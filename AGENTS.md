@@ -1,6 +1,6 @@
-# AGENTS.md — NLP-Biomedical-Disease-Mapping
+# AGENTS.md — BioDKM: Biomedical Disease Knowledge Mapping
 
-Research project: unsupervised disease-mapping from PubMed abstracts comparing TF-IDF vs BioBERT embeddings with KMeans/HDBSCAN/Hierarchical clustering.
+Research project: **BioDKM** — An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature (IEEEtran format, targeted for AJSE).
 
 ## Quick start
 
@@ -64,6 +64,7 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 
 ## LaTeX manuscript
 
+- **Title**: *BioDKM: An Unsupervised Topological Framework for Biomedical Disease Knowledge Mapping and Comorbidity Discovery from PubMed Literature*
 - **File**: `AJSE_LaTeX/main.tex`
 - **Output PDF**: `AJSE_LaTeX/main.pdf` (compiled, exactly 20 pages)
 - **Journal**: AJSE (Arabian Journal for Science and Engineering), IEEEtran format
