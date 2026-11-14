@@ -69,7 +69,7 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 - **Output PDF**: `AJSE_LaTeX/main.pdf` (compiled, exactly 20 pages)
 - **Journal**: AJSE (Arabian Journal for Science and Engineering), IEEEtran format
 - **Specs**: A4, double-blind, max 20 pages, ~180-word abstract (strictly 20 pages, adhering to the 20-page ceiling)
-- **Status**: Publication-grade manuscript with 40 IEEE references, expanded TikZ architecture diagram, 19 figures, and 16 comprehensive tables.
+- **Status**: Publication-grade manuscript with 40 verified 2023–2026 IEEE references (100% top-tier: Elsevier, Springer Nature, IEEE, Oxford, Frontiers, MDPI, SAGE with verified DOIs), expanded TikZ architecture diagram, 19 figures, and 16 comprehensive tables.
 - **Figures Directory**: `AJSE_LaTeX/figures/` (self-contained directory containing all 18 manuscript image figures + standalone vector/raster architecture diagrams).
 - **Tables & Data Directory**: `AJSE_LaTeX/tables/` (self-contained directory containing all 41 manuscript table CSVs, evaluation matrices, and empirical metrics for full replication; mirrored at `AJSE_LaTeX/data/`).
 
@@ -82,7 +82,7 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 5. Results (13 empirical subsections including baselines, ablation, disease alignment, hyperparameter sweeps, statistical tests, MeSH ontology grounding, comorbidity network, expanded transformer benchmark, apples-to-apples noise ablation, 10-fold subsampling stability, algorithmic scalability, and word intrusion purity)
 6. Discussion (comprehensive synthesis across all 13 experiments, clinical translation, limitations, energy considerations, defense of noise filtering, and topological manifold stability)
 7. Conclusion (crisp summary of principles and future outlook)
-8. References (40 complete IEEE entries)
+8. References (40 verified 2023–2026 IEEE entries with valid DOIs from Elsevier, Springer Nature, IEEE, Oxford, Frontiers, MDPI, and SAGE)
 
 ### Layout fixes applied
 
