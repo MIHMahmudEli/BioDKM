@@ -34,7 +34,7 @@ Biomedical literature is expanding exponentially, creating acute challenges for 
 **BioDKM** introduces an unsupervised, dual-stream topological framework that extracts, projects, clusters, and harmonizes biomedical disease knowledge from unstructured PubMed abstracts without manual annotation.
 
 <p align="center">
-  <img src="results/manuscript/Complete_pipeline_architecture.png" alt="BioDKM Architecture Diagram" width="95%"/>
+  <img src="results/manuscript/architecture_diagram.png" alt="BioDKM Architecture Diagram" width="95%"/>
 </p>
 
 ### Coordinated Pipeline Stages
