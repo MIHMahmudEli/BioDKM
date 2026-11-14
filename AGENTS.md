@@ -13,7 +13,7 @@ No CI, no tests, no linting, no formatter, no typechecker. Open `.ipynb` files d
 
 ## Data
 
-- `pubmed_dataset.csv` — ~27 MB, 14,065 rows, columns: `PMID`, `Title`, `Abstract`
+- `data/pubmed_dataset.csv` — ~27 MB, 14,065 rows, columns: `PMID`, `Title`, `Abstract`
 - Collected from 8 disease queries via NCBI E-utilities (diabetes, cancer, cardiovascular, neurological, stroke, hypertension, Alzheimer's, Parkinson)
 - Disease distribution: 1,504–1,951 records per disease
 

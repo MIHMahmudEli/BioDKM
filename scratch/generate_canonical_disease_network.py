@@ -11,7 +11,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 print("=== Generating Canonical Cross-Disease Knowledge Network Suite ===")
 
 # 1. Load dataset & assign disease labels
-df = pd.read_csv('pubmed_dataset.csv')
+data_path = 'data/pubmed_dataset.csv' if os.path.exists('data/pubmed_dataset.csv') else 'pubmed_dataset.csv'
+df = pd.read_csv(data_path)
 disease_counts = [
     ('Cancer Neoplasm', 1951),
     ('Diabetes Mellitus', 1922),
