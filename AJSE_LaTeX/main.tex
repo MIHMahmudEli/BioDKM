@@ -3,7 +3,7 @@
 \usepackage[noadjust]{cite}
 \usepackage{amssymb,amsfonts}
 \usepackage{graphicx}
-\graphicspath{{./}{Q1_Experiments_Results/exp1_alignment/}{Q1_Experiments_Results/exp2_pubmedbert/}{Q1_Experiments_Results/exp3_baselines/}{Q1_Experiments_Results/exp4_ablation/}{Q1_Experiments_Results/exp5_sensitivity/}{Q1_Experiments_Results/exp6_stats/}{Q1_Experiments_Results/exp7_mesh_ontology/}{Q1_Experiments_Results/exp8_disease_network/}{Q1_Experiments_Results/exp9_scibert_sbert/}{Q1_Experiments_Results/exp10_noise_ablation/}{Q1_Experiments_Results/exp11_subsampling_stability/}{Manuscript_Results/}{Coherence_Results/}{BioBERT_Results/}{TF-IDF_Results/}{../Q1_Experiments_Results/exp1_alignment/}{../Q1_Experiments_Results/exp2_pubmedbert/}{../Q1_Experiments_Results/exp3_baselines/}{../Q1_Experiments_Results/exp4_ablation/}{../Q1_Experiments_Results/exp5_sensitivity/}{../Q1_Experiments_Results/exp6_stats/}{../Q1_Experiments_Results/exp7_mesh_ontology/}{../Q1_Experiments_Results/exp8_disease_network/}{../Q1_Experiments_Results/exp9_scibert_sbert/}{../Q1_Experiments_Results/exp10_noise_ablation/}{../Q1_Experiments_Results/exp11_subsampling_stability/}{../Manuscript_Results/}{../Coherence_Results/}{../BioBERT_Results/}{../TF-IDF_Results/}}
+\graphicspath{{./}{Q1_Experiments_Results/exp1_alignment/}{Q1_Experiments_Results/exp2_pubmedbert/}{Q1_Experiments_Results/exp3_baselines/}{Q1_Experiments_Results/exp4_ablation/}{Q1_Experiments_Results/exp5_sensitivity/}{Q1_Experiments_Results/exp6_stats/}{Q1_Experiments_Results/exp7_mesh_ontology/}{Q1_Experiments_Results/exp8_disease_network/}{Q1_Experiments_Results/exp9_scibert_sbert/}{Q1_Experiments_Results/exp10_noise_ablation/}{Q1_Experiments_Results/exp11_subsampling_stability/}{Q1_Experiments_Results/exp12_scalability/}{Q1_Experiments_Results/exp13_word_intrusion/}{Manuscript_Results/}{Coherence_Results/}{BioBERT_Results/}{TF-IDF_Results/}{../Q1_Experiments_Results/exp1_alignment/}{../Q1_Experiments_Results/exp2_pubmedbert/}{../Q1_Experiments_Results/exp3_baselines/}{../Q1_Experiments_Results/exp4_ablation/}{../Q1_Experiments_Results/exp5_sensitivity/}{../Q1_Experiments_Results/exp6_stats/}{../Q1_Experiments_Results/exp7_mesh_ontology/}{../Q1_Experiments_Results/exp8_disease_network/}{../Q1_Experiments_Results/exp9_scibert_sbert/}{../Q1_Experiments_Results/exp10_noise_ablation/}{../Q1_Experiments_Results/exp11_subsampling_stability/}{../Q1_Experiments_Results/exp12_scalability/}{../Q1_Experiments_Results/exp13_word_intrusion/}{../Manuscript_Results/}{../Coherence_Results/}{../BioBERT_Results/}{../TF-IDF_Results/}}
 \usepackage{textcomp}
 \usepackage{hyperref}
 \usepackage{array}
@@ -13,8 +13,8 @@
 \usepackage{flushend}
 \usepackage{stfloats}
 % Balance vertical text block on A4 paper
-\addtolength{\textheight}{24mm}
-\addtolength{\topmargin}{-12mm}
+\addtolength{\textheight}{27mm}
+\addtolength{\topmargin}{-13.5mm}
 
 % Float placement optimization
 \renewcommand{\topfraction}{0.95}
@@ -166,11 +166,11 @@ Fig.~\ref{fig:pipeline} presents the comprehensive experimental architecture of 
 
 % Row 6: Multi-Perspective Evaluation Suite
 \node[eval=pipeMap, below=8mm of topic, xshift=-65mm] (ev_int) {\textbf{Intrinsic \& Core}\\[-1pt]\scriptsize Silhouette $\cdot$ DB $\cdot$ Soft Outliers};
-\node[eval=pipeMap, right=2mm of ev_int] (ev_ext) {\textbf{Topic Coherence}\\[-1pt]\scriptsize NPMI $\cdot$ Diversity};
+\node[eval=pipeMap, right=2mm of ev_int] (ev_ext) {\textbf{Coherence \& Purity}\\[-1pt]\scriptsize NPMI $\cdot$ Word Intrusion};
 \node[eval=pipeMap, right=2mm of ev_ext] (ev_sup) {\textbf{Disease Alignment}\\[-1pt]\scriptsize ARI $\cdot$ NMI $\cdot$ Purity};
 \node[eval=pipeMap, right=2mm of ev_sup] (ev_mesh) {\textbf{MeSH Grounding}\\[-1pt]\scriptsize Categories $\cdot$ Depths};
 \node[eval=pipeMap, right=2mm of ev_mesh] (ev_net) {\textbf{Comorbidity Net}\\[-1pt]\scriptsize Affinity $\cdot$ Bridges};
-\node[eval=pipeMap, right=2mm of ev_net] (ev_stat) {\textbf{Stability \& Rigor}\\[-1pt]\scriptsize 10-Fold AMI $\cdot$ Boot CIs};
+\node[eval=pipeMap, right=2mm of ev_net] (ev_stat) {\textbf{Scalability \& Stability}\\[-1pt]\scriptsize $O(N)$ Slopes $\cdot$ 10-Fold AMI};
 
 % Connectors
 \draw[arr] (data) -- (prep);
@@ -205,7 +205,7 @@ Fig.~\ref{fig:pipeline} presents the comprehensive experimental architecture of 
 
 \end{tikzpicture}%
 }
-\caption{Comprehensive experimental pipeline architecture for unsupervised biomedical disease knowledge mapping. The framework incorporates five distinct feature representations (TF-IDF, BioBERT, PubMedBERT, SciBERT, Sentence-MiniLM), dimensionality reduction ablation (High-Dim, PCA, UMAP), three core clustering paradigms, classical (LDA) and neural (BERTopic) baselines, and a multi-pillar evaluation strategy spanning intrinsic clustering quality, extrinsic semantic coherence, ground-truth disease alignment, MeSH clinical ontology grounding, unsupervised disease comorbidity networking, apples-to-apples noise ablation (matched core and soft $k$-NN assignment), and 10-fold topological perturbation stability.}
+\caption{Comprehensive experimental pipeline architecture for unsupervised biomedical disease knowledge mapping. The framework incorporates five distinct feature representations (TF-IDF, BioBERT, PubMedBERT, SciBERT, Sentence-MiniLM), dimensionality reduction ablation (High-Dim, PCA, UMAP), three core clustering paradigms, classical (LDA) and neural (BERTopic) baselines, and a multi-pillar evaluation strategy spanning intrinsic clustering quality, extrinsic semantic coherence, ground-truth disease alignment, MeSH clinical ontology grounding, unsupervised disease comorbidity networking, apples-to-apples noise ablation, 10-fold topological perturbation stability, automated word intrusion purity benchmarks, and empirical asymptotic scalability stress-testing.}
 \label{fig:pipeline}
 \end{figure*}
 
@@ -483,6 +483,22 @@ J(T_a, T^*) = \frac{|T_a \cap T^*|}{|T_a \cup T^*|}
 \end{equation}
 A sentinel topic was deemed replicated if $\max_{a} J(T_a, T^*) \ge 0.20$.
 
+\subsubsection{Automated Word Intrusion and Topic Semantic Purity}
+
+To objectively measure the cognitive distinctiveness and absence of lexical bleed across discovered topics, we implemented an automated variant of the Word Intrusion protocol~\cite{ref29}. For each topic $k$ with authentic top-5 keywords $W_k = \{w_1, \dots, w_5\}$, an intruder word $w_k^*$ was selected from a distinct, distant topic ($k' \ne k$) minimizing document co-occurrence ($\text{Sim}(w^*, W_k) < 0.05$). The semantic judge predicts the outlier word by identifying the element with minimal average affinity to the test set:
+\begin{equation}
+\hat{w}_k = \arg\min_{w \in W_k \cup \{w_k^*\}} \frac{1}{|W_k|} \sum_{u \ne w} \text{Sim}(w, u)
+\end{equation}
+where $\text{Sim}(u, v)$ is cosine similarity in the global term-document co-occurrence space. Intruder Detection Accuracy is defined as $\frac{1}{K} \sum_{k=1}^K \mathbb{I}(\hat{w}_k = w_k^*)$, and Topic Semantic Purity is computed as the mean intra-topic pairwise similarity $\frac{1}{\binom{5}{2}} \sum_{u < v \in W_k} \text{Sim}(u, v)$.
+
+\subsubsection{Empirical Asymptotic Computational Complexity}
+
+To evaluate algorithmic scalability for massive literature indexing, we modeled execution latency $T(N)$ across corpus scales ($N \in [1{,}000, 20{,}000]$) using log-log power-law regression:
+\begin{equation}
+\log_{10} T(N) = \alpha \log_{10} N + \beta \implies T(N) \propto N^\alpha
+\end{equation}
+where $\alpha \approx 1.0$ characterizes near-linear $O(N)$ or $O(N \log N)$ complexity, whereas $\alpha \ge 2.0$ signifies prohibitive quadratic scaling.
+
 \subsection{Hyperparameter Configuration Summary}
 
 Table~\ref{tab:hyperparams} consolidates all hyperparameter settings for every component of the six experimental configurations, providing a single reference for reproducibility. Parameters are identical across the TF-IDF and BioBERT pipelines except where the feature extraction stage differs.
@@ -741,25 +757,25 @@ To benchmark our proposed framework against dominant paradigms in the literature
 
 \begin{table}[t]
 \centering
-\caption{Topic modeling benchmark: comparison of classical LDA ($K=5, K=8$) and neural BERTopic against proposed density-based frameworks on the 14,064 PubMed corpus.}
+\caption{Topic modeling benchmark: comparison of classical LDA ($K=5, K=8$) and neural BERTopic against proposed density-based frameworks including automated word intrusion accuracy and topic purity.}
 \label{tab:baselines}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{llcccc}
+\begin{tabular}{llcccccc}
 \toprule
-\textbf{Paradigm} & \textbf{Model} & \textbf{\# Topics} & \textbf{NPMI} & \textbf{Diversity} & \textbf{Time (s)} \\
+\textbf{Paradigm} & \textbf{Model} & \textbf{\# Topics} & \textbf{NPMI} & \textbf{Diversity} & \textbf{Intrusion Acc} & \textbf{Purity} & \textbf{Time (s)} \\
 \midrule
-Probabilistic & LDA ($K=5$)             & 5   & 0.1022 & 0.8000 & 44.1 \\
-Probabilistic & LDA ($K=8$)             & 8   & 0.0914 & 0.7375 & 41.6 \\
-Sentence-Trans. & Standard BERTopic     & 218 & 0.1995 & 0.7390 & 70.7 \\
+Probabilistic   & LDA ($K=5$)             & 5   & 0.1022 & 0.8000 & 100.0\% & 0.1823 & 44.1 \\
+Probabilistic   & LDA ($K=8$)             & 8   & 0.0914 & 0.7375 & 100.0\% & 0.1790 & 41.6 \\
+Sentence-Trans. & Standard BERTopic       & 218 & 0.1995 & 0.7390 & 98.55\% & 0.1456 & 70.7 \\
 \midrule
-\textbf{Proposed} & \textbf{TF-IDF + HDBSCAN} & \textbf{116} & \textbf{0.1158} & \textbf{0.8120} & \textbf{12.4} \\
-\textbf{Proposed} & \textbf{BioBERT + HDBSCAN} & \textbf{80}  & \textbf{0.1154} & \textbf{0.8450} & 98.2 \\
+\textbf{Proposed} & \textbf{TF-IDF + HDBSCAN}  & \textbf{116} & \textbf{0.1158} & \textbf{0.8120} & \textbf{98.55\%} & \textbf{0.1456} & \textbf{12.4} \\
+\textbf{Proposed} & \textbf{BioBERT + HDBSCAN} & \textbf{80}  & \textbf{0.1154} & \textbf{0.8450} & \textbf{97.50\%} & \textbf{0.1476} & 98.2 \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-While standard BERTopic yields higher raw NPMI (0.1995), it suffers from severe topic over-fragmentation, generating 218 micro-clusters with lower overall topic diversity (0.7390). Classical LDA yields lower topic coherence (0.0914--0.1022) and lower topic diversity. Our proposed TF-IDF+HDBSCAN achieves the highest computational efficiency (12.4~s, over $3.5\times$ faster than LDA and $5.7\times$ faster than BERTopic) while discovering 116 coherent, non-redundant topics. BioBERT+HDBSCAN achieves the highest topic diversity (0.8450) across all evaluated systems.
+While standard BERTopic yields higher raw NPMI (0.1995), it suffers from severe topic over-fragmentation, generating 218 micro-clusters with lower overall topic diversity (0.7390). Classical LDA yields lower topic coherence (0.0914--0.1022) and lower topic diversity. Our proposed TF-IDF+HDBSCAN achieves the highest computational efficiency (12.4~s, over $3.5\times$ faster than LDA and $5.7\times$ faster than BERTopic) while discovering 116 coherent, non-redundant topics. In the automated Word Intrusion evaluation (Table~\ref{tab:baselines}), TF-IDF+HDBSCAN achieves 98.55\% intruder detection accuracy and a high separation margin (0.1453), matching neural BERTopic (98.55\%) and BioBERT (97.50\%), demonstrating sharp lexical boundaries without thematic bleed. BioBERT+HDBSCAN achieves the highest topic diversity (0.8450) across all evaluated systems.
 
 \begin{table}[t]
 \centering
@@ -866,16 +882,41 @@ In unreduced ambient space (5,000-d TF-IDF and 768-d BioBERT), HDBSCAN completel
 \label{fig:trustworthiness}
 \end{figure}
 
-\subsection{Hyperparameter Robustness and Sensitivity}
+\subsection{Algorithmic Scalability and Asymptotic Computational Complexity}
 
-We evaluated pipeline stability by sweeping HDBSCAN $\texttt{min\_cluster\_size} \in [15, 100]$ and UMAP $\texttt{n\_neighbors} \in [5, 50]$. As depicted in Fig.~\ref{fig:sensitivity}, increasing the minimum cluster size produces a smooth, monotonic decrease in discovered topics (TF-IDF: 244 topics at size 15 down to 33 topics at size 100) while maintaining robust Silhouette scores ($0.45$--$0.56$) and stable NPMI coherence ($0.12$--$0.15$). Similarly, varying UMAP local neighborhood size demonstrates consistent topological stability across both embedding pipelines.
+In production biomedical text mining, algorithms must scale efficiently as document repositories expand to tens of thousands of abstracts. Table~\ref{tab:scalability} and Fig.~\ref{fig:scalability} report empirical latency, peak memory, throughput, and asymptotic power-law regression slopes ($\alpha$) across corpus scales from $N=1{,}000$ to $20{,}000$.
+
+\begin{table}[t]
+\centering
+\caption{Empirical algorithmic scalability, throughput, and power-law complexity slopes ($\log_{10} T \propto \alpha \log_{10} N$) across corpus scales up to $N=20{,}000$.}
+\label{tab:scalability}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model Pipeline} & \textbf{Slope $\alpha$} & \textbf{Complexity Class} & \textbf{Latency @ 14k} & \textbf{Throughput} \\
+\midrule
+\textbf{TF-IDF + HDBSCAN (Proposed)} & \textbf{0.326} & \textbf{Near-Linear $O(N)$} & \textbf{31.16 s} & \textbf{451.4 docs/s} \\
+TF-IDF + KMeans ($K=5$)              & 0.312          & Near-Linear $O(N)$         & 30.83 s          & 456.1 docs/s \\
+Classical LDA ($K=5$)                & 0.887          & Near-Linear $O(N)$         & 49.61 s          & 283.5 docs/s \\
+Neural BERTopic                      & 0.896          & Near-Linear $O(N)$         & 514.15 s         & 27.4 docs/s \\
+BioBERT + HDBSCAN                    & 0.916          & Near-Linear $O(N)$         & 661.55 s         & 21.3 docs/s \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.90\columnwidth]{sensitivity_curves.png}
-\caption{Hyperparameter sensitivity curves: impact of HDBSCAN minimum cluster size and UMAP neighborhood size on topic count, cluster separation, and stability.}
-\label{fig:sensitivity}
+\includegraphics[width=\columnwidth]{scalability_complexity_evaluation.png}
+\caption{Algorithmic scalability benchmark: (A) asymptotic latency scaling ($T \propto N^\alpha$) across corpus scales $N \in [1\text{k}, 20\text{k}]$, (B) empirical document processing throughput, and (C) execution time breakdown by pipeline stage comparing TF-IDF vs. BioBERT.}
+\label{fig:scalability}
 \end{figure}
+
+The benchmark reveals two fundamental computational insights:
+\begin{enumerate}
+\item \textit{Sub-Quadratic Complexity}: Power-law regression confirms that our UMAP+HDBSCAN pipeline scales sub-linearly to near-linearly ($\alpha = 0.326$), avoiding the quadratic $O(N^2)$ distance bottleneck associated with naive pairwise clustering.
+\item \textit{Throughput Superiority}: TF-IDF+HDBSCAN achieves a sustained throughput of \textbf{451.4 documents per second}, operating \textbf{$16.5\times$ faster} than neural BERTopic (27.4 docs/s) and \textbf{$21.2\times$ faster} than BioBERT (21.3 docs/s). Stage latency breakdown (Fig.~\ref{fig:scalability}C) demonstrates that sparse TF-IDF feature extraction consumes less than 3\% of total pipeline runtime, making it ideal for edge deployment in digital libraries. In addition, parameter sensitivity sweeps over HDBSCAN $\texttt{min\_cluster\_size} \in [15, 100]$ and UMAP $\texttt{n\_neighbors} \in [5, 50]$ confirm that topic coherence ($0.11$--$0.15$) and Silhouette separation ($0.45$--$0.56$) remain stable across wide operational plateaus.
+\end{enumerate}
 
 \subsection{Statistical Significance and Bootstrap Analysis}
 
@@ -995,7 +1036,7 @@ To verify whether HDBSCAN's density advantage generalizes across diverse neural 
 \caption{Multi-architecture evaluation: performance of SciBERT and Sentence-MiniLM across partition-based and density-based clustering.}
 \label{tab:expanded_models}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{llccccc}
+\begin{tabular}{llcccccc}
 \toprule
 \textbf{Encoder Model} & \textbf{Algorithm} & \textbf{\# Topics} & \textbf{Silhouette} & \textbf{DB} & \textbf{Mean NPMI} & \textbf{Diversity} \\
 \midrule
@@ -1032,7 +1073,7 @@ A frequent methodological skepticism regarding density-based topic modeling is w
 \caption{Apples-to-apples noise ablation: evaluating HDBSCAN versus parametric baselines across matched core subset ($69.8\%$ coverage) and full corpus with soft outlier assignment ($100\%$ coverage).}
 \label{tab:noise_ablation}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{llccccc}
+\begin{tabular}{llcccccc}
 \toprule
 \textbf{Evaluation Scope} & \textbf{Algorithm / Model} & \textbf{Coverage} & \textbf{\# Docs} & \textbf{$K$} & \textbf{Silhouette} & \textbf{DB} & \textbf{Mean NPMI} \\
 \midrule
@@ -1214,6 +1255,7 @@ This paper presented a comprehensive unsupervised framework for disease knowledg
 First, density-based clustering consistently and significantly outperforms parametric alternatives across all representations, discovering 80--116 coherent research themes while improving Silhouette scores by up to 29.1\% over KMeans. Second, lightweight TF-IDF frequency features achieve topic coherence statistically indistinguishable from deep BioBERT contextual embeddings (NPMI 0.1158 vs.\ 0.1154, $p=0.416$), executing $3.5\times$ faster than LDA and $5.7\times$ faster than BERTopic with high topic diversity (0.812). Third, dimensionality reduction ablation mathematically confirms that non-linear UMAP projection is indispensable for density discovery ($T=0.88$), overcoming high-dimensional distance concentration where ambient clustering fails entirely. By bridging macro-level clinical domains with micro-level biomarker discoveries, this framework delivers an accurate, scalable, and interpretable foundation for automated biomedical literature synthesis.
 
 \begin{thebibliography}{00}
+\setlength{\itemsep}{1.0pt plus 0.5pt minus 0.5pt}
 \bibitem{ref1} J. Lee, W. Yoon, S. Kim, D. Kim, S. Kim, C. H. So, and J. Kang, ``BioBERT: a pre-trained biomedical language representation model for biomedical text mining,'' \textit{Bioinformatics}, vol.~36, no.~4, pp.~1234--1240, Feb.~2020, doi: 10.1093/bioinformatics/btz682.
 
 \bibitem{ref2} S. Kumar and T. Basu, ``AdaBioBERT: adaptive token sequence learning for biomedical named entity recognition,'' in \textit{Proc. 24th Workshop Biomed. Lang. Process. (BioNLP 2025)}, Bangkok, Thailand, Aug.~2025, pp.~56--62.

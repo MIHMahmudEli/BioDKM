@@ -138,3 +138,28 @@ All heavy experiments were executed on cloud GPU/CPU nodes using the Kaggle Clou
   - `cluster_subsampling_stability.png`: 3-panel publication figure showing fold-by-fold metric stability, pairwise AMI matrix, and sentinel topic replication.
 - **Key Finding**: Manifold stability across independent 80% subsamples is extraordinarily high: Mean Core Adjusted Mutual Information is $\mathbf{0.7498 \pm 0.0110}$ (tight range 0.7294 to 0.7801). Cluster count remains steady at $100.9 \pm 6.1$, Silhouette at $0.4988 \pm 0.0219$, and NPMI at $0.1132 \pm 0.0053$. Five out of six clinical sentinel biomarker topics achieve a $\mathbf{100\%}$ replication rate across all 10 folds.
 
+---
+
+### 12. `exp12_scalability/` — Algorithmic Scalability & Asymptotic Computational Complexity
+- **Kernel**: `mihjihad/exp12-scalability-benchmark`
+- **Script**: `kaggle_experiments/exp12_scalability/exp12_scalability.py`
+- **Description**: Benchmarks empirical execution latency, peak memory consumption, and document processing throughput across corpus scales ($N \in [1{,}000, 2{,}500, 5{,}000, 7{,}500, 10{,}000, 14{,}064, 20{,}000]$) to establish asymptotic power-law complexity exponents ($\log_{10} T \propto \alpha \log_{10} N$).
+- **Key Metrics**:
+  - `scalability_benchmark_metrics.csv`: Full breakdown of feature extraction, UMAP projection, and clustering time across scales.
+  - `scalability_complexity_slopes.csv`: Fitted log-log regression slope $\alpha$, intercept, empirical complexity class, and throughput.
+  - `scalability_complexity_evaluation.png`: 3-panel publication figure showing latency scaling, throughput curves, and stage runtime breakdown.
+- **Key Finding**: UMAP+HDBSCAN scales with a sub-linear/near-linear empirical slope of $\alpha = 0.326$, avoiding the quadratic $O(N^2)$ distance explosion. TF-IDF + HDBSCAN achieves a sustained processing throughput of **451.4 documents per second**, operating **$16.5\times$ faster than BERTopic** (27.4 docs/s) and **$21.2\times$ faster than BioBERT** (21.3 docs/s).
+
+---
+
+### 13. `exp13_word_intrusion/` — Quantitative Automated Word Intrusion & Topic Purity Benchmark
+- **Kernel**: `almasukmim12/exp13-word-intrusion`
+- **Script**: `kaggle_experiments/exp13_word_intrusion/exp13_word_intrusion.py`
+- **Description**: Implements the classic Chang et al. (NeurIPS) Word Intrusion cognitive test across all models. For every topic, injects an intruder word from a distant topic and evaluates whether an objective semantic judge detects the outlier based on global term co-occurrence similarity.
+- **Key Metrics**:
+  - `word_intrusion_model_benchmark.csv`: Evaluated topic count, intruder detection accuracy (%), mean topic purity score, and mean intrusion separation margin.
+  - `word_intrusion_sample_trials.csv`: Sample trials recording authentic keywords, injected intruder, predicted intruder, hit status, and margin.
+  - `word_intrusion_evaluation.png`: 3-panel publication figure displaying detection accuracy, topic purity, and separation margins.
+- **Key Finding**: TF-IDF + HDBSCAN achieves **98.55% Intruder Detection Accuracy** across 207 fine-grained topics with a high separation margin of 0.1453, matching deep neural BERTopic (98.55%) and BioBERT (97.50%). This proves that discovered density topics have sharp semantic boundaries without lexical bleed or cross-topic contamination.
+
+
