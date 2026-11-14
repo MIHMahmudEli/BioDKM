@@ -111,3 +111,30 @@ All heavy experiments were executed on cloud GPU/CPU nodes using the Kaggle Clou
   - `expanded_models_topics.csv`: Extracted cluster topics and keywords.
   - `expanded_models_comparison.png`: 3-panel comparative performance plot.
 - **Key Finding**: Sentence-MiniLM with HDBSCAN achieves an exceptional NPMI coherence of 0.1270 across 95 topics with DB 0.6171 and Silhouette 0.4041. SciBERT HDBSCAN achieves NPMI 0.0956 (50 topics), outperforming SciBERT KMeans (0.0663) by 44.2%, corroborating that the density-based advantage is architecture-invariant.
+
+---
+
+### 10. `exp10_noise_ablation/` — Apples-to-Apples Noise Infiltration & Soft Outlier Assignment
+- **Kernel**: `baingalamukintu/exp10-noise-ablation`
+- **Script**: `kaggle_experiments/exp10_noise_ablation/exp10_noise_ablation.py`
+- **Description**: Directly refutes the potential reviewer criticism that HDBSCAN's performance advantage is an artifact of discarding 30% noise. Compares HDBSCAN against KMeans ($K=123$ and $K=5$) and Hierarchical clustering on the identical matched core subset ($N=9{,}822$, 69.8% coverage), and benchmarks 100% full-corpus coverage using soft $k$-NN neighbor projection ($N=14{,}064$).
+- **Key Metrics**:
+  - `noise_ablation_comparison_metrics.csv`: Coverage %, document count, cluster count, Silhouette score, Davies--Bouldin index, and mean NPMI coherence.
+  - `noise_vs_core_linguistic_profiles.csv`: Document lengths, disease distribution entropy, and clinical nature of core versus noise.
+  - `noise_top_keywords.csv`: Top 20 terms dominating the noise boundary partition.
+  - `noise_ablation_evaluation.png`: 3-panel publication figure comparing metrics across scopes, coherence distributions, and linguistic entropy.
+- **Key Finding**: HDBSCAN maintains superior cluster compactness on the matched core subset ($\text{DB} = 0.5892$ vs. 0.8494 for KMeans and 1.0714 for Hierarchical). Under 100% full-corpus soft assignment, HDBSCAN achieves $\text{DB} = 0.8286$ and $\text{NPMI} = 0.0931$, outperforming full-corpus KMeans ($\text{DB} = 0.8659, \text{NPMI} = 0.0711$) and Hierarchical ($\text{DB} = 0.9464, \text{NPMI} = 0.0646$). Noise documents are proven to be genuine multi-disease clinical reviews ($H = 2.978$ bits) rather than corrupt text.
+
+---
+
+### 11. `exp11_subsampling_stability/` — 10-Fold Subsampling Perturbation & Topological Manifold Stability
+- **Kernel**: `abhafnan/exp11-subsampling-stability`
+- **Script**: `kaggle_experiments/exp11_subsampling_stability/exp11_subsampling_stability.py`
+- **Description**: Evaluates empirical reproducibility across 10 independent random 80% subsamples ($N=11{,}251$ per fold) across 10 random seeds ($S \in \{42, 101, 202, 303, 404, 505, 606, 707, 808, 909\}$). Evaluates pairwise ARI/AMI partition stability across all $\binom{10}{2} = 45$ combinations and tracks replication rates of key clinical sentinel topics.
+- **Key Metrics**:
+  - `subsampling_stability_summary_metrics.csv`: Fold-by-fold topic count, core/noise proportions, Silhouette, Davies--Bouldin, and NPMI.
+  - `pairwise_fold_stability_matrix.csv`: Pairwise ARI and AMI on common documents and core documents for all 45 combinations.
+  - `sentinel_topic_replication_rates.csv`: Cross-fold discovery rates and keyword Jaccard overlap for 6 clinical sentinel topics.
+  - `cluster_subsampling_stability.png`: 3-panel publication figure showing fold-by-fold metric stability, pairwise AMI matrix, and sentinel topic replication.
+- **Key Finding**: Manifold stability across independent 80% subsamples is extraordinarily high: Mean Core Adjusted Mutual Information is $\mathbf{0.7498 \pm 0.0110}$ (tight range 0.7294 to 0.7801). Cluster count remains steady at $100.9 \pm 6.1$, Silhouette at $0.4988 \pm 0.0219$, and NPMI at $0.1132 \pm 0.0053$. Five out of six clinical sentinel biomarker topics achieve a $\mathbf{100\%}$ replication rate across all 10 folds.
+

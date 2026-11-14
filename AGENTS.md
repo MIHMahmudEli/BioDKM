@@ -59,25 +59,25 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 | `BioBERT_Results/` | 11 CSVs + 11 PNGs (same structure) |
 | `Coherence_Results/` | 3 CSVs + 4 PNGs (combined metrics, per-topic coherence) |
 | `Manuscript_Results/` | 2 CSVs + 4 PNGs (macro/micro tables, pipeline architecture, comparison figure) |
-| `Q1_Experiments_Results/` | 9 subdirectories containing all empirical CSV metrics and PNG plots for Q1 benchmarks |
-| `kaggle_experiments/` | 9 self-contained reproduction scripts and metadata for cloud execution on Kaggle |
+| `Q1_Experiments_Results/` | 11 subdirectories containing all empirical CSV metrics and PNG plots for Q1 benchmarks |
+| `kaggle_experiments/` | 11 self-contained reproduction scripts and metadata for cloud execution on Kaggle |
 
 ## LaTeX manuscript
 
 - **File**: `AJSE_LaTeX/main.tex`
-- **Output PDF**: `AJSE_LaTeX/main.pdf` (compiled, 19 pages)
+- **Output PDF**: `AJSE_LaTeX/main.pdf` (compiled, exactly 20 pages)
 - **Journal**: AJSE (Arabian Journal for Science and Engineering), IEEEtran format
-- **Specs**: A4, double-blind, max 20 pages, ~180-word abstract (currently 19 pages, strictly under 20-page ceiling)
-- **Status**: Publication-grade manuscript with 40 IEEE references, expanded TikZ architecture diagram, 17 figures, and 13 comprehensive tables.
+- **Specs**: A4, double-blind, max 20 pages, ~180-word abstract (strictly 20 pages, adhering to the 20-page ceiling)
+- **Status**: Publication-grade manuscript with 40 IEEE references, expanded TikZ architecture diagram, 19 figures (18 image plots + 1 TikZ system model), and 15 comprehensive tables.
 
 ### Manuscript sections
 
-1. Title & Abstract (180 words, 5 representations, UMAP, HDBSCAN, baselines, MeSH grounding, disease network)
-2. Introduction (6 RQs, domain context, limitations of prior work, 4 major contributions)
+1. Title & Abstract (180 words, 5 representations, UMAP, HDBSCAN, baselines, MeSH grounding, disease network, noise ablation, stability)
+2. Introduction (6 RQs, domain context, limitations of prior work, 5 major contributions)
 3. Related Work (5 subsections, comprehensive contextualization)
-4. Methodology (8 coordinated stages, TikZ diagram, formal mathematical formulations including MeSH tree depth and comorbidity affinity)
-5. Results (11 empirical subsections including baselines, ablation, disease alignment, hyperparameter sweeps, statistical tests, MeSH ontology grounding, comorbidity network, and expanded transformer benchmark)
-6. Discussion (comprehensive synthesis across all 9 experiments, clinical translation, limitations, energy considerations)
+4. Methodology (8 coordinated stages, TikZ diagram, formal mathematical formulations including MeSH tree depth, comorbidity affinity, matched-core noise ablation, and 10-fold subsampling stability)
+5. Results (13 empirical subsections including baselines, ablation, disease alignment, hyperparameter sweeps, statistical tests, MeSH ontology grounding, comorbidity network, expanded transformer benchmark, apples-to-apples noise ablation, and 10-fold subsampling stability)
+6. Discussion (comprehensive synthesis across all 11 experiments, clinical translation, limitations, energy considerations, defense of noise filtering, and topological manifold stability)
 7. Conclusion (crisp summary of principles and future outlook)
 8. References (40 complete IEEE entries)
 
@@ -111,6 +111,8 @@ Or upload `main.tex` + figure CSVs/PNGs to Overleaf project root.
 | `scratch/launch_experiments.py` | Dispatch and push all experiment kernels to Kaggle cloud |
 | `scratch/monitor_and_download.py` | Poll kernel runtimes and pull output CSVs/PNGs locally |
 | `scratch/wait_and_pull.py` | Automatic monitoring loop for kernel outputs |
+| `scratch/launch_stability_noise_experiments.py` | Launch Exp 10 and Exp 11 on Kaggle cloud workers |
+| `scratch/monitor_exp10_exp11.py` | Poll and pull Exp 10 and Exp 11 results locally |
 
 ## Key gotchas
 
