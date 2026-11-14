@@ -21,3 +21,13 @@ run_pipeline_step5_9.py
 *.aux
 *.log
 *.out
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
+
+# Temporary files
+*.tmp
+~*
+.DS_Store
+Thumbs.db
