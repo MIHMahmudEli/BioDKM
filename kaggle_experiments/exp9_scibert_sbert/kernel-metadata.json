@@ -1,0 +1,15 @@
+{
+  "id": "abdullahalsayfan/exp9-scibert-sbert",
+  "title": "exp9-scibert-sbert",
+  "code_file": "exp9_scibert_sbert.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

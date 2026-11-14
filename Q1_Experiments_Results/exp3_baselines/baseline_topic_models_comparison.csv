@@ -1,0 +1,6 @@
+Model_Family,Model,Num_Topics,NPMI_Coherence,Topic_Diversity,Runtime_Seconds
+Classical Probabilistic,LDA (K=5),5,0.1022,0.8,44.14
+Classical Probabilistic,LDA (K=8),8,0.0914,0.7375,41.56
+Neural / Sentence-Transformer,Standard BERTopic (MiniLM),218,0.1995,0.739,70.7
+Proposed Framework,TF-IDF + HDBSCAN (Ours),116,0.1158,0.812,12.4
+Proposed Framework,BioBERT + HDBSCAN (Ours),80,0.1154,0.845,98.2

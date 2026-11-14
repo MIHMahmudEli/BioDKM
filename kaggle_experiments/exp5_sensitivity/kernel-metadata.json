@@ -1,0 +1,14 @@
+{
+  "id": "leyamridha/exp5-hyperparameter-sensitivity",
+  "title": "Exp5 Hyperparameter Sensitivity",
+  "code_file": "exp5_sensitivity.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}

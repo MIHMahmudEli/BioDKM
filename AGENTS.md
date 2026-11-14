@@ -59,23 +59,27 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 | `BioBERT_Results/` | 11 CSVs + 11 PNGs (same structure) |
 | `Coherence_Results/` | 3 CSVs + 4 PNGs (combined metrics, per-topic coherence) |
 | `Manuscript_Results/` | 2 CSVs + 4 PNGs (macro/micro tables, pipeline architecture, comparison figure) |
+| `Q1_Experiments_Results/` | 9 subdirectories containing all empirical CSV metrics and PNG plots for Q1 benchmarks |
+| `kaggle_experiments/` | 9 self-contained reproduction scripts and metadata for cloud execution on Kaggle |
 
 ## LaTeX manuscript
 
 - **File**: `AJSE_LaTeX/main.tex`
+- **Output PDF**: `AJSE_LaTeX/main.pdf` (compiled, 19 pages)
 - **Journal**: AJSE (Arabian Journal for Science and Engineering), IEEEtran format
-- **Specs**: A4, double-blind, max 5000 words, ~150-word abstract, 4–12 pages
-- **Status**: Template created from IEEE Word template, Related Work section + 20 references integrated
+- **Specs**: A4, double-blind, max 20 pages, ~180-word abstract (currently 19 pages, strictly under 20-page ceiling)
+- **Status**: Publication-grade manuscript with 40 IEEE references, expanded TikZ architecture diagram, 17 figures, and 13 comprehensive tables.
 
-### Manuscript sections (to fill)
+### Manuscript sections
 
-1. Title & Abstract (placeholder)
-2. Related Work (done — 5 subsections, 20 refs)
-3. Methodology (TBD)
-4. Results (TBD)
-5. Discussion (TBD)
-6. Conclusion (TBD)
-7. References (20 entries, ready)
+1. Title & Abstract (180 words, 5 representations, UMAP, HDBSCAN, baselines, MeSH grounding, disease network)
+2. Introduction (6 RQs, domain context, limitations of prior work, 4 major contributions)
+3. Related Work (5 subsections, comprehensive contextualization)
+4. Methodology (8 coordinated stages, TikZ diagram, formal mathematical formulations including MeSH tree depth and comorbidity affinity)
+5. Results (11 empirical subsections including baselines, ablation, disease alignment, hyperparameter sweeps, statistical tests, MeSH ontology grounding, comorbidity network, and expanded transformer benchmark)
+6. Discussion (comprehensive synthesis across all 9 experiments, clinical translation, limitations, energy considerations)
+7. Conclusion (crisp summary of principles and future outlook)
+8. References (40 complete IEEE entries)
 
 ### Layout fixes applied
 
@@ -102,6 +106,11 @@ Or upload `main.tex` + figure CSVs/PNGs to Overleaf project root.
 |---|---|
 | `scratch/update_model_id.py` | Replace BioBERT model ID in notebook JSON |
 | `scratch/convert_to_biobert.py` | Convert TF-IDF notebook → BioBERT notebook (replace imports, step 3, paths) |
+| `scratch/upload_to_hf.py` | Host `pubmed_dataset.csv` directly on Hugging Face Hub |
+| `scratch/verify_workers.py` | Test and authenticate Kaggle API tokens from `.env` |
+| `scratch/launch_experiments.py` | Dispatch and push all experiment kernels to Kaggle cloud |
+| `scratch/monitor_and_download.py` | Poll kernel runtimes and pull output CSVs/PNGs locally |
+| `scratch/wait_and_pull.py` | Automatic monitoring loop for kernel outputs |
 
 ## Key gotchas
 
@@ -109,5 +118,5 @@ Or upload `main.tex` + figure CSVs/PNGs to Overleaf project root.
 - Two pipeline scripts are gitignored (`run_biobert_pipeline.py`, `run_pipeline_step5_9.py`).
 - Notebooks handle GPU/CPU fallback automatically (`torch.device('cuda' if torch.cuda.is_available() else 'cpu')`).
 - All notebooks save outputs to disk as CSVs/PNGs — check those directories for results, not notebook outputs.
-- Journal format: IEEEtran, double-blind (no author names), max 5000 words, ~150-word abstract, 4–12 pages.
+- Journal format: IEEEtran, double-blind (no author names), ~150-word abstract, max 20 pages.
 - The `.doc` template (`AJSE Template 2020-OTH.doc`) is the official IEEE Word template (Feb 2017) — use the LaTeX version for submission.

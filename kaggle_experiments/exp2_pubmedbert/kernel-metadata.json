@@ -1,0 +1,14 @@
+{
+  "id": "tasnimjenny/exp2-pubmedbert-benchmark",
+  "title": "Exp2 PubMedBERT Benchmark",
+  "code_file": "exp2_pubmedbert.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}
