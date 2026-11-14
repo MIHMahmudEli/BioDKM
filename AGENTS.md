@@ -69,6 +69,7 @@ HDBSCAN produces many more fine-grained topics with higher coherence. TF-IDF and
 - **Journal**: AJSE (Arabian Journal for Science and Engineering), IEEEtran format
 - **Specs**: A4, double-blind, max 20 pages, ~180-word abstract (strictly 20 pages, adhering to the 20-page ceiling)
 - **Status**: Publication-grade manuscript with 40 IEEE references, expanded TikZ architecture diagram, 19 figures, and 16 comprehensive tables.
+- **Figures Directory**: `AJSE_LaTeX/figures/` (self-contained directory containing all 18 manuscript image figures + standalone vector/raster architecture diagrams).
 
 ### Manuscript sections
 
